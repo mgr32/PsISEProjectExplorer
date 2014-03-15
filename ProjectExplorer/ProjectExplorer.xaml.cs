@@ -37,6 +37,29 @@ namespace ProjectExplorer
 
         private DocumentHierarchySearcher DocumentHierarchySearcher;
 
+        private TreeViewEntryItem rootTreeViewEntryItem;
+
+        public TreeViewEntryItem RootTreeViewEntryItem
+        {
+            get { return this.rootTreeViewEntryItem; }
+            set
+            {
+                this.rootTreeViewEntryItem = value;
+                this.PropertyChanged(this, new PropertyChangedEventArgs("TreeViewItems"));
+            }
+        }
+
+        public IList<TreeViewEntryItem> TreeViewItems
+        {
+            get
+            {
+                if (this.RootTreeViewEntryItem == null)
+                {
+                    return new List<TreeViewEntryItem>();
+                }
+                return this.RootTreeViewEntryItem.Children;
+            }
+        }
 
         private void OnIseTabChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -154,14 +177,7 @@ namespace ProjectExplorer
             {
                 this.ReindexSearchTree();
             }
-            
-                /*this.SearchResults.Items.Clear();
-            //AddItemsFromDirectory(this.SearchResults.Items, this.RootDirectoryToSearch);
-
-            foreach (DirectoryEntryItem model in DirectoryModelFactory.GetDirectoryEntryItems(this.RootDirectoryToSearch)) {
-                this.SearchResults.Items.Add(model);
-            }*/
-           
+                       
         }
 
         private void ReindexSearchTree()
@@ -194,66 +210,23 @@ namespace ProjectExplorer
         {
             this.SearchingInProgress = false;
             INode node = (INode)e.Result;
-            this.SearchResults.Items.Clear();
             bool expandNodes = !String.IsNullOrWhiteSpace(this.SearchText);
-            this.MapToTreeViewEntryItem(node, this.SearchResults, expandNodes);
+            var rootEntryItem = new TreeViewEntryItem(node);
+            this.MapToTreeViewEntryItem(node, rootEntryItem, expandNodes);
+            this.RootTreeViewEntryItem = rootEntryItem;
            
         }
 
-        private void MapToTreeViewEntryItem(INode node, ItemsControl itemsControl, bool expandNodes)
+        private void MapToTreeViewEntryItem(INode node, TreeViewEntryItem treeViewEntryItem, bool expandNodes)
         {
             foreach (INode child in node.Children)
             {
                 TreeViewEntryItem newItem = new TreeViewEntryItem(child);
                 newItem.IsExpanded = expandNodes;
-                itemsControl.Items.Add(newItem);
+                treeViewEntryItem.Children.Add(newItem);
                 this.MapToTreeViewEntryItem(child, newItem, expandNodes);
             }
         }
-
-        private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            // Clear the previous results
-            this.SearchResults.Items.Clear();
-            
-            //HostObject.CurrentPowerShellTab.Files.SelectedFile.FullPath
-            /*
-            // Break the file into its lines
-            string[] lineBreakers = new string[] { "\r\n" };
-            string[] fileText = HostObject.CurrentPowerShellTab.Files.SelectedFile.Editor.Text.Split(
-                lineBreakers, StringSplitOptions.None);
-
-            // Try to see if their search text represents a Regular Expression
-            Regex searchRegex = null;
-            try
-            {
-                searchRegex = new Regex(this.SearchText.Text, RegexOptions.IgnoreCase);
-            }
-            catch (ArgumentException)
-            {
-                // Ignore the ArgumentException that we get if the regular expression is
-                // not valid.
-            }
-
-            // Go through all of the lines in the file
-            for (int lineNumber = 0; lineNumber < fileText.Length; lineNumber++)
-            {
-                // See if the line matches the regex or literal text
-                if (
-                    ((searchRegex != null) && (searchRegex.IsMatch(fileText[lineNumber]))) ||
-                    (fileText[lineNumber].IndexOf(this.SearchText.Text, StringComparison.CurrentCultureIgnoreCase) >= 0))
-                {
-                    // If so, add it to the search results box.
-                    SearchResult result = new SearchResult()
-                    {
-                        Line = lineNumber + 1,
-                        Content = fileText[lineNumber]
-                    };
-                    this.SearchResults.Items.Add(result);
-                }
-            }*/
-        }
-
 
         private void SearchResults_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -272,6 +245,7 @@ namespace ProjectExplorer
             TreeViewEntryItem selectedItem = (TreeViewEntryItem)this.SearchResults.SelectedItem;
             if (selectedItem != null)
             {
+                // TODO: ensure it's file
                 HostObject.CurrentPowerShellTab.Files.Add(selectedItem.DocumentHierarchyNode.Path);
             }
         }
