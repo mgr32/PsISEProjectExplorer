@@ -1,6 +1,6 @@
-﻿using ProjectExplorer.DocHierarchy;
-using ProjectExplorer.DocHierarchy.HierarchyLogic;
-using ProjectExplorer.TreeView;
+﻿using PsISEProjectExplorer.DocHierarchy;
+using PsISEProjectExplorer.DocHierarchy.HierarchyLogic;
+using PsISEProjectExplorer.TreeView;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer
+namespace PsISEProjectExplorer
 {
     public class BackgroundIndexer : BackgroundWorker
     {

@@ -1,6 +1,6 @@
-﻿using ProjectExplorer.DocHierarchy.FullText;
-using ProjectExplorer.DocHierarchy.Nodes;
-using ProjectExplorer.EnumsAndOptions;
+﻿using PsISEProjectExplorer.DocHierarchy.FullText;
+using PsISEProjectExplorer.DocHierarchy.Nodes;
+using PsISEProjectExplorer.EnumsAndOptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.DocHierarchy.HierarchyLogic
+namespace PsISEProjectExplorer.DocHierarchy.HierarchyLogic
 {
     public class DocumentHierarchy
     {

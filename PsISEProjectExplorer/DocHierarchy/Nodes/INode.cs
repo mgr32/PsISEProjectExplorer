@@ -1,11 +1,11 @@
-﻿using ProjectExplorer.EnumsAndOptions;
+﻿using PsISEProjectExplorer.EnumsAndOptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.DocHierarchy.Nodes
+namespace PsISEProjectExplorer.DocHierarchy.Nodes
 {
     public interface INode
     {

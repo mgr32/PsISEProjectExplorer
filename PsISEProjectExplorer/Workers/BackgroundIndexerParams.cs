@@ -1,12 +1,12 @@
-﻿using ProjectExplorer.DocHierarchy;
-using ProjectExplorer.DocHierarchy.HierarchyLogic;
+﻿using PsISEProjectExplorer.DocHierarchy;
+using PsISEProjectExplorer.DocHierarchy.HierarchyLogic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer
+namespace PsISEProjectExplorer
 {
     public class BackgroundIndexerParams
     {

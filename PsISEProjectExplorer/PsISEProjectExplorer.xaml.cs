@@ -1,10 +1,10 @@
 ﻿using Microsoft.PowerShell.Host.ISE;
-using ProjectExplorer.DocHierarchy;
-using ProjectExplorer.DocHierarchy.FullText;
-using ProjectExplorer.DocHierarchy.HierarchyLogic;
-using ProjectExplorer.DocHierarchy.Nodes;
-using ProjectExplorer.EnumsAndOptions;
-using ProjectExplorer.TreeView;
+using PsISEProjectExplorer.DocHierarchy;
+using PsISEProjectExplorer.DocHierarchy.FullText;
+using PsISEProjectExplorer.DocHierarchy.HierarchyLogic;
+using PsISEProjectExplorer.DocHierarchy.Nodes;
+using PsISEProjectExplorer.EnumsAndOptions;
+using PsISEProjectExplorer.TreeView;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -24,7 +24,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 
-namespace ProjectExplorer
+namespace PsISEProjectExplorer
 {
     /// <summary>
     /// Interaction logic for UserControl1.xaml

@@ -7,7 +7,7 @@ using System.Management.Automation;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.DocHierarchy.HierarchyLogic
+namespace PsISEProjectExplorer.DocHierarchy.HierarchyLogic
 {
     public class FileSystemParser
     {

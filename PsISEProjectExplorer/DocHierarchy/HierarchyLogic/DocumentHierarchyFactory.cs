@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.DocHierarchy.HierarchyLogic
+namespace PsISEProjectExplorer.DocHierarchy.HierarchyLogic
 {
     public class DocumentHierarchyFactory
     {

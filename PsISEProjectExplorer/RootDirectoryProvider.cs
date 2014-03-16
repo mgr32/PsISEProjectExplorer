@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer
+namespace PsISEProjectExplorer
 {
     public class RootDirectoryProvider
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.DocHierarchy.FullText
+namespace PsISEProjectExplorer.DocHierarchy.FullText
 {
     /// <summary>
     /// Custom Lucene Analyzer - like SimpleAnalyzer but treats numbers as text.

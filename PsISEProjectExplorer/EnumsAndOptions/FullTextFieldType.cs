@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.EnumsAndOptions 
+namespace PsISEProjectExplorer.EnumsAndOptions 
 {
     public enum FullTextFieldType
     {

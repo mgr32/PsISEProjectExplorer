@@ -1,12 +1,12 @@
-﻿using ProjectExplorer.DocHierarchy.HierarchyLogic;
-using ProjectExplorer.EnumsAndOptions;
+﻿using PsISEProjectExplorer.DocHierarchy.HierarchyLogic;
+using PsISEProjectExplorer.EnumsAndOptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.DocHierarchy.Nodes
+namespace PsISEProjectExplorer.DocHierarchy.Nodes
 {
     public class PowershellFunctionNode : AbstractNode
     {

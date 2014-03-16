@@ -2,9 +2,24 @@
 
 ##### Description
 
-Enables exploring and full-text searching whole directory structure containing Powershell scripts. It visualizes directory structure in a Solution Explorer-like tree view, but also including Powershell functions in leaf levels (thus can also be used as Function Explorer).
-
 Project not released yet.
+
+Provides a tree view that enables to index and explore whole directory structure containing Powershell scripts. It has following features:
+
+* Visualize directory structure (also files not loaded to ISE yet) in a Solution Explorer-like tree view.
+* Show functions in leafs of the tree view and enable to jump to the function definition (similarly to some available Function Explorer plugins).
+* Search the tree view (file names, function names, optionally file contents).
+
+##### Installation
+
+* Run Install_to_UserModules.bat or copy PSISEProjectExplorer folder manually to $env:USERPROFILE\Documents\WindowsPowerShell\Modules.
+* Launch PowerShell ISE
+* Run 'Import-Module PsISEProjectExplorer'
+* If you want it to be loaded automatically, add the line above to your ISE profile (see $profile).
+
+##### Why?
+
+Because I work on complex Powershell modules with lots of functions, and navigating between them in ISE is painful. I wasn't able to find an ISE plugin that could search through whole directory structure, without requiring the user to load the files into the ISE first. Also, I was lacking 'Go to Definition' and 'Find all references' features from Visual Studio.
 
 ##### Implementation details
 
