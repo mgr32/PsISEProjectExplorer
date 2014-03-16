@@ -142,11 +142,28 @@ namespace PsISEProjectExplorer
             }
         }
 
+        private bool searchInFiles;
+
+        public bool SearchInFiles
+        {
+            get { return this.searchInFiles; }
+            set
+            {
+                this.searchInFiles = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("SearchInFiles"));
+                if (!String.IsNullOrEmpty(this.SearchText))
+                {
+                    this.searchOptions.SearchField = (this.searchInFiles ? FullTextFieldType.CATCH_ALL : FullTextFieldType.NAME);
+                    this.RunSearch();
+                }
+            }
+        }
+
         private bool searchTreeInitialized;
 
         public string RootDirectoryLabel
         {
-            get { return "Search in directory " + RootDirectoryToSearch; }
+            get { return "Project root: " + RootDirectoryToSearch; }
         }
 
         private SearchOptions searchOptions = new SearchOptions();
@@ -165,7 +182,7 @@ namespace PsISEProjectExplorer
         {
             this.DataContext = this;
             this.searchOptions.IncludeAllParents = true;
-            this.searchOptions.SearchField = FullTextFieldType.CATCH_ALL;
+            this.searchOptions.SearchField = FullTextFieldType.NAME;
             this.backgroundIndexer.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundIndexerWorkCompleted);
             this.backgroundSearcher.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundSearcherWorkCompleted);
             InitializeComponent();
@@ -174,10 +191,11 @@ namespace PsISEProjectExplorer
 
         private void RefreshSearchTree()
         {
-            string oldRootDirectoryToSearch = this.rootDirectoryToSearch;
-            this.RootDirectoryToSearch = RootDirectoryProvider.GetRootDirectoryToSearch(HostObject.CurrentPowerShellTab.Files.SelectedFile.FullPath);
-            if (oldRootDirectoryToSearch != this.RootDirectoryToSearch)
+            var selectedFile = HostObject.CurrentPowerShellTab.Files.SelectedFile;
+            string newRootDirectoryToSearch = selectedFile == null ? null : RootDirectoryProvider.GetRootDirectoryToSearch(selectedFile.FullPath);
+            if (newRootDirectoryToSearch != null && (this.RootDirectoryToSearch == null || !newRootDirectoryToSearch.StartsWith(this.RootDirectoryToSearch)))
             {
+                this.RootDirectoryToSearch = newRootDirectoryToSearch;
                 this.ReindexSearchTree();
             }
                        
@@ -185,6 +203,7 @@ namespace PsISEProjectExplorer
 
         private void ReindexSearchTree()
         {
+            this.searchTreeInitialized = false;
             BackgroundIndexerParams indexerParams = new BackgroundIndexerParams(this.DocumentHierarchies, this.rootDirectoryToSearch, null);
             this.IndexingInProgress = true;
             this.backgroundIndexer.RunWorkerAsync(indexerParams);

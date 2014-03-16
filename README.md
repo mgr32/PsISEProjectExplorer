@@ -2,7 +2,7 @@
 
 ##### Description
 
-Project not released yet.
+Project not released yet - you can compile it manually or wait for first official release.
 
 Provides a tree view that enables to index and explore whole directory structure containing Powershell scripts. It has following features:
 
@@ -16,6 +16,13 @@ Provides a tree view that enables to index and explore whole directory structure
 * Launch PowerShell ISE
 * Run 'Import-Module PsISEProjectExplorer'
 * If you want it to be loaded automatically, add the line above to your ISE profile (see $profile).
+
+##### Usage
+
+When you open a Powershell file in ISE, Project Explorer will automatically set its project root directory to the first parent directory of the opened file where a .psm1 file resides. If there's no .psm1 file in any parent directory, it will take the last parent containing .ps1 files.
+
+This is assuming you'll be working on a single Powershell module with subdirectories. When you load a file from another module (which is not a submodule of the current one), the root directory will be updated. Indexes for the previous module will not be deleted.
+If this is not enough for your work, please create an issue with a suggestion how to improve.
 
 ##### Why?
 
