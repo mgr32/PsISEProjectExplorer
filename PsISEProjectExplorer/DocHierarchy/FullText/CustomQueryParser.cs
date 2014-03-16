@@ -47,10 +47,10 @@ namespace PsISEProjectExplorer.DocHierarchy.FullText
         private IEnumerable<string> Tokenize(string text)
         {
             IList<string> tokens = new List<string>();
-            int startPos = 0;
             int tokenLen = 0;
 
             int len = text.Length;
+            char[] buf = new char[255];
             for (int i = 0; i <= len; i++)
             {
                 char c = '\x00';
@@ -60,17 +60,20 @@ namespace PsISEProjectExplorer.DocHierarchy.FullText
                 }
                 if (i != len && TokenizeRules.IsTokenChar(c))
                 {
+                    buf[tokenLen] = c;
                     tokenLen++;
+                    if (tokenLen > 255)
+                    {
+                        throw new InvalidOperationException("Token longer than 255 characters.");
+                    }
                 }
                 else
                 {
                     // we're not interested in tokens shorter than 2 chars
                     if (tokenLen >= 1)
                     {
-                        // not optimal but this is only for short input string
-                        tokens.Add(text.Substring(startPos, tokenLen));
+                        tokens.Add(new string(buf, 0, tokenLen));
                     }
-                    startPos = startPos + tokenLen + 1;
                     tokenLen = 0;
                 }
             }
