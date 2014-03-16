@@ -28,7 +28,7 @@ namespace PsISEProjectExplorer.Services
             }
 
             INode newRoot = new RootNode(this.DocumentHierarchy.RootNode.Path);
-            IEnumerable<INode> nodes = this.DocumentHierarchy.SearchNodesFullText(filter, searchOptions);
+            IEnumerable<INode> nodes = this.DocumentHierarchy.SearchNodesFullText(filter, searchOptions.SearchField);
             if (searchOptions.IncludeAllParents)
             {
                 this.FillNewFilteredDocumentHierarchyRecursively(nodes, newRoot, this.DocumentHierarchy.RootNode);
@@ -39,6 +39,11 @@ namespace PsISEProjectExplorer.Services
             }
         
            return newRoot;
+        }
+
+        public INode GetFunctionNodeByName(string name)
+        {
+            return this.DocumentHierarchy.SearchNodesByTerm(name, FullTextFieldType.NAME_NOT_ANALYZED).Where(node => node.NodeType == NodeType.FUNCTION).FirstOrDefault();
         }
 
         private void FillNewDocumentHierarchyRecursively(IEnumerable<INode> filteredNodes, INode newParent) 

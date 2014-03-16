@@ -64,13 +64,14 @@
   <ItemGroup>
     <Compile Include="FullText\TokenizeRules.cs" />
     <Compile Include="Model\DocHierarchy\DocumentHierarchy.cs" />
+    <Compile Include="Model\EditorInfo.cs" />
     <Compile Include="Services\DocumentHierarchyIndexer.cs" />
     <Compile Include="Services\FileSystemParser.cs" />
     <Compile Include="EnumsAndOptions\FullTextFieldType.cs" />
     <Compile Include="FullText\CustomAnalyzer.cs" />
     <Compile Include="FullText\CustomQueryParser.cs" />
     <Compile Include="FullText\CustomTokenizer.cs" />
-    <Compile Include="FullText\DocumentCreator.cs" />
+    <Compile Include="FullText\DocumentFactory.cs" />
     <Compile Include="Model\DocHierarchy\Nodes\DefaultNodeComparer.cs" />
     <Compile Include="Model\DocHierarchy\Nodes\INode.cs" />
     <Compile Include="Model\DocHierarchy\Nodes\PowershellFunctionNode.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Model\DocHierarchy\Nodes\ViewNode.cs" />
     <Compile Include="Model\PowershellFunction.cs" />
     <Compile Include="EnumsAndOptions\NodeType.cs" />
+    <Compile Include="Services\PowershellTokenizer.cs" />
     <Compile Include="UI\IseIntegration\IseEventArgs.cs" />
     <Compile Include="UI\IseIntegration\IseIntegrator.cs" />
     <Compile Include="UI\ViewModel\BaseViewModel.cs" />
@@ -103,7 +105,7 @@
     <Compile Include="UI\ViewModel\TreeViewEntryItem.cs" />
     <Compile Include="Services\DocumentHierarchyFactory.cs" />
     <Compile Include="Services\DocumentHierarchySearcher.cs" />
-    <Compile Include="RootDirectoryProvider.cs" />
+    <Compile Include="Services\RootDirectoryProvider.cs" />
     <Compile Include="PsISEProjectExplorer.xaml.cs">
       <DependentUpon>PsISEProjectExplorer.xaml</DependentUpon>
       <SubType>Code</SubType>

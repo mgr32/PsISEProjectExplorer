@@ -26,7 +26,7 @@ namespace PsISEProjectExplorer.FullText
 
         private CustomQueryParser CustomQueryParser { get; set; }
 
-        public DocumentCreator DocumentCreator { get; private set; }
+        public DocumentFactory DocumentCreator { get; private set; }
 
         public FullTextDirectory()
         {
@@ -35,9 +35,22 @@ namespace PsISEProjectExplorer.FullText
             this.IndexWriter = new IndexWriter(this.LuceneDirectory, this.Analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
             this.IndexReader = this.IndexWriter.GetReader();
             this.CustomQueryParser = new CustomQueryParser(this.Analyzer);
-            this.DocumentCreator = new DocumentCreator(this.IndexWriter);
+            this.DocumentCreator = new DocumentFactory(this.IndexWriter);
         }
+
+        public IEnumerable<string> SearchTerm(string searchTerm, FullTextFieldType field)
+        {
+            Query query = new TermQuery(new Term(field.ToString(), searchTerm));
+            return this.RunQuery(query);   
+        }
+
         public IEnumerable<string> Search(string searchText, FullTextFieldType field)
+        {
+            Query query = this.CustomQueryParser.Parse(searchText, field.ToString());
+            return this.RunQuery(query);
+        }
+
+        private IEnumerable<string> RunQuery(Query query)
         {
             IndexReader newReader = this.IndexReader.Reopen();
             if (newReader != this.IndexReader)
@@ -46,15 +59,14 @@ namespace PsISEProjectExplorer.FullText
                 this.IndexReader = newReader;
             }
             IndexSearcher searcher = new IndexSearcher(this.IndexReader);
-            Query query = this.CustomQueryParser.Parse(searchText, field.ToString());
             if (query == null)
             {
-                return Enumerable.Empty<string>(); 
+                return Enumerable.Empty<string>();
             }
             TopDocs hits = searcher.Search(query, 1000);
             IEnumerable<string> paths = hits.ScoreDocs.Select(scoreDoc => searcher.Doc(scoreDoc.Doc).Get(FullTextFieldType.PATH.ToString()));
             return paths;
-        }     
+        }
 
     }
 }
