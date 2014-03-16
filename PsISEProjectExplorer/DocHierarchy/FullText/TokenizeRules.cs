@@ -8,7 +8,7 @@ namespace ProjectExplorer.DocHierarchy.FullText
 {
     public class TokenizeRules
     {
-        private static char[] TOKEN_SEPARATORS = new char[] { '-', '.', ',' };
+        private static char[] TOKEN_SEPARATORS = new char[] { '-', '.', ',', ':' };
 
         public static bool IsTokenChar(char c)
         {

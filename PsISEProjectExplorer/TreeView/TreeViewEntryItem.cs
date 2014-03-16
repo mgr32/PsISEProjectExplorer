@@ -35,16 +35,7 @@ namespace ProjectExplorer.TreeView
         {
             get
             {
-                INode node = this.Node;
-                if (node is DirectoryNode)
-                {
-                    return "Resources/folder.png";
-                }
-                else if (node is FileNode)
-                {
-                    return "Resources/page_white.png";
-                }
-                return null;
+                return "Resources/" + this.Node.NodeType.ToString().ToLowerInvariant() + ".png";
             }
         }
 
@@ -58,12 +49,16 @@ namespace ProjectExplorer.TreeView
 
         public bool IsExpanded { get; set; }
 
-        public ObservableCollection<TreeViewEntryItem> Children { get; set; }
+        public IList<TreeViewEntryItem> Children { get; set; }
 
         public TreeViewEntryItem(INode node)
         {
+            if (node == null)
+            {
+                throw new ArgumentNullException("node");
+            }
             this.DocumentHierarchyNode = node;
-            this.Children = new ObservableCollection<TreeViewEntryItem>();
+            this.Children = new List<TreeViewEntryItem>();
         }
     }
 }

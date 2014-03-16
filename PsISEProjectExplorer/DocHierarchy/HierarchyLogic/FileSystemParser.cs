@@ -31,6 +31,7 @@ namespace ProjectExplorer.DocHierarchy.HierarchyLogic
         {
             this.Path = path;
             this.IsDirectory = isDirectory;
+            this.PowershellFunctions = new List<PowershellFunction>();
             if (!this.IsDirectory)
             {
                 this.ParseFile();
@@ -56,8 +57,8 @@ namespace ProjectExplorer.DocHierarchy.HierarchyLogic
             }
             Collection<PSParseError> errors;
             IEnumerable<PSToken> tokens = PSParser.Tokenize(this.FileContents, out errors);
+            IList<PowershellFunction> functions = (IList<PowershellFunction>)this.PowershellFunctions;
             bool nextTokenIsFunction = false;
-            IList<PowershellFunction> functions = new List<PowershellFunction>();
             foreach (PSToken token in tokens)
             {
                 if (nextTokenIsFunction)

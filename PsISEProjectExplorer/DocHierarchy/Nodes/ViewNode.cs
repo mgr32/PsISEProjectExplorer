@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProjectExplorer.EnumsAndOptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,8 @@ namespace ProjectExplorer.DocHierarchy.Nodes
 {
     public class ViewNode : INode
     {
+        public NodeType NodeType { get { return NodeType.INTERMEDIATE; } }
+
         public INode Node { get; private set; }
 
         public string Path
