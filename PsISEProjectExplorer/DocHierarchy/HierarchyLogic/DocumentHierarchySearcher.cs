@@ -1,5 +1,6 @@
 ﻿using ProjectExplorer.DocHierarchy;
 using ProjectExplorer.DocHierarchy.Nodes;
+using ProjectExplorer.EnumsAndOptions;
 using System;
 using System.Collections.Generic;
 using System.IO;

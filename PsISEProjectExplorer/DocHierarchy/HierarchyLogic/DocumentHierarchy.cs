@@ -1,5 +1,6 @@
 ﻿using ProjectExplorer.DocHierarchy.FullText;
 using ProjectExplorer.DocHierarchy.Nodes;
+using ProjectExplorer.EnumsAndOptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,7 +70,7 @@ namespace ProjectExplorer.DocHierarchy.HierarchyLogic
                 {
                     node = this.CreateNewIntermediateDirectoryNode(currentAbsolutePath, segment, currentNode);
                 }
-                currentNode = (FileSystemNode)node;
+                currentNode = (INode)node;
             }
             return currentNode;
         }
@@ -78,16 +79,22 @@ namespace ProjectExplorer.DocHierarchy.HierarchyLogic
         {
             INode node = new DirectoryNode(absolutePath, segment, parent);
             this.NodeMap.Add(absolutePath, node);
-            this.FullTextDirectory.AddDirectoryEntry(absolutePath, segment);
+            this.FullTextDirectory.DocumentCreator.AddDirectoryEntry(absolutePath, segment);
             return node;
         }
 
         private INode CreateNewFileNode(FileSystemParser parser, INode parent)
         {
-            INode node = new FileNode(parser.Path, parser.FileName, parent);
-            this.NodeMap.Add(parser.Path, node);
-            this.FullTextDirectory.AddFileEntry(parser);
-            return node;
+            INode fileNode = new FileNode(parser.Path, parser.FileName, parent);
+            this.NodeMap.Add(parser.Path, fileNode);
+            this.FullTextDirectory.DocumentCreator.AddFileEntry(parser);
+            foreach (PowershellFunction func in parser.PowershellFunctions)
+            {
+                INode functionNode = new PowershellFunctionNode(parser.Path, func, fileNode);
+                this.NodeMap.Add(functionNode.Path, functionNode);
+                this.FullTextDirectory.DocumentCreator.AddFunctionEntry(functionNode.Path, func.Name);
+            }
+            return fileNode;
         }
     }
 }

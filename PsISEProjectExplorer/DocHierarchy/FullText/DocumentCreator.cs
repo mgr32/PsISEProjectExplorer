@@ -1,6 +1,7 @@
 ﻿using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using ProjectExplorer.DocHierarchy.HierarchyLogic;
+using ProjectExplorer.EnumsAndOptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +22,16 @@ namespace ProjectExplorer.DocHierarchy.FullText
         public void AddDirectoryEntry(string path, string segment)
         {
             this.CreateDocument(path, segment, string.Empty);
-            
         }
 
         public void AddFileEntry(FileSystemParser parser)
         {
             this.CreateDocument(parser.Path, parser.FileName, parser.FileContents);
+        }
+
+        public void AddFunctionEntry(string path, string name)
+        {
+            this.CreateDocument(path, name, string.Empty);
         }
 
         private void CreateDocument(string path, string name, string contents)

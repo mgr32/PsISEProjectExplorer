@@ -3,6 +3,7 @@ using ProjectExplorer.DocHierarchy;
 using ProjectExplorer.DocHierarchy.FullText;
 using ProjectExplorer.DocHierarchy.HierarchyLogic;
 using ProjectExplorer.DocHierarchy.Nodes;
+using ProjectExplorer.EnumsAndOptions;
 using ProjectExplorer.TreeView;
 using System;
 using System.Collections.Generic;
@@ -81,8 +82,7 @@ namespace ProjectExplorer
 
         private ObjectModelRoot hostObject;
 
-        // Populated by the ISE because we implement the IAddOnToolHostObject interface.
-        // Represents the entry-point to the ISE object model.
+         // Entry point to the ISE object model.
         public ObjectModelRoot HostObject
         {
             get { return hostObject; }
@@ -213,6 +213,11 @@ namespace ProjectExplorer
         {
             this.SearchingInProgress = false;
             INode node = (INode)e.Result;
+            if (node == null)
+            {
+                this.RootTreeViewEntryItem = null;
+                return;
+            }
             bool expandNodes = !String.IsNullOrWhiteSpace(this.SearchText);
             var rootEntryItem = new TreeViewEntryItem(node);
             this.MapToTreeViewEntryItem(node, rootEntryItem, expandNodes);
@@ -243,17 +248,23 @@ namespace ProjectExplorer
                 SelectItem();
             }
         }
+
         private void SelectItem()
         {
             TreeViewEntryItem selectedItem = (TreeViewEntryItem)this.SearchResults.SelectedItem;
             if (selectedItem != null)
             {
-                
-                // TODO: ensure it's file
-                HostObject.CurrentPowerShellTab.Files.Add(selectedItem.Node.Path);
+                if (selectedItem.Node.NodeType == NodeType.FILE)
+                {
+                    HostObject.CurrentPowerShellTab.Files.Add(selectedItem.Node.Path);
+                }
+                else if (selectedItem.Node.NodeType == NodeType.FUNCTION)
+                {
+                    PowershellFunctionNode node = ((PowershellFunctionNode)selectedItem.Node);
+                    HostObject.CurrentPowerShellTab.Files.Add(node.FilePath);
+                    HostObject.CurrentPowerShellTab.Files.SelectedFile.Editor.SetCaretPosition(node.PowershellFunction.StartLine, node.PowershellFunction.StartColumn);
+                }
             }
         }
-
-        
     }
 }

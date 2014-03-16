@@ -7,6 +7,7 @@ using Lucene.Net.Search;
 using Lucene.Net.Store;
 using ProjectExplorer.DocHierarchy.FullText;
 using ProjectExplorer.DocHierarchy.HierarchyLogic;
+using ProjectExplorer.EnumsAndOptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace ProjectExplorer.DocHierarchy.FullText
 
         private CustomQueryParser CustomQueryParser { get; set; }
 
-        private DocumentCreator DocumentCreator { get; set; }
+        public DocumentCreator DocumentCreator { get; private set; }
 
         public FullTextDirectory()
         {
@@ -38,17 +39,6 @@ namespace ProjectExplorer.DocHierarchy.FullText
             this.CustomQueryParser = new CustomQueryParser(this.Analyzer);
             this.DocumentCreator = new DocumentCreator(this.IndexWriter);
         }
-
-        public void AddDirectoryEntry(string path, string segment)
-        {
-            this.DocumentCreator.AddDirectoryEntry(path, segment);
-        }
-
-        public void AddFileEntry(FileSystemParser parser)
-        {
-            this.DocumentCreator.AddFileEntry(parser);
-        }
-
         public IEnumerable<string> Search(string searchText, FullTextFieldType field)
         {
             IndexReader newReader = this.IndexReader.Reopen();

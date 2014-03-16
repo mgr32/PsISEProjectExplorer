@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProjectExplorer.EnumsAndOptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ namespace ProjectExplorer.DocHierarchy.Nodes
 {
     public abstract class AbstractNode : INode
     {
+        public abstract NodeType NodeType { get; }
         public virtual string Path { get; private set; }
         public virtual string Name { get; private set; }
         public INode Parent { get; private set; }
@@ -15,6 +17,8 @@ namespace ProjectExplorer.DocHierarchy.Nodes
 
         // less = will be before other nodes
         public virtual int OrderValue { get { return 0; } }
+
+        
 
         public AbstractNode(string path, string name, INode parent)
         {
