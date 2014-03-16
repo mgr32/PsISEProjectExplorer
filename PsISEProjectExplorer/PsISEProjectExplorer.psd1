@@ -73,7 +73,7 @@ CLRVersion = '4.0'
 ModuleList = @('PsISEProjectExplorer.psm1')
 
 # List of all files packaged with this module
-FileList = @('PsISEProjectExplorer.psm1', 'PsISEProjectExplorer.psd1', 'PsISEProjectExplorer.dll', 'Lucene.Net.dll', 'ICSharpCode.SharpZipLib.dll')
+FileList = @('PsISEProjectExplorer.psm1', 'PsISEProjectExplorer.psd1', 'PsISEProjectExplorer.dll', 'Lucene.Net.dll')
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
 # PrivateData = ''
