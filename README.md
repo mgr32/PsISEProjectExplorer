@@ -10,6 +10,9 @@ Provides a tree view that enables to index and explore whole directory structure
 * Show functions in leafs of the tree view and enable to jump to the function definition (similarly to some available Function Explorer plugins).
 * Search the tree view (file names, function names, optionally file contents).
 
+##### Screenshot 
+![Image](./PsISEExplorer_screen2.png?raw=true)
+
 ##### Installation
 
 * Run Install_to_UserModules.bat or copy PSISEProjectExplorer folder manually to $env:USERPROFILE\Documents\WindowsPowerShell\Modules.
