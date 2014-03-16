@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.DocHierarchy
+namespace ProjectExplorer.DocHierarchy.HierarchyLogic
 {
     public class DocumentHierarchyFactory
     {
@@ -14,29 +14,30 @@ namespace ProjectExplorer.DocHierarchy
         public DocumentHierarchy CreateDocumentHierarchy(string path)
         {
             DocumentHierarchy documentHierarchy = new DocumentHierarchy(path);
-            IList<string> fileSystemEntryList = new List<string>();
+            IList<FileSystemParser> fileSystemEntryList = new List<FileSystemParser>();
             this.FillFileListRecursively(path, fileSystemEntryList);
 
-            foreach (string fileSystemEntry in fileSystemEntryList) {
+            foreach (FileSystemParser fileSystemEntry in fileSystemEntryList)
+            {
                 documentHierarchy.AddFileSystemNode(fileSystemEntry);
             }
             return documentHierarchy;
         }
 
-        private bool FillFileListRecursively(string path, IList<string> result)
+        private bool FillFileListRecursively(string path, IList<FileSystemParser> result)
         {           
             foreach (string dir in Directory.EnumerateDirectories(path))
             {
                 if (this.FillFileListRecursively(dir, result))
                 {
-                    result.Add(dir);
+                    result.Add(new FileSystemParser(dir, true));
                 }
             }
 
             var files = Directory.EnumerateFiles(path, FILES_PATTERN);
             foreach (string file in files)
             {
-                result.Add(file);
+                result.Add(new FileSystemParser(file, false));
             }
             return files.Any();
 

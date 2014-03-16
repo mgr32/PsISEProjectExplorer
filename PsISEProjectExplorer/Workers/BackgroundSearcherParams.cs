@@ -1,4 +1,5 @@
 ﻿using ProjectExplorer.DocHierarchy;
+using ProjectExplorer.DocHierarchy.HierarchyLogic;
 using ProjectExplorer.TreeView;
 using System;
 using System.Collections.Generic;

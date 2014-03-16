@@ -58,15 +58,22 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="System.Management.Automation" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DocHierarchy\FullText\TokenizeRules.cs" />
+    <Compile Include="DocHierarchy\HierarchyLogic\FileSystemParser.cs" />
+    <Compile Include="DocHierarchy\FullText\FullTextFieldType.cs" />
     <Compile Include="DocHierarchy\FullText\CustomAnalyzer.cs" />
     <Compile Include="DocHierarchy\FullText\CustomQueryParser.cs" />
     <Compile Include="DocHierarchy\FullText\CustomTokenizer.cs" />
+    <Compile Include="DocHierarchy\FullText\DocumentCreator.cs" />
     <Compile Include="DocHierarchy\Nodes\DefaultNodeComparer.cs" />
     <Compile Include="DocHierarchy\Nodes\INode.cs" />
+    <Compile Include="DocHierarchy\Nodes\PowershellFunctionNode.cs" />
     <Compile Include="DocHierarchy\Nodes\RootNode.cs" />
     <Compile Include="DocHierarchy\Nodes\ViewNode.cs" />
+    <Compile Include="DocHierarchy\HierarchyLogic\PowershellFunction.cs" />
     <Compile Include="Workers\BackgroundIndexer.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -74,25 +81,25 @@
     <Compile Include="Workers\BackgroundSearcher.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="DocHierarchy\DocumentHierarchies.cs" />
-    <Compile Include="DocHierarchy\DocumentHierarchy.cs" />
+    <Compile Include="DocHierarchy\HierarchyLogic\DocumentHierarchies.cs" />
+    <Compile Include="DocHierarchy\HierarchyLogic\DocumentHierarchy.cs" />
     <Compile Include="DocHierarchy\Nodes\DirectoryNode.cs" />
     <Compile Include="DocHierarchy\Nodes\FileNode.cs" />
     <Compile Include="DocHierarchy\Nodes\FileSystemNode.cs" />
     <Compile Include="DocHierarchy\Nodes\AbstractNode.cs" />
     <Compile Include="DocHierarchy\FullText\FullTextDirectory.cs" />
     <Compile Include="Workers\BackgroundSearcherParams.cs" />
-    <Page Include="ProjectExplorer.xaml">
+    <Page Include="PsISEProjectExplorer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="DocHierarchy\SearchOptions.cs" />
+    <Compile Include="DocHierarchy\HierarchyLogic\SearchOptions.cs" />
     <Compile Include="TreeView\TreeViewEntryItem.cs" />
-    <Compile Include="DocHierarchy\DocumentHierarchyFactory.cs" />
-    <Compile Include="DocHierarchy\DocumentHierarchySearcher.cs" />
+    <Compile Include="DocHierarchy\HierarchyLogic\DocumentHierarchyFactory.cs" />
+    <Compile Include="DocHierarchy\HierarchyLogic\DocumentHierarchySearcher.cs" />
     <Compile Include="RootDirectoryProvider.cs" />
-    <Compile Include="ProjectExplorer.xaml.cs">
-      <DependentUpon>ProjectExplorer.xaml</DependentUpon>
+    <Compile Include="PsISEProjectExplorer.xaml.cs">
+      <DependentUpon>PsISEProjectExplorer.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

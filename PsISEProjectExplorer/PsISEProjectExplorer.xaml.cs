@@ -1,5 +1,7 @@
 ﻿using Microsoft.PowerShell.Host.ISE;
 using ProjectExplorer.DocHierarchy;
+using ProjectExplorer.DocHierarchy.FullText;
+using ProjectExplorer.DocHierarchy.HierarchyLogic;
 using ProjectExplorer.DocHierarchy.Nodes;
 using ProjectExplorer.TreeView;
 using System;
@@ -163,6 +165,7 @@ namespace ProjectExplorer
         {
             this.DataContext = this;
             this.searchOptions.IncludeAllParents = true;
+            this.searchOptions.SearchField = FullTextFieldType.CATCH_ALL;
             this.backgroundIndexer.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundIndexerWorkCompleted);
             this.backgroundSearcher.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundSearcherWorkCompleted);
             InitializeComponent();
@@ -245,8 +248,9 @@ namespace ProjectExplorer
             TreeViewEntryItem selectedItem = (TreeViewEntryItem)this.SearchResults.SelectedItem;
             if (selectedItem != null)
             {
+                
                 // TODO: ensure it's file
-                HostObject.CurrentPowerShellTab.Files.Add(selectedItem.DocumentHierarchyNode.Path);
+                HostObject.CurrentPowerShellTab.Files.Add(selectedItem.Node.Path);
             }
         }
 
