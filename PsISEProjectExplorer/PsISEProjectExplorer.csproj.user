@@ -6,6 +6,6 @@
     <StartArguments>..\..\Debug_LoadToIse.ps1</StartArguments>
   </PropertyGroup>
   <PropertyGroup>
-    <ProjectView>ShowAllFiles</ProjectView>
+    <ProjectView>ProjectFiles</ProjectView>
   </PropertyGroup>
 </Project>
