@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PsISEProjectExplorer.DocHierarchy.Nodes
+namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 {
     public abstract class AbstractNode : INode
     {
@@ -34,25 +34,6 @@ namespace PsISEProjectExplorer.DocHierarchy.Nodes
                 this.Parent.Children.Add(this);
             }
         }
-
-        /*public void TraverseSubtree(Func<INode, bool> node)
-        {
-            if (node == null)
-            {
-                throw new ArgumentNullException("node");
-            }
-            if (!node(this))
-            {
-                return;
-            }
-            if (this.Children.Count() > 0)
-            {
-                foreach (var c in Children)
-                {
-                    c.TraverseSubtree(node);
-                }
-            }
-        }*/
 
         public override bool Equals(object obj)
         {

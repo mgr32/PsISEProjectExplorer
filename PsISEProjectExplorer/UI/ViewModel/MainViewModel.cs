@@ -1,7 +1,8 @@
-﻿using PsISEProjectExplorer.DocHierarchy.HierarchyLogic;
-using PsISEProjectExplorer.DocHierarchy.Nodes;
-using PsISEProjectExplorer.EnumsAndOptions;
-using PsISEProjectExplorer.IseIntegration;
+﻿using PsISEProjectExplorer.EnumsAndOptions;
+using PsISEProjectExplorer.Model.DocHierarchy;
+using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
+using PsISEProjectExplorer.Services;
+using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.Workers;
 using System;
 using System.Collections.Generic;
@@ -100,9 +101,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private BackgroundSearcher BackgroundSearcher { get; set; }
 
-        private DocumentHierarchies DocumentHierarchies { get; set; }
-
         private DocumentHierarchySearcher DocumentHierarchySearcher { get; set; }
+
+        private DocumentHierarchyFactory DocumentHierarchyIndexer { get; set; }
 
         private IseIntegrator iseIntegrator;
 
@@ -135,10 +136,22 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.BackgroundSearcher = new BackgroundSearcher();
             this.BackgroundIndexer.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundIndexerWorkCompleted);
             this.BackgroundSearcher.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundSearcherWorkCompleted);
-            this.DocumentHierarchies = new DocumentHierarchies();
+            this.DocumentHierarchyIndexer = new DocumentHierarchyFactory();
         }
 
-        private void BackgroundIndexerWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
+        public void GoToDefinition()
+        {
+            var lineWithColumnIndex = this.IseIntegrator.GetCurrentLineWithColumnIndex();
+            // string funcName = this.IseIntegrator.GetTokenAtCursor();
+            // TODO
+        }
+
+        public void FindAllReferences()
+        {
+            // TODO
+        }
+
+          private void BackgroundIndexerWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             this.IndexingInProgress = false;
             this.DocumentHierarchySearcher = (DocumentHierarchySearcher)e.Result;
@@ -180,7 +193,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private void ReindexSearchTree()
         {
             this.SearchTreeInitialized = false;
-            BackgroundIndexerParams indexerParams = new BackgroundIndexerParams(this.DocumentHierarchies, this.rootDirectoryToSearch, null);
+            BackgroundIndexerParams indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyIndexer, this.rootDirectoryToSearch, null);
             this.IndexingInProgress = true;
             this.BackgroundIndexer.RunWorkerAsync(indexerParams);
         }
@@ -195,24 +208,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private void OnFileTabChanged(object sender, IseEventArgs args)
         {
             this.RefreshSearchTree();
-        }
-
-        /*
-       
-
-        
-       
-        */
-         
-        public void GoToDefinition()
-        {
-            // TODO
-        }
-
-        public void FindAllReferences()
-        {
-            // TODO
-        }
+        }      
 
     }
 }

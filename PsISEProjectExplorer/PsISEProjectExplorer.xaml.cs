@@ -1,5 +1,5 @@
 ﻿using Microsoft.PowerShell.Host.ISE;
-using PsISEProjectExplorer.IseIntegration;
+using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.ViewModel;
 using System;
 using System.Windows.Controls;
@@ -34,6 +34,16 @@ namespace PsISEProjectExplorer
             this.MainViewModel = new MainViewModel();
             this.DataContext = this.MainViewModel;
             InitializeComponent();
+        }
+
+        public void GoToDefinition()
+        {
+            this.MainViewModel.GoToDefinition();
+        }
+
+        public void FindAllReferences()
+        {
+            this.MainViewModel.FindAllReferences();
         }
 
         private void SearchResults_MouseDoubleClick(object sender, MouseButtonEventArgs e)

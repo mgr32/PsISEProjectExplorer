@@ -1,6 +1,5 @@
-﻿using PsISEProjectExplorer.DocHierarchy;
-using PsISEProjectExplorer.DocHierarchy.HierarchyLogic;
-using PsISEProjectExplorer.EnumsAndOptions;
+﻿using PsISEProjectExplorer.EnumsAndOptions;
+using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI.ViewModel;
 using System;
 using System.Collections.Generic;

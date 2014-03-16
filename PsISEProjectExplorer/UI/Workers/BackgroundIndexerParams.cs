@@ -1,5 +1,4 @@
-﻿using PsISEProjectExplorer.DocHierarchy;
-using PsISEProjectExplorer.DocHierarchy.HierarchyLogic;
+﻿using PsISEProjectExplorer.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +9,13 @@ namespace PsISEProjectExplorer.UI.Workers
 {
     public class BackgroundIndexerParams
     {
-        public DocumentHierarchies DocumentHierarchies { get; private set; }
+        public DocumentHierarchyFactory DocumentHierarchyIndexer { get; private set; }
         public string RootDirectory { get; private set; }
         public IEnumerable<string> FilesChanged { get; private set; }
 
-        public BackgroundIndexerParams(DocumentHierarchies documentHierarchies, string rootDirectory, IEnumerable<string> filesChanged)
+        public BackgroundIndexerParams(DocumentHierarchyFactory documentHierarchyIndexer, string rootDirectory, IEnumerable<string> filesChanged)
         {
-            this.DocumentHierarchies = documentHierarchies;
+            this.DocumentHierarchyIndexer = documentHierarchyIndexer;
             this.RootDirectory = rootDirectory;
             this.FilesChanged = filesChanged;
         }

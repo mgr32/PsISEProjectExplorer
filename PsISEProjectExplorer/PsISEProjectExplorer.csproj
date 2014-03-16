@@ -62,22 +62,24 @@
     <Reference Include="System.Management.Automation" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DocHierarchy\FullText\TokenizeRules.cs" />
-    <Compile Include="DocHierarchy\HierarchyLogic\FileSystemParser.cs" />
+    <Compile Include="FullText\TokenizeRules.cs" />
+    <Compile Include="Model\DocHierarchy\DocumentHierarchy.cs" />
+    <Compile Include="Services\DocumentHierarchyIndexer.cs" />
+    <Compile Include="Services\FileSystemParser.cs" />
     <Compile Include="EnumsAndOptions\FullTextFieldType.cs" />
-    <Compile Include="DocHierarchy\FullText\CustomAnalyzer.cs" />
-    <Compile Include="DocHierarchy\FullText\CustomQueryParser.cs" />
-    <Compile Include="DocHierarchy\FullText\CustomTokenizer.cs" />
-    <Compile Include="DocHierarchy\FullText\DocumentCreator.cs" />
-    <Compile Include="DocHierarchy\Nodes\DefaultNodeComparer.cs" />
-    <Compile Include="DocHierarchy\Nodes\INode.cs" />
-    <Compile Include="DocHierarchy\Nodes\PowershellFunctionNode.cs" />
-    <Compile Include="DocHierarchy\Nodes\RootNode.cs" />
-    <Compile Include="DocHierarchy\Nodes\ViewNode.cs" />
-    <Compile Include="DocHierarchy\HierarchyLogic\PowershellFunction.cs" />
+    <Compile Include="FullText\CustomAnalyzer.cs" />
+    <Compile Include="FullText\CustomQueryParser.cs" />
+    <Compile Include="FullText\CustomTokenizer.cs" />
+    <Compile Include="FullText\DocumentCreator.cs" />
+    <Compile Include="Model\DocHierarchy\Nodes\DefaultNodeComparer.cs" />
+    <Compile Include="Model\DocHierarchy\Nodes\INode.cs" />
+    <Compile Include="Model\DocHierarchy\Nodes\PowershellFunctionNode.cs" />
+    <Compile Include="Model\DocHierarchy\Nodes\RootNode.cs" />
+    <Compile Include="Model\DocHierarchy\Nodes\ViewNode.cs" />
+    <Compile Include="Model\PowershellFunction.cs" />
     <Compile Include="EnumsAndOptions\NodeType.cs" />
-    <Compile Include="IseIntegration\IseEventArgs.cs" />
-    <Compile Include="IseIntegration\IseIntegrator.cs" />
+    <Compile Include="UI\IseIntegration\IseEventArgs.cs" />
+    <Compile Include="UI\IseIntegration\IseIntegrator.cs" />
     <Compile Include="UI\ViewModel\BaseViewModel.cs" />
     <Compile Include="UI\ViewModel\MainViewModel.cs" />
     <Compile Include="UI\ViewModel\TreeViewModel.cs" />
@@ -88,12 +90,10 @@
     <Compile Include="UI\Workers\BackgroundSearcher.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="DocHierarchy\HierarchyLogic\DocumentHierarchies.cs" />
-    <Compile Include="DocHierarchy\HierarchyLogic\DocumentHierarchy.cs" />
-    <Compile Include="DocHierarchy\Nodes\DirectoryNode.cs" />
-    <Compile Include="DocHierarchy\Nodes\FileNode.cs" />
-    <Compile Include="DocHierarchy\Nodes\AbstractNode.cs" />
-    <Compile Include="DocHierarchy\FullText\FullTextDirectory.cs" />
+    <Compile Include="Model\DocHierarchy\Nodes\DirectoryNode.cs" />
+    <Compile Include="Model\DocHierarchy\Nodes\FileNode.cs" />
+    <Compile Include="Model\DocHierarchy\Nodes\AbstractNode.cs" />
+    <Compile Include="FullText\FullTextDirectory.cs" />
     <Compile Include="UI\Workers\BackgroundSearcherParams.cs" />
     <Page Include="PsISEProjectExplorer.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -101,8 +101,8 @@
     </Page>
     <Compile Include="EnumsAndOptions\SearchOptions.cs" />
     <Compile Include="UI\ViewModel\TreeViewEntryItem.cs" />
-    <Compile Include="DocHierarchy\HierarchyLogic\DocumentHierarchyFactory.cs" />
-    <Compile Include="DocHierarchy\HierarchyLogic\DocumentHierarchySearcher.cs" />
+    <Compile Include="Services\DocumentHierarchyFactory.cs" />
+    <Compile Include="Services\DocumentHierarchySearcher.cs" />
     <Compile Include="RootDirectoryProvider.cs" />
     <Compile Include="PsISEProjectExplorer.xaml.cs">
       <DependentUpon>PsISEProjectExplorer.xaml</DependentUpon>
@@ -149,9 +149,7 @@
   <ItemGroup>
     <Resource Include="Resources\function.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UI\TreeView\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

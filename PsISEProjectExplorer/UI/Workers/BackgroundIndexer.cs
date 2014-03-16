@@ -1,5 +1,6 @@
-﻿using PsISEProjectExplorer.DocHierarchy;
-using PsISEProjectExplorer.DocHierarchy.HierarchyLogic;
+﻿using PsISEProjectExplorer.Model.DocHierarchy;
+using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
+using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -24,9 +25,8 @@ namespace PsISEProjectExplorer.UI.Workers
             BackgroundIndexerParams indexerParams = (BackgroundIndexerParams)e.Argument;
             if (indexerParams.FilesChanged == null)
             {
-                DocumentHierarchy docHierarchy =  indexerParams.DocumentHierarchies.CreateDocumentHierarchy(indexerParams.RootDirectory);
+                DocumentHierarchy docHierarchy = indexerParams.DocumentHierarchyIndexer.CreateDocumentHierarchy(indexerParams.RootDirectory);
                 e.Result = new DocumentHierarchySearcher(docHierarchy);
-               
             }
         }
 

@@ -1,11 +1,13 @@
-﻿using System;
+﻿using PsISEProjectExplorer.Model.DocHierarchy;
+using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PsISEProjectExplorer.DocHierarchy.HierarchyLogic
+namespace PsISEProjectExplorer.Services
 {
     public class DocumentHierarchyFactory
     {
@@ -13,15 +15,16 @@ namespace PsISEProjectExplorer.DocHierarchy.HierarchyLogic
 
         public DocumentHierarchy CreateDocumentHierarchy(string path)
         {
-            DocumentHierarchy documentHierarchy = new DocumentHierarchy(path);
+            DocumentHierarchy docHierarchy = new DocumentHierarchy(new RootNode(path));
+            DocumentHierarchyIndexer documentHierarchyIndexer = new DocumentHierarchyIndexer(docHierarchy);
             IList<FileSystemParser> fileSystemEntryList = new List<FileSystemParser>();
             this.FillFileListRecursively(path, fileSystemEntryList);
 
             foreach (FileSystemParser fileSystemEntry in fileSystemEntryList)
             {
-                documentHierarchy.AddFileSystemNode(fileSystemEntry);
+                documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
             }
-            return documentHierarchy;
+            return docHierarchy;
         }
 
         private bool FillFileListRecursively(string path, IList<FileSystemParser> result)

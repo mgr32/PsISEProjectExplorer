@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PsISEProjectExplorer.Model;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -7,7 +8,7 @@ using System.Management.Automation;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PsISEProjectExplorer.DocHierarchy.HierarchyLogic
+namespace PsISEProjectExplorer.Services
 {
     public class FileSystemParser
     {
