@@ -7,8 +7,9 @@ Project not released yet - you can compile it manually or wait for first officia
 Provides a tree view that enables to index and explore whole directory structure containing Powershell scripts. It has following features:
 
 * Visualize directory structure (also files not loaded to ISE yet) in a Solution Explorer-like tree view.
-* Show functions in leafs of the tree view and enable to jump to the function definition (similarly to some available Function Explorer plugins).
+* Show functions in leafs of the tree view and enable to jump to the function definition (F12, similarly to some available Function Explorer plugins).
 * Search the tree view (file names, function names, optionally file contents).
+* Find all references of the symbol under the cursor (SHIFT+F12).
 
 ##### Screenshot 
 ![Image](./PsISEExplorer_screen2.png?raw=true)
@@ -24,7 +25,7 @@ Provides a tree view that enables to index and explore whole directory structure
 
 When you open a Powershell file in ISE, Project Explorer will automatically set its project root directory to the first parent directory of the opened file where a .psm1 file resides. If there's no .psm1 file in any parent directory, it will take the last parent containing .ps1 files.
 
-This is assuming you'll be working on a single Powershell module with subdirectories. When you load a file from another module (which is not a submodule of the current one), the root directory will be updated. Indexes for the previous module will not be deleted.
+This is assuming you'll be working on a single Powershell module with subdirectories. When you load a file from another module (which is not a submodule of the current one), the root directory will be updated. 
 If this is not enough for your work, please create an issue with a suggestion how to improve.
 
 ##### Why?

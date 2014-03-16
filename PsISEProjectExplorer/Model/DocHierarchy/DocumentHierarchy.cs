@@ -56,11 +56,16 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             return functionNode;
         }
 
-        public IEnumerable<INode> SearchNodesFullText(string filter, SearchOptions searchOptions)
+        public IEnumerable<INode> SearchNodesFullText(string filter, FullTextFieldType fieldType)
         {
-            IEnumerable<string> paths = this.FullTextDirectory.Search(filter, searchOptions.SearchField);
-            var nodes = paths.Select(path => this.GetNode(path));
-            return nodes;
+            IEnumerable<string> paths = this.FullTextDirectory.Search(filter, fieldType);
+            return paths.Select(path => this.GetNode(path));
+        }
+
+        public IEnumerable<INode> SearchNodesByTerm(string filter, FullTextFieldType fieldType)
+        {
+            IEnumerable<string> paths = this.FullTextDirectory.SearchTerm(filter, fieldType);
+            return paths.Select(path => this.GetNode(path));
         }
 
     }

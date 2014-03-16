@@ -1,4 +1,5 @@
 ﻿using PsISEProjectExplorer.EnumsAndOptions;
+using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.Services;
@@ -129,9 +130,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         public MainViewModel()
         {
             this.TreeViewModel = new TreeViewModel();
-            this.SearchOptions = new SearchOptions();
-            this.SearchOptions.IncludeAllParents = true;
-            this.SearchOptions.SearchField = FullTextFieldType.NAME;
+            this.SearchOptions = new SearchOptions(true, FullTextFieldType.NAME);
             this.BackgroundIndexer = new BackgroundIndexer();
             this.BackgroundSearcher = new BackgroundSearcher();
             this.BackgroundIndexer.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundIndexerWorkCompleted);
@@ -141,17 +140,50 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public void GoToDefinition()
         {
-            var lineWithColumnIndex = this.IseIntegrator.GetCurrentLineWithColumnIndex();
-            // string funcName = this.IseIntegrator.GetTokenAtCursor();
-            // TODO
+            string funcName = this.GetFunctionNameAtCurrentPosition();
+            if (funcName == null)
+            {
+                return;
+            }
+            PowershellFunctionNode node = (PowershellFunctionNode)this.DocumentHierarchySearcher.GetFunctionNodeByName(funcName);
+            if (node == null)
+            {
+                return;
+            }
+            this.IseIntegrator.GoToFile(node.FilePath);
+            this.IseIntegrator.SetCursor(node.PowershellFunction.StartLine, node.PowershellFunction.StartColumn);
+            
         }
 
         public void FindAllReferences()
         {
-            // TODO
+            string funcName = this.GetFunctionNameAtCurrentPosition();
+            if (funcName == null)
+            {
+                return;
+            }
+            this.searchText = funcName;
+            this.SearchInFiles = true;
+            this.OnPropertyChanged("SearchText");
         }
 
-          private void BackgroundIndexerWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private string GetFunctionNameAtCurrentPosition()
+        {
+            if (this.DocumentHierarchySearcher == null)
+            {
+                return null;
+            }
+            EditorInfo editorInfo = this.IseIntegrator.GetCurrentLineWithColumnIndex();
+            if (editorInfo == null)
+            {
+                return null;
+            }
+            string funcName = editorInfo.GetTokenFromCurrentPosition();
+            return funcName;
+        }
+
+
+        private void BackgroundIndexerWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             this.IndexingInProgress = false;
             this.DocumentHierarchySearcher = (DocumentHierarchySearcher)e.Result;
@@ -201,7 +233,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private void RunSearch()
         {
             BackgroundSearcherParams searcherParams = new BackgroundSearcherParams(this.DocumentHierarchySearcher, this.SearchOptions, this.SearchText);
-            this.SearchingInProgress = true;
+            if (this.SearchingInProgress)
+            {
+                // TODO: not two at the same time !
+            }
+            this.SearchingInProgress = true;           
             this.BackgroundSearcher.RunWorkerAsync(searcherParams);
         }
 

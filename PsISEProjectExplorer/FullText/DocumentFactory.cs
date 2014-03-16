@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.FullText
 {
-    public class DocumentCreator
+    public class DocumentFactory
     {
         private IndexWriter IndexWriter { get; set; }
 
-        public DocumentCreator(IndexWriter indexWriter)
+        public DocumentFactory(IndexWriter indexWriter)
         {
             this.IndexWriter = indexWriter;
         }

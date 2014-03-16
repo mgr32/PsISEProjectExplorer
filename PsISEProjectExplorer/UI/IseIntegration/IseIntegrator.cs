@@ -1,4 +1,5 @@
 ﻿using Microsoft.PowerShell.Host.ISE;
+using PsISEProjectExplorer.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -49,14 +50,14 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             }
         }
 
-        public KeyValuePair<string, int> GetCurrentLineWithColumnIndex()
+        public EditorInfo GetCurrentLineWithColumnIndex()
         {
             var file = this.HostObject.CurrentPowerShellTab.Files.SelectedFile;
             if (file == null)
             {
-                return default(KeyValuePair<string, int>);
+                return null;
             }
-            return new KeyValuePair<string, int>(file.Editor.CaretLineText, file.Editor.CaretColumn);           
+            return new EditorInfo(file.Editor.CaretLineText, file.Editor.CaretColumn);           
         }
 
         private void OnIseTabChanged(object sender, PropertyChangedEventArgs e)
