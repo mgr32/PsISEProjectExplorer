@@ -1,4 +1,4 @@
-﻿using ProjectExplorer.EnumsAndOptions;
+﻿using PsISEProjectExplorer.EnumsAndOptions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.DocHierarchy.Nodes
+namespace PsISEProjectExplorer.DocHierarchy.Nodes
 {
     public class FileNode : AbstractNode
     {

@@ -1,14 +1,14 @@
 ﻿using Lucene.Net.Documents;
 using Lucene.Net.Index;
-using ProjectExplorer.DocHierarchy.HierarchyLogic;
-using ProjectExplorer.EnumsAndOptions;
+using PsISEProjectExplorer.DocHierarchy.HierarchyLogic;
+using PsISEProjectExplorer.EnumsAndOptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.DocHierarchy.FullText
+namespace PsISEProjectExplorer.DocHierarchy.FullText
 {
     public class DocumentCreator
     {

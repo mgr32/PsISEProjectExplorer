@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.DocHierarchy.Nodes
+namespace PsISEProjectExplorer.DocHierarchy.Nodes
 {
     public class DefaultNodeComparer : IComparer<INode>
     {

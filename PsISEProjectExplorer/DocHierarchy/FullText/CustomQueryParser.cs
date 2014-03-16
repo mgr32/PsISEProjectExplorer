@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.DocHierarchy.FullText
+namespace PsISEProjectExplorer.DocHierarchy.FullText
 {
     /// <summary>
     /// Custom very simple query parser. Can't use the built-in one for example due to treatment of '-' and OR between words.
