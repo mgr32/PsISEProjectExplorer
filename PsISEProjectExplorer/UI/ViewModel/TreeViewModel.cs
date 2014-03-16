@@ -1,6 +1,6 @@
-﻿using PsISEProjectExplorer.DocHierarchy.Nodes;
-using PsISEProjectExplorer.EnumsAndOptions;
-using PsISEProjectExplorer.IseIntegration;
+﻿using PsISEProjectExplorer.EnumsAndOptions;
+using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
+using PsISEProjectExplorer.UI.IseIntegration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,10 +37,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
         }
 
         public IseIntegrator IseIntegrator { get; set; }
-
-        public TreeViewModel()
-        {
-        }
 
         public void SelectItem(TreeViewEntryItem item)
         {

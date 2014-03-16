@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PsISEProjectExplorer.DocHierarchy.HierarchyLogic
+namespace PsISEProjectExplorer.Model
 {
     public class PowershellFunction
     {

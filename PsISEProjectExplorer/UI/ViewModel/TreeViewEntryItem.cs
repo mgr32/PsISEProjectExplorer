@@ -1,5 +1,4 @@
-﻿using PsISEProjectExplorer.DocHierarchy;
-using PsISEProjectExplorer.DocHierarchy.Nodes;
+﻿using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.Properties;
 using System;
 using System.Collections.Generic;

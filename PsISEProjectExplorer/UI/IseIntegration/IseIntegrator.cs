@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PsISEProjectExplorer.IseIntegration
+namespace PsISEProjectExplorer.UI.IseIntegration
 {
     public class IseIntegrator
     {
@@ -21,12 +21,9 @@ namespace PsISEProjectExplorer.IseIntegration
         }
 
 
-
         public event EventHandler<IseEventArgs> FileTabChanged;
 
         private ObjectModelRoot HostObject { get; set; }
-
-
 
         public IseIntegrator(ObjectModelRoot hostObject)
         {
@@ -50,6 +47,16 @@ namespace PsISEProjectExplorer.IseIntegration
             {
                 this.HostObject.CurrentPowerShellTab.Files.SelectedFile.Editor.SetCaretPosition(line, column);
             }
+        }
+
+        public KeyValuePair<string, int> GetCurrentLineWithColumnIndex()
+        {
+            var file = this.HostObject.CurrentPowerShellTab.Files.SelectedFile;
+            if (file == null)
+            {
+                return default(KeyValuePair<string, int>);
+            }
+            return new KeyValuePair<string, int>(file.Editor.CaretLineText, file.Editor.CaretColumn);           
         }
 
         private void OnIseTabChanged(object sender, PropertyChangedEventArgs e)

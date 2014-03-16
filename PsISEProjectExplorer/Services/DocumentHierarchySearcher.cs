@@ -1,6 +1,6 @@
-﻿using PsISEProjectExplorer.DocHierarchy;
-using PsISEProjectExplorer.DocHierarchy.Nodes;
-using PsISEProjectExplorer.EnumsAndOptions;
+﻿using PsISEProjectExplorer.EnumsAndOptions;
+using PsISEProjectExplorer.Model.DocHierarchy;
+using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,16 +8,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PsISEProjectExplorer.DocHierarchy.HierarchyLogic
+namespace PsISEProjectExplorer.Services
 {
     public class DocumentHierarchySearcher
     {
-
-        private DocumentHierarchy documentHierarchy;
+        private DocumentHierarchy DocumentHierarchy { get; set; }
 
         public DocumentHierarchySearcher(DocumentHierarchy documentHierarchy)
         {
-            this.documentHierarchy = documentHierarchy;
+            this.DocumentHierarchy = documentHierarchy;
         }
 
         public INode GetFilteredDocumentHierarchyNodes(string filter, SearchOptions searchOptions)
@@ -25,14 +24,14 @@ namespace PsISEProjectExplorer.DocHierarchy.HierarchyLogic
             
             if (String.IsNullOrWhiteSpace(filter))
             {
-                return this.documentHierarchy.RootNode;
+                return this.DocumentHierarchy.RootNode;
             }
-            
-            INode newRoot = new RootNode(this.documentHierarchy.RootNode.Path);
-            IEnumerable<INode> nodes = documentHierarchy.SearchNodesFullText(filter, searchOptions);
+
+            INode newRoot = new RootNode(this.DocumentHierarchy.RootNode.Path);
+            IEnumerable<INode> nodes = this.DocumentHierarchy.SearchNodesFullText(filter, searchOptions);
             if (searchOptions.IncludeAllParents)
             {
-                this.FillNewFilteredDocumentHierarchyRecursively(nodes, newRoot, documentHierarchy.RootNode);
+                this.FillNewFilteredDocumentHierarchyRecursively(nodes, newRoot, this.DocumentHierarchy.RootNode);
             }
             else
             {
@@ -41,8 +40,6 @@ namespace PsISEProjectExplorer.DocHierarchy.HierarchyLogic
         
            return newRoot;
         }
-
-
 
         private void FillNewDocumentHierarchyRecursively(IEnumerable<INode> filteredNodes, INode newParent) 
         {

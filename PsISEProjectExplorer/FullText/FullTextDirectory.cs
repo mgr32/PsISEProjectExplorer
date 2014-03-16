@@ -5,8 +5,6 @@ using Lucene.Net.Index;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
-using PsISEProjectExplorer.DocHierarchy.FullText;
-using PsISEProjectExplorer.DocHierarchy.HierarchyLogic;
 using PsISEProjectExplorer.EnumsAndOptions;
 using System;
 using System.Collections.Generic;
@@ -14,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PsISEProjectExplorer.DocHierarchy.FullText
+namespace PsISEProjectExplorer.FullText
 {
     public class FullTextDirectory
     {

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PsISEProjectExplorer.DocHierarchy.Nodes
+namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 {
     public class FileNode : AbstractNode
     {

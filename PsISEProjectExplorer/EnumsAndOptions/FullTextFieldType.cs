@@ -10,6 +10,7 @@ namespace PsISEProjectExplorer.EnumsAndOptions
     {
         CATCH_ALL, 
         NAME,
+        NAME_NOT_ANALYZED,
         PATH
     }
 }
