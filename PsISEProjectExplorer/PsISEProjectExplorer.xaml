@@ -15,7 +15,7 @@
         <TextBox Name="TextBoxSearchText" HorizontalAlignment="Stretch" Height="21" Margin="10,25,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged, Delay=150}" MaxLength="100"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,54,0,0" TextWrapping="Wrap" Text="Search Results:" VerticalAlignment="Top" Width="100"/>
         <TextBlock HorizontalAlignment="Right" Margin="10,54,0,0" TextWrapping="Wrap" Text="Indexing..." VerticalAlignment="Top" Width="70" Visibility="{Binding Path=IndexingInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <TreeView Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewItems}" MouseDoubleClick="SearchResults_MouseDoubleClick" KeyUp="SearchResults_KeyUp" >
+        <TreeView Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,25" ItemsSource="{Binding Path=TreeViewItems}" MouseDoubleClick="SearchResults_MouseDoubleClick" KeyUp="SearchResults_KeyUp" >
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">        
                     <StackPanel Orientation="Horizontal">
@@ -30,5 +30,6 @@
                 </Style>
             </TreeView.ItemContainerStyle>
         </TreeView>
+        <CheckBox HorizontalAlignment="Left" Margin="10,0,0,5" Content="Search in files" VerticalAlignment="Bottom" Width="100" IsChecked="{Binding Path=SearchInFiles}" />
     </Grid>
 </UserControl>

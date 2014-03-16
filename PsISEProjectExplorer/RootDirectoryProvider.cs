@@ -13,18 +13,23 @@ namespace PsISEProjectExplorer
         private static Regex ROOT_DIR_SEARCH_END_PATTERN = new Regex(@"(\.psm1|\.psd1)$", RegexOptions.Compiled);
         private static Regex ROOT_DIR_SEARCH_INTERMEDIATE_PATTERN = new Regex(@"\.ps1$", RegexOptions.Compiled);
 
-        public static string GetRootDirectoryToSearch(string currentFile)
+        public static string GetRootDirectoryToSearch(string filePath)
         {
-
-            string rootDir = Path.GetDirectoryName(currentFile);
+            if (String.IsNullOrEmpty(filePath))
+            {
+                return null;
+            }
+            string driveRoot = Path.GetPathRoot(filePath).ToLowerInvariant();
+            string rootDir = Path.GetDirectoryName(filePath);
             string currentDir = rootDir;
             while (true)
             {
-                currentDir = Directory.GetParent(currentDir).FullName;
-                if (currentDir == null)
+                var currentDirInfo = Directory.GetParent(currentDir);
+                if (currentDirInfo == null || currentDirInfo.FullName.ToLowerInvariant() == driveRoot)
                 {
-                    return rootDir;
+                    return (rootDir.ToLowerInvariant() == driveRoot ? null : rootDir);
                 }
+                currentDir = currentDirInfo.FullName;
                 IList<string> allFilesInCurrentDir = Directory.GetFiles(currentDir).ToList();
                 bool onlyDirectories = true;
                 foreach (string file in allFilesInCurrentDir)
