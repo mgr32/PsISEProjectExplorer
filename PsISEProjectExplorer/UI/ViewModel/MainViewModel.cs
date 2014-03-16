@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace PsISEProjectExplorer.UI.ViewModel
@@ -136,6 +137,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.BackgroundIndexer.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundIndexerWorkCompleted);
             this.BackgroundSearcher.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundSearcherWorkCompleted);
             this.DocumentHierarchyIndexer = new DocumentHierarchyFactory();
+            FileSystemChangeNotifier.FileSystemChanged += OnFileSystemChanged;
         }
 
         public void GoToDefinition()
@@ -202,12 +204,20 @@ namespace PsISEProjectExplorer.UI.ViewModel
             if (node == null)
             {
                 this.TreeViewModel.RootTreeViewEntryItem = null;
+                FileSystemChangeNotifier.Watch(null);
                 return;
             }
             bool expandNodes = !String.IsNullOrWhiteSpace(this.SearchText);
             var rootEntryItem = new TreeViewEntryItem(node);
             TreeViewEntryItem.MapToTreeViewEntryItem(node, rootEntryItem, expandNodes);
             this.TreeViewModel.RootTreeViewEntryItem = rootEntryItem;
+            FileSystemChangeNotifier.Watch(rootEntryItem.Node.Path);
+        }
+
+        private void OnFileSystemChanged(object sender, EventArgs args)
+        {
+            // TODO: reindex incrementally
+            Application.Current.Dispatcher.Invoke(new Action(() => { this.ReindexSearchTree(); }));
         }
 
         private void RefreshSearchTree()
@@ -225,6 +235,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private void ReindexSearchTree()
         {
             this.SearchTreeInitialized = false;
+            if (this.IndexingInProgress)
+            {
+                // TODO: handle it more nicely
+                return;
+            }
             BackgroundIndexerParams indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyIndexer, this.rootDirectoryToSearch, null);
             this.IndexingInProgress = true;
             this.BackgroundIndexer.RunWorkerAsync(indexerParams);
@@ -235,7 +250,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
             BackgroundSearcherParams searcherParams = new BackgroundSearcherParams(this.DocumentHierarchySearcher, this.SearchOptions, this.SearchText);
             if (this.SearchingInProgress)
             {
-                // TODO: not two at the same time !
+                // TODO: handle it more nicely
+                return;
             }
             this.SearchingInProgress = true;           
             this.BackgroundSearcher.RunWorkerAsync(searcherParams);
