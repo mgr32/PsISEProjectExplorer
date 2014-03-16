@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace PsISEProjectExplorer.TreeView
+namespace PsISEProjectExplorer.UI.ViewModel
 {
     public class TreeViewEntryItem
     {
@@ -59,6 +59,17 @@ namespace PsISEProjectExplorer.TreeView
             }
             this.DocumentHierarchyNode = node;
             this.Children = new List<TreeViewEntryItem>();
+        }
+
+        public static void MapToTreeViewEntryItem(INode node, TreeViewEntryItem treeViewEntryItem, bool expandNodes)
+        {
+            foreach (INode child in node.Children)
+            {
+                TreeViewEntryItem newItem = new TreeViewEntryItem(child);
+                newItem.IsExpanded = expandNodes;
+                treeViewEntryItem.Children.Add(newItem);
+                MapToTreeViewEntryItem(child, newItem, expandNodes);
+            }
         }
     }
 }

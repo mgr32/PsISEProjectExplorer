@@ -76,11 +76,16 @@
     <Compile Include="DocHierarchy\Nodes\ViewNode.cs" />
     <Compile Include="DocHierarchy\HierarchyLogic\PowershellFunction.cs" />
     <Compile Include="EnumsAndOptions\NodeType.cs" />
-    <Compile Include="Workers\BackgroundIndexer.cs">
+    <Compile Include="IseIntegration\IseEventArgs.cs" />
+    <Compile Include="IseIntegration\IseIntegrator.cs" />
+    <Compile Include="UI\ViewModel\BaseViewModel.cs" />
+    <Compile Include="UI\ViewModel\MainViewModel.cs" />
+    <Compile Include="UI\ViewModel\TreeViewModel.cs" />
+    <Compile Include="UI\Workers\BackgroundIndexer.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Workers\BackgroundIndexerParams.cs" />
-    <Compile Include="Workers\BackgroundSearcher.cs">
+    <Compile Include="UI\Workers\BackgroundIndexerParams.cs" />
+    <Compile Include="UI\Workers\BackgroundSearcher.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="DocHierarchy\HierarchyLogic\DocumentHierarchies.cs" />
@@ -89,13 +94,13 @@
     <Compile Include="DocHierarchy\Nodes\FileNode.cs" />
     <Compile Include="DocHierarchy\Nodes\AbstractNode.cs" />
     <Compile Include="DocHierarchy\FullText\FullTextDirectory.cs" />
-    <Compile Include="Workers\BackgroundSearcherParams.cs" />
+    <Compile Include="UI\Workers\BackgroundSearcherParams.cs" />
     <Page Include="PsISEProjectExplorer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="EnumsAndOptions\SearchOptions.cs" />
-    <Compile Include="TreeView\TreeViewEntryItem.cs" />
+    <Compile Include="UI\ViewModel\TreeViewEntryItem.cs" />
     <Compile Include="DocHierarchy\HierarchyLogic\DocumentHierarchyFactory.cs" />
     <Compile Include="DocHierarchy\HierarchyLogic\DocumentHierarchySearcher.cs" />
     <Compile Include="RootDirectoryProvider.cs" />
@@ -143,6 +148,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\function.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UI\TreeView\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PsISEProjectExplorer
+namespace PsISEProjectExplorer.UI.Workers
 {
     public class BackgroundSearcher : BackgroundWorker
     {
