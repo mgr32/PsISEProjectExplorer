@@ -66,6 +66,7 @@
     <Compile Include="Model\DocHierarchy\DocumentHierarchy.cs" />
     <Compile Include="Model\EditorInfo.cs" />
     <Compile Include="Services\DocumentHierarchyIndexer.cs" />
+    <Compile Include="Services\FileSystemChangeNotifier.cs" />
     <Compile Include="Services\FileSystemParser.cs" />
     <Compile Include="EnumsAndOptions\FullTextFieldType.cs" />
     <Compile Include="FullText\CustomAnalyzer.cs" />

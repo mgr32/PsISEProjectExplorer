@@ -10,6 +10,7 @@ Provides a tree view that enables to index and explore whole directory structure
 * Show functions in leafs of the tree view and enable to jump to the function definition (F12, similarly to some available Function Explorer plugins).
 * Search the tree view (file names, function names, optionally file contents).
 * Find all references of the symbol under the cursor (SHIFT+F12).
+* Automatic reindex on file system change.
 
 ##### Screenshot 
 ![Image](./PsISEExplorer_screen2.png?raw=true)

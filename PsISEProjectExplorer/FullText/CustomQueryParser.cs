@@ -69,8 +69,8 @@ namespace PsISEProjectExplorer.FullText
                 }
                 else
                 {
-                    // we're not interested in tokens shorter than 2 chars
-                    if (tokenLen >= 1)
+                    // we're not interested in tokens shorter than 3 chars
+                    if (tokenLen >= 3)
                     {
                         tokens.Add(new string(buf, 0, tokenLen));
                     }
