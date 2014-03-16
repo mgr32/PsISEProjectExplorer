@@ -10,7 +10,7 @@ namespace ProjectExplorer.DocHierarchy.FullText
 {
     public class CustomTokenizer : CharTokenizer
     {
-
+        
         /// <summary>Construct a new CustomTokenizer. </summary>
 		public CustomTokenizer(System.IO.TextReader @in):base(@in)
 		{
@@ -33,7 +33,7 @@ namespace ProjectExplorer.DocHierarchy.FullText
         /// </summary>
         protected override bool IsTokenChar(char c)
         {
-            return System.Char.IsLetter(c) || System.Char.IsNumber(c) || c == '$';
+            return TokenizeRules.IsTokenChar(c);
         }
 
         /// <summary>Converts char to lower case
@@ -41,7 +41,7 @@ namespace ProjectExplorer.DocHierarchy.FullText
         /// </summary>
         protected override char Normalize(char c)
         {
-            return System.Char.ToLower(c);
+            return TokenizeRules.Normalize(c);
         }
     }
 }

@@ -1,5 +1,5 @@
-/ProjectExplorer/bin
-/ProjectExplorer/obj
-/ProjectExplorer/ps1test
+/PsISEProjectExplorer/bin
+/PsISEProjectExplorer/obj
+/PsISEProjectExplorer/ps1test
 /packages
-/ProjectExplorer*.suo
+/PsISEProjectExplorer*.suo

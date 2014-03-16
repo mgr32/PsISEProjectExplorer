@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.DocHierarchy
+namespace ProjectExplorer.DocHierarchy.HierarchyLogic
 {
     public class DocumentHierarchies
     {

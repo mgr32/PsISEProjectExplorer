@@ -14,9 +14,9 @@ namespace ProjectExplorer.TreeView
 {
     public class TreeViewEntryItem
     {
-        public INode DocumentHierarchyNode { get; private set; }
+        private INode DocumentHierarchyNode { get; set; }
 
-        private INode Node
+        public INode Node
         {
             get
             {

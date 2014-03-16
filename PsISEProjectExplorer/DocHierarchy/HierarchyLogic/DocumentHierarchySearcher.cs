@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.TreeView
+namespace ProjectExplorer.DocHierarchy.HierarchyLogic
 {
     public class DocumentHierarchySearcher
     {
@@ -28,7 +28,7 @@ namespace ProjectExplorer.TreeView
             }
             
             INode newRoot = new RootNode(this.documentHierarchy.RootNode.Path);
-            IEnumerable<INode> nodes = documentHierarchy.SearchNodesFullText(filter);
+            IEnumerable<INode> nodes = documentHierarchy.SearchNodesFullText(filter, searchOptions);
             if (searchOptions.IncludeAllParents)
             {
                 this.FillNewFilteredDocumentHierarchyRecursively(nodes, newRoot, documentHierarchy.RootNode);
@@ -73,26 +73,5 @@ namespace ProjectExplorer.TreeView
                 }
             }
         }
-
-       /* private void FillFilteredTreeViewItemsRecursively(IEnumerable<DocumentHierarchyNode> filteredNodes, DocumentHierarchyNode newParent, DocumentHierarchyNode originalParent)
-        {
-            if (!newParent.Children.Any())
-            {
-                return;
-            }
-            var sortedChildrenNodes = newParent.Children.OrderBy(node => node is DocumentHierarchyDirectoryNode).ThenBy(node => node.Name);
-            foreach (DocumentHierarchyNode node in sortedChildrenNodes)
-            {
-                if (filteredNodes.Any(filteredNode => filteredNode.Path.StartsWith(node.Path)))
-                {
-                    var newDocumentHierarchyNode = new DocumentHierarchyNode(node.Path, node.Name, newParent);
-                    if (node.Children.Any())
-                    {
-                        this.FillFilteredTreeViewItemsRecursively(filteredNodes, newDocumentHierarchyNode);
-                    }
-                }
-            }
-        }*/
-
     }
 }

@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectExplorer.DocHierarchy
+namespace ProjectExplorer.DocHierarchy.FullText
 {
-    public class SearchOptions
+    public enum FullTextFieldType
     {
-        public bool IncludeAllParents { get; set; }
+        CATCH_ALL, 
+        NAME,
+        PATH
     }
 }

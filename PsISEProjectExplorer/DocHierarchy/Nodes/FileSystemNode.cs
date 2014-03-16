@@ -14,19 +14,6 @@ namespace ProjectExplorer.DocHierarchy.Nodes
         {
         }
 
-        public static FileSystemNode CreateDirectoryOrFileNode(string path, string pathSegment, INode parent)
-        {
-            if ((File.GetAttributes(path) & FileAttributes.Directory) == FileAttributes.Directory)
-            {
-                return new DirectoryNode(path, pathSegment, parent);
-            }
-            else
-            {
-                return new FileNode(path, pathSegment, parent);
-            }
-
-        }
-
         /*public DocumentHierarchyFileSystemNode FindChildByPathSegment(string pathSegment)
         {
             foreach (var child in this.Children)
