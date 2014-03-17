@@ -48,14 +48,14 @@ namespace PsISEProjectExplorer
 
         private void SearchResults_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItem)this.SearchResults.SelectedItem);
+            this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem);
         }
 
         private void SearchResults_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
-                this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItem)this.SearchResults.SelectedItem);
+                this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem);
             }
         }
 
