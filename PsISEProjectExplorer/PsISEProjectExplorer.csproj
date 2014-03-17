@@ -62,6 +62,7 @@
     <Reference Include="System.Management.Automation" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EnumsAndOptions\TreeViewOptions.cs" />
     <Compile Include="FullText\TokenizeRules.cs" />
     <Compile Include="Model\DocHierarchy\DocumentHierarchy.cs" />
     <Compile Include="Model\EditorInfo.cs" />
@@ -84,7 +85,9 @@
     <Compile Include="UI\IseIntegration\IseEventArgs.cs" />
     <Compile Include="UI\IseIntegration\IseIntegrator.cs" />
     <Compile Include="UI\ViewModel\BaseViewModel.cs" />
+    <Compile Include="UI\ViewModel\DefaultTreeViewEntryItemComparer.cs" />
     <Compile Include="UI\ViewModel\MainViewModel.cs" />
+    <Compile Include="UI\ViewModel\TreeViewEntryItemObservableSet.cs" />
     <Compile Include="UI\ViewModel\TreeViewModel.cs" />
     <Compile Include="UI\Workers\BackgroundIndexer.cs">
       <SubType>Component</SubType>
@@ -103,7 +106,7 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="EnumsAndOptions\SearchOptions.cs" />
-    <Compile Include="UI\ViewModel\TreeViewEntryItem.cs" />
+    <Compile Include="UI\ViewModel\TreeViewEntryItemModel.cs" />
     <Compile Include="Services\DocumentHierarchyFactory.cs" />
     <Compile Include="Services\DocumentHierarchySearcher.cs" />
     <Compile Include="Services\RootDirectoryProvider.cs" />

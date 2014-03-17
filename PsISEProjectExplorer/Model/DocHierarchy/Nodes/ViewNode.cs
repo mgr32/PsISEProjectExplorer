@@ -39,7 +39,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 
         public INode Parent { get; private set; }
 
-        public ICollection<INode> Children { get; private set; }
+        public ISet<INode> Children { get; private set; }
 
         public ViewNode(INode viewedNode, INode parent)
         {
@@ -54,6 +54,21 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             {
                 this.Parent.Children.Add(this);
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is INode))
+            {
+                return false;
+            }
+            INode node = (INode)obj;
+            return (node.Path == this.Path);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Path.GetHashCode();
         }
     }
 }

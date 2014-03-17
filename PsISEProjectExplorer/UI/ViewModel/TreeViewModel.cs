@@ -1,5 +1,6 @@
 ﻿using PsISEProjectExplorer.EnumsAndOptions;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
+using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI.IseIntegration;
 using System;
 using System.Collections.Generic;
@@ -11,34 +12,80 @@ namespace PsISEProjectExplorer.UI.ViewModel
 {
     public class TreeViewModel : BaseViewModel
     {
-        private TreeViewEntryItem rootTreeViewEntryItem;
+        public TreeViewEntryItemModel RootTreeViewEntryItem { get; private set; }
 
-        public TreeViewEntryItem RootTreeViewEntryItem
-        {
-            get { return this.rootTreeViewEntryItem; }
-            set
-            {
-                this.rootTreeViewEntryItem = value;
-                this.OnPropertyChanged();
-                this.OnPropertyChanged("TreeViewItems");
-            }
-        }
-
-        public IList<TreeViewEntryItem> TreeViewItems
+        public TreeViewEntryItemObservableSet TreeViewItems
         {
             get
             {
                 if (this.RootTreeViewEntryItem == null)
                 {
-                    return new List<TreeViewEntryItem>();
+                    return new TreeViewEntryItemObservableSet();
                 }
                 return this.RootTreeViewEntryItem.Children;
             }
         }
 
+        public TreeViewOptions TreeViewOptions { get; set; }
+
         public IseIntegrator IseIntegrator { get; set; }
 
-        public void SelectItem(TreeViewEntryItem item)
+        public TreeViewModel()
+        {
+            this.TreeViewOptions = new TreeViewOptions();
+        }
+
+        public void RefreshFromRoot(INode newDocumentHierarchyRoot)
+        {
+            if (newDocumentHierarchyRoot == null)
+            {
+                this.RootTreeViewEntryItem = null;
+                FileSystemChangeNotifier.Watch(null);
+                return;
+            }
+
+            if (this.RootTreeViewEntryItem == null || !this.RootTreeViewEntryItem.Node.Equals(newDocumentHierarchyRoot))
+            {
+                this.RootTreeViewEntryItem = new TreeViewEntryItemModel(newDocumentHierarchyRoot, null);
+                FileSystemChangeNotifier.Watch(this.RootTreeViewEntryItem.Node.Path);
+            }
+
+            this.RefreshFromIntermediateNode(newDocumentHierarchyRoot, this.RootTreeViewEntryItem);
+            this.OnPropertyChanged("TreeViewItems");
+        }
+
+        private void RefreshFromIntermediateNode(INode node, TreeViewEntryItemModel treeViewEntryItem)
+        {
+            
+            // delete old items
+            var itemsToDelete = treeViewEntryItem.Children.Where(item => !node.Children.Contains(item.Node)).ToList();
+            foreach (TreeViewEntryItemModel item in itemsToDelete) {
+                item.Delete();
+            }
+
+            // add new items
+            foreach (INode docHierarchyChild in node.Children)
+            {
+                TreeViewEntryItemModel newTreeViewItem = null;
+                foreach (TreeViewEntryItemModel treeViewChild in treeViewEntryItem.Children)
+                {
+                    if (treeViewChild.Node.Equals(docHierarchyChild))
+                    {
+                        newTreeViewItem = treeViewChild;
+                        break;
+                    }
+                }
+                if (newTreeViewItem == null)
+                {
+                    newTreeViewItem = new TreeViewEntryItemModel(docHierarchyChild, treeViewEntryItem);
+                    newTreeViewItem.IsExpanded = this.TreeViewOptions.ExpandAllNodes;
+                }
+                this.RefreshFromIntermediateNode(docHierarchyChild, newTreeViewItem);
+            }
+
+        }
+
+        public void SelectItem(TreeViewEntryItemModel item)
         {
             if (this.IseIntegrator == null)
             {

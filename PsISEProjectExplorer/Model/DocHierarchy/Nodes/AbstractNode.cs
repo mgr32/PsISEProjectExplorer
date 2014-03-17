@@ -13,7 +13,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         public virtual string Path { get; private set; }
         public virtual string Name { get; private set; }
         public INode Parent { get; private set; }
-        public ICollection<INode> Children { get; private set; }
+        public ISet<INode> Children { get; private set; }
 
         // less = will be before other nodes
         public virtual int OrderValue { get { return 0; } }
@@ -37,7 +37,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 
         public override bool Equals(object obj)
         {
-            if (obj == null || this.GetType() != obj.GetType() || !(obj is INode))
+            if (obj == null || !(obj is INode))
             {
                 return false;
             }

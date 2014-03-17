@@ -122,7 +122,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.iseIntegrator.FileTabChanged += OnFileTabChanged;
                 if (this.IseIntegrator.SelectedFilePath != null)
                 {
-                    this.RefreshSearchTree();
+                    this.ReloadRootDirectory();
                 }
             }
 
@@ -131,7 +131,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         public MainViewModel()
         {
             this.TreeViewModel = new TreeViewModel();
-            this.SearchOptions = new SearchOptions(true, FullTextFieldType.NAME);
+            this.SearchOptions = new SearchOptions { IncludeAllParents = true, SearchField = FullTextFieldType.NAME };
             this.BackgroundIndexer = new BackgroundIndexer();
             this.BackgroundSearcher = new BackgroundSearcher();
             this.BackgroundIndexer.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundIndexerWorkCompleted);
@@ -200,18 +200,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private void BackgroundSearcherWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             this.SearchingInProgress = false;
-            INode node = (INode)e.Result;
-            if (node == null)
-            {
-                this.TreeViewModel.RootTreeViewEntryItem = null;
-                FileSystemChangeNotifier.Watch(null);
-                return;
-            }
-            bool expandNodes = !String.IsNullOrWhiteSpace(this.SearchText);
-            var rootEntryItem = new TreeViewEntryItem(node);
-            TreeViewEntryItem.MapToTreeViewEntryItem(node, rootEntryItem, expandNodes);
-            this.TreeViewModel.RootTreeViewEntryItem = rootEntryItem;
-            FileSystemChangeNotifier.Watch(rootEntryItem.Node.Path);
+            INode rootNode = (INode)e.Result;
+            this.TreeViewModel.TreeViewOptions.ExpandAllNodes = !String.IsNullOrWhiteSpace(this.SearchText);
+            this.TreeViewModel.RefreshFromRoot(rootNode);
         }
 
         private void OnFileSystemChanged(object sender, EventArgs args)
@@ -220,7 +211,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             Application.Current.Dispatcher.Invoke(new Action(() => { this.ReindexSearchTree(); }));
         }
 
-        private void RefreshSearchTree()
+        private void ReloadRootDirectory()
         {
             var selectedFilePath = this.IseIntegrator.SelectedFilePath;
             string newRootDirectoryToSearch = RootDirectoryProvider.GetRootDirectoryToSearch(selectedFilePath);
@@ -259,7 +250,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void OnFileTabChanged(object sender, IseEventArgs args)
         {
-            this.RefreshSearchTree();
+            this.ReloadRootDirectory();
         }      
 
     }

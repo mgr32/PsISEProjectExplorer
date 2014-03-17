@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.EnumsAndOptions
 {
-    public class SearchOptions
+    public class TreeViewOptions
     {
-        public bool IncludeAllParents { get; set; }
-
-        public FullTextFieldType SearchField { get; set; }
+        public bool ExpandAllNodes { get; set; }
     }
 }
