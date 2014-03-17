@@ -12,7 +12,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
 {
     public class TreeViewModel : BaseViewModel
     {
-        public TreeViewEntryItemModel RootTreeViewEntryItem { get; private set; }
 
         public TreeViewEntryItemObservableSet TreeViewItems
         {
@@ -26,35 +25,51 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        public TreeViewOptions TreeViewOptions { get; set; }
 
         public IseIntegrator IseIntegrator { get; set; }
 
+        private TreeViewEntryItemModel RootTreeViewEntryItem { get; set; }
+
         public TreeViewModel()
         {
-            this.TreeViewOptions = new TreeViewOptions();
         }
 
-        public void RefreshFromRoot(INode newDocumentHierarchyRoot)
+        public void RefreshFromRoot(INode newDocumentHierarchyRoot, bool expandAllNodes)
         {
             if (newDocumentHierarchyRoot == null)
             {
-                this.RootTreeViewEntryItem = null;
+                this.SetNewRootItem(null);
                 FileSystemChangeNotifier.Watch(null);
                 return;
             }
 
             if (this.RootTreeViewEntryItem == null || !this.RootTreeViewEntryItem.Node.Equals(newDocumentHierarchyRoot))
             {
-                this.RootTreeViewEntryItem = new TreeViewEntryItemModel(newDocumentHierarchyRoot, null);
-                FileSystemChangeNotifier.Watch(this.RootTreeViewEntryItem.Node.Path);
+                TreeViewEntryItemModel newRootItem = new TreeViewEntryItemModel(newDocumentHierarchyRoot, null);
+                this.SetNewRootItem(newRootItem);
+                FileSystemChangeNotifier.Watch(newRootItem.Node.Path);
             }
 
-            this.RefreshFromIntermediateNode(newDocumentHierarchyRoot, this.RootTreeViewEntryItem);
+            this.RefreshFromIntermediateNode(newDocumentHierarchyRoot, this.RootTreeViewEntryItem, expandAllNodes);
             this.OnPropertyChanged("TreeViewItems");
         }
 
-        private void RefreshFromIntermediateNode(INode node, TreeViewEntryItemModel treeViewEntryItem)
+        private void SetNewRootItem(TreeViewEntryItemModel rootItem)
+        {
+            this.RootTreeViewEntryItem = rootItem;
+        }
+
+        /*private TreeViewEntryItemModel CloneTree(TreeViewEntryItemModel item, TreeViewEntryItemModel parent)
+        {
+            TreeViewEntryItemModel newItem = item.Clone(parent);
+            foreach (TreeViewEntryItemModel child in item.Children)
+            {
+                this.CloneTree(child, newItem);
+            }
+            return newItem;
+        }*/
+
+        private void RefreshFromIntermediateNode(INode node, TreeViewEntryItemModel treeViewEntryItem, bool expandAllNodes)
         {
             
             // delete old items
@@ -78,12 +93,18 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 if (newTreeViewItem == null)
                 {
                     newTreeViewItem = new TreeViewEntryItemModel(docHierarchyChild, treeViewEntryItem);
-                    newTreeViewItem.IsExpanded = this.TreeViewOptions.ExpandAllNodes;
                 }
-                this.RefreshFromIntermediateNode(docHierarchyChild, newTreeViewItem);
+                if (expandAllNodes)
+                {
+                    newTreeViewItem.IsExpanded = true;
+                }
+                this.RefreshFromIntermediateNode(docHierarchyChild, newTreeViewItem, expandAllNodes);
             }
 
         }
+
+        
+
 
         public void SelectItem(TreeViewEntryItemModel item)
         {

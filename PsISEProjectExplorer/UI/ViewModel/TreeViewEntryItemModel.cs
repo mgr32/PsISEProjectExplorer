@@ -54,11 +54,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return this.isExpanded;
+                return this.Node.IsExpanded;
             }
             set
             {
-                this.isExpanded = value;
+                this.Node.IsExpanded = value;
                 this.OnPropertyChanged();
             }
         }
@@ -88,8 +88,15 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
             this.DocumentHierarchyNode = null;
             this.Children = null;
-            this.Parent = null;  
+            this.Parent = null;
         }
+
+        /*public TreeViewEntryItemModel Clone(TreeViewEntryItemModel newParent)
+        {
+            TreeViewEntryItemModel newItem = new TreeViewEntryItemModel(this.Node, newParent);
+            newItem.IsExpanded = this.IsExpanded;
+            return newItem;
+        }*/
 
         public override bool Equals(object obj)
         {

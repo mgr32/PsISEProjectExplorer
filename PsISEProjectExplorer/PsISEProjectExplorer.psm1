@@ -5,7 +5,7 @@ function Register-PsISEProjectExplorer() {
 
 function Register-PsISEProjectExplorerMenus() {
 	$psISE.CurrentPowershellTab.AddOnsMenu.Submenus.Add("Go To Definition", { (Get-PSISEProjectExplorerControlHandle).GoToDefinition() }, "F12")
-	$psISE.CurrentPowershellTab.AddOnsMenu.Submenus.Add("Find All References", { (Get-PSISEProjectExplorerControlHandle).FindAllReferences() }, "SHIFT+F12")
+	$psISE.CurrentPowershellTab.AddOnsMenu.Submenus.Add("Find All Occurrences", { (Get-PSISEProjectExplorerControlHandle).FindAllOccurrences() }, "SHIFT+F12")
 }
 
 function Get-PSISEProjectExplorerControlHandle() {

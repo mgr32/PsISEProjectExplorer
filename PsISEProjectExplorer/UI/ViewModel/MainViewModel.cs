@@ -201,8 +201,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             this.SearchingInProgress = false;
             INode rootNode = (INode)e.Result;
-            this.TreeViewModel.TreeViewOptions.ExpandAllNodes = !String.IsNullOrWhiteSpace(this.SearchText);
-            this.TreeViewModel.RefreshFromRoot(rootNode);
+            bool expandNewNodes = !String.IsNullOrWhiteSpace(this.SearchText);
+            this.TreeViewModel.RefreshFromRoot(rootNode, expandNewNodes);
         }
 
         private void OnFileSystemChanged(object sender, EventArgs args)
