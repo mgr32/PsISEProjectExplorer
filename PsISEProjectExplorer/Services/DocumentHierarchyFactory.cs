@@ -13,18 +13,46 @@ namespace PsISEProjectExplorer.Services
     {
         private static string FILES_PATTERN = "*.ps*1";
 
+        private IDictionary<string, DocumentHierarchy> DocumentHierarchies { get; set; }
+
+        public DocumentHierarchyFactory()
+        {
+            this.DocumentHierarchies = new Dictionary<string, DocumentHierarchy>();
+        }
+
         public DocumentHierarchy CreateDocumentHierarchy(string path)
         {
-            DocumentHierarchy docHierarchy = new DocumentHierarchy(new RootNode(path));
+            DocumentHierarchy docHierarchy;
+            this.DocumentHierarchies.TryGetValue(path, out docHierarchy);
+            if (docHierarchy != null)
+            {
+                return docHierarchy;
+            }
+            docHierarchy = new DocumentHierarchy(new RootNode(path));
+            this.DocumentHierarchies.Add(path, docHierarchy);
+            this.UpdateDocumentHierarchy(docHierarchy, path);
+            return docHierarchy;
+        }
+
+        public DocumentHierarchy UpdateDocumentHierarchy(string rootPath, string pathToUpdate)
+        {
+            DocumentHierarchy docHierarchy = this.DocumentHierarchies[rootPath];
+            this.UpdateDocumentHierarchy(docHierarchy, pathToUpdate);
+            return docHierarchy;
+        }
+
+        private void UpdateDocumentHierarchy(DocumentHierarchy docHierarchy, string pathToUpdate)
+        {
             DocumentHierarchyIndexer documentHierarchyIndexer = new DocumentHierarchyIndexer(docHierarchy);
             IList<FileSystemParser> fileSystemEntryList = new List<FileSystemParser>();
-            this.FillFileListRecursively(path, fileSystemEntryList);
+            this.FillFileListRecursively(pathToUpdate, fileSystemEntryList);
 
+            INode node = docHierarchy.GetNode(pathToUpdate);
+            docHierarchy.CutOffNode(node);
             foreach (FileSystemParser fileSystemEntry in fileSystemEntryList)
             {
                 documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
             }
-            return docHierarchy;
         }
 
         private bool FillFileListRecursively(string path, IList<FileSystemParser> result)

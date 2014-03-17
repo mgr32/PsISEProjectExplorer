@@ -12,7 +12,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         public abstract NodeType NodeType { get; }
         public virtual string Path { get; private set; }
         public virtual string Name { get; private set; }
-        public INode Parent { get; private set; }
+        public INode Parent { get; protected set; }
         public ISet<INode> Children { get; private set; }
         public bool IsExpanded { get; set; }
 
@@ -30,7 +30,10 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             this.Children = new SortedSet<INode>(DefaultNodeComparer.NODE_COMPARER);
             if (this.Parent != null)
             {
-                this.Parent.Children.Add(this);
+                if (!this.Parent.Children.Add(this))
+                {
+                    throw new InvalidOperationException(String.Format("Adding element '{0}' failed", this.Path));
+                }
             }
         }
 
@@ -47,6 +50,11 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         public override int GetHashCode()
         {
             return this.Path.GetHashCode();
+        }
+
+        public void CutOff()
+        {
+            this.Children.Clear();
         }
 
     }

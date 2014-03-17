@@ -48,6 +48,12 @@ namespace PsISEProjectExplorer.FullText
         {
             Query query = this.CustomQueryParser.Parse(searchText, field.ToString());
             return this.RunQuery(query);
+            
+        }
+
+        public void DeleteDocument(string path)
+        {
+            this.IndexWriter.DeleteDocuments(new Term(FullTextFieldType.PATH.ToString(), path));
         }
 
         private IEnumerable<string> RunQuery(Query query)

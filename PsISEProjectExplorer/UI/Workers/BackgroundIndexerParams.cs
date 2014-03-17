@@ -11,13 +11,13 @@ namespace PsISEProjectExplorer.UI.Workers
     {
         public DocumentHierarchyFactory DocumentHierarchyIndexer { get; private set; }
         public string RootDirectory { get; private set; }
-        public IEnumerable<string> FilesChanged { get; private set; }
+        public IEnumerable<string> PathsChanged { get; private set; }
 
-        public BackgroundIndexerParams(DocumentHierarchyFactory documentHierarchyIndexer, string rootDirectory, IEnumerable<string> filesChanged)
+        public BackgroundIndexerParams(DocumentHierarchyFactory documentHierarchyIndexer, string rootDirectory, IEnumerable<string> pathsChanged)
         {
             this.DocumentHierarchyIndexer = documentHierarchyIndexer;
             this.RootDirectory = rootDirectory;
-            this.FilesChanged = filesChanged;
+            this.PathsChanged = pathsChanged;
         }
         
     }

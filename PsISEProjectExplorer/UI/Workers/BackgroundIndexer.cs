@@ -23,11 +23,20 @@ namespace PsISEProjectExplorer.UI.Workers
         private void doWork(object sender, DoWorkEventArgs e)
         {
             BackgroundIndexerParams indexerParams = (BackgroundIndexerParams)e.Argument;
-            if (indexerParams.FilesChanged == null)
+            DocumentHierarchy docHierarchy = null;
+            if (indexerParams.PathsChanged == null)
             {
-                DocumentHierarchy docHierarchy = indexerParams.DocumentHierarchyIndexer.CreateDocumentHierarchy(indexerParams.RootDirectory);
-                e.Result = new DocumentHierarchySearcher(docHierarchy);
+                docHierarchy = indexerParams.DocumentHierarchyIndexer.CreateDocumentHierarchy(indexerParams.RootDirectory);
             }
+            else
+            {
+                foreach (string path in indexerParams.PathsChanged)
+                {
+                    docHierarchy = indexerParams.DocumentHierarchyIndexer.UpdateDocumentHierarchy(indexerParams.RootDirectory, path);
+                }
+            }
+
+            e.Result = new DocumentHierarchySearcher(docHierarchy);
         }
 
     }

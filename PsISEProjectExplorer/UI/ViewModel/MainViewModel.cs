@@ -8,6 +8,7 @@ using PsISEProjectExplorer.UI.Workers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -138,6 +139,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.BackgroundSearcher.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundSearcherWorkCompleted);
             this.DocumentHierarchyIndexer = new DocumentHierarchyFactory();
             FileSystemChangeNotifier.FileSystemChanged += OnFileSystemChanged;
+            FileSystemChangeNotifier.FileSystemRenamed += OnFileSystemRenamed;
         }
 
         public void GoToDefinition()
@@ -205,10 +207,29 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.TreeViewModel.RefreshFromRoot(rootNode, expandNewNodes);
         }
 
-        private void OnFileSystemChanged(object sender, EventArgs args)
+        private void OnFileSystemChanged(object sender, FileSystemEventArgs args)
         {
-            // TODO: reindex incrementally
-            Application.Current.Dispatcher.Invoke(new Action(() => { this.ReindexSearchTree(); }));
+            IList<string> pathsChanged = new List<string>() { this.GetParentDir(args.FullPath) };
+            Application.Current.Dispatcher.Invoke(new Action(() => { this.ReindexSearchTree(pathsChanged); }));
+        }
+
+        private void OnFileSystemRenamed(object sender, RenamedEventArgs args)
+        {
+            IList<string> pathsChanged = new List<string>();
+            string oldParent = this.GetParentDir(args.OldFullPath);
+            string newParent = this.GetParentDir(args.FullPath);
+            pathsChanged.Add(newParent);
+            if (oldParent.ToLowerInvariant() != newParent.ToLowerInvariant())
+            {
+                pathsChanged.Add(oldParent);
+            }
+            // TODO: handle workspace directory rename
+            Application.Current.Dispatcher.Invoke(new Action(() => { this.ReindexSearchTree(pathsChanged); }));
+        }
+
+        private string GetParentDir(string path)
+        {
+           return path.Substring(0, path.LastIndexOf('\\'));
         }
 
         private void ReloadRootDirectory()
@@ -218,12 +239,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
             if (newRootDirectoryToSearch != null && (this.RootDirectoryToSearch == null || !newRootDirectoryToSearch.StartsWith(this.RootDirectoryToSearch)))
             {
                 this.RootDirectoryToSearch = newRootDirectoryToSearch;
-                this.ReindexSearchTree();
+                this.ReindexSearchTree(null);
             }
 
         }
 
-        private void ReindexSearchTree()
+        private void ReindexSearchTree(IEnumerable<string> pathsChanged)
         {
             this.SearchTreeInitialized = false;
             if (this.IndexingInProgress)
@@ -231,7 +252,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 // TODO: handle it more nicely
                 return;
             }
-            BackgroundIndexerParams indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyIndexer, this.rootDirectoryToSearch, null);
+            BackgroundIndexerParams indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyIndexer, this.rootDirectoryToSearch, pathsChanged);
             this.IndexingInProgress = true;
             this.BackgroundIndexer.RunWorkerAsync(indexerParams);
         }
