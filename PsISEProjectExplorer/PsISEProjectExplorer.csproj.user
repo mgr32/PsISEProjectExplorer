@@ -3,7 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartAction>Program</StartAction>
     <StartProgram>C:\Windows\System32\WindowsPowerShell\v1.0\powershell_ise.exe</StartProgram>
-    <StartArguments>..\..\Debug_LoadToIse.ps1</StartArguments>
+    <StartArguments>..\..\..\Debug_LoadToIse.ps1</StartArguments>
   </PropertyGroup>
   <PropertyGroup>
     <ProjectView>ProjectFiles</ProjectView>

@@ -14,6 +14,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         string Name { get;  }
         INode Parent { get; }
         ISet<INode> Children { get; }
+        bool IsExpanded { get; set; }
 
         // less = will be before other nodes
         int OrderValue { get; }
