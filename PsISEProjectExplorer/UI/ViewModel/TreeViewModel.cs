@@ -94,6 +94,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 {
                     newTreeViewItem = new TreeViewEntryItemModel(docHierarchyChild, treeViewEntryItem);
                 }
+                else
+                {
+                    newTreeViewItem.UpdateNode(docHierarchyChild);
+                }
                 if (expandAllNodes)
                 {
                     newTreeViewItem.IsExpanded = true;

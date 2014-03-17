@@ -36,7 +36,7 @@ namespace PsISEProjectExplorer.FullText
         private void CreateDocument(string path, string name, string contents)
         {
             Document doc = new Document();
-            Field field = new Field(FullTextFieldType.PATH.ToString(), path, Field.Store.YES, Field.Index.NO);
+            Field field = new Field(FullTextFieldType.PATH.ToString(), path, Field.Store.YES, Field.Index.NOT_ANALYZED);
             doc.Add(field);
             field = new Field(FullTextFieldType.NAME.ToString(), name, Field.Store.NO, Field.Index.ANALYZED);
             field.OmitTermFreqAndPositions = true;

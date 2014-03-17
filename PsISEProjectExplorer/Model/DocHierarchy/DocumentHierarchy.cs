@@ -32,6 +32,18 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             return value;
         }
 
+        public void CutOffNode(INode node)
+        {
+            foreach (INode child in node.Children)
+            {
+                this.NodeMap.Remove(child.Path);
+                this.FullTextDirectory.DeleteDocument(child.Path);
+                this.CutOffNode(child);
+            }
+            node.CutOff();
+        }
+
+
         public INode CreateNewIntermediateDirectoryNode(string absolutePath, string segment, INode parent)
         {
             INode node = new DirectoryNode(absolutePath, segment, parent);

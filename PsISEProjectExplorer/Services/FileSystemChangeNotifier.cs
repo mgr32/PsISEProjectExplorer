@@ -10,7 +10,9 @@ namespace PsISEProjectExplorer.Services
 {
     public static class FileSystemChangeNotifier
     {
-        public static event EventHandler FileSystemChanged;
+        public static event FileSystemEventHandler FileSystemChanged;
+
+        public static event RenamedEventHandler FileSystemRenamed;
 
         private static FileSystemWatcher watcher = new FileSystemWatcher();
 
@@ -38,7 +40,7 @@ namespace PsISEProjectExplorer.Services
 
         private static void OnFileRenamed(object source, RenamedEventArgs e)
         {
-            FileSystemChanged(source, e);
+            FileSystemRenamed(source, e);
         }
     }
 }

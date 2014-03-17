@@ -46,9 +46,13 @@ namespace PsISEProjectExplorer
             this.MainViewModel.FindAllReferences();
         }
 
-        private void SearchResults_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void SearchResults_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem);
+            if (e.ClickCount > 1)
+            {
+                this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem);
+                e.Handled = true;
+            }
         }
 
         private void SearchResults_KeyUp(object sender, KeyEventArgs e)

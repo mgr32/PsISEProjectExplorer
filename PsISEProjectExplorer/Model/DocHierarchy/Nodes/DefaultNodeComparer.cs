@@ -28,7 +28,12 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             {
                 return x.OrderValue.CompareTo(y.OrderValue);
             }
-            return x.Name.CompareTo(y.Name);
+            int nameCompare = x.Name.CompareTo(y.Name);
+            if (nameCompare != 0)
+            {
+                return nameCompare;
+            }
+            return x.Path.CompareTo(y.Path);
         }
     }
 }

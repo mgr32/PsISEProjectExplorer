@@ -13,7 +13,19 @@ namespace PsISEProjectExplorer.UI.ViewModel
 {
     public class TreeViewEntryItemModel : BaseViewModel
     {
-        private INode DocumentHierarchyNode { get; set; }
+        private INode documentHierarchyNode;
+
+        private INode DocumentHierarchyNode { 
+            get
+            {
+                return this.documentHierarchyNode;
+            }
+            set
+            {
+                this.documentHierarchyNode = value;
+                this.OnPropertyChanged("IsExpanded");
+            }
+        }
 
         public INode Node
         {
@@ -47,8 +59,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
         }
 
         public TreeViewEntryItemModel Parent { get; private set; }
-
-        private bool isExpanded;
 
         public bool IsExpanded
         {
@@ -89,6 +99,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.DocumentHierarchyNode = null;
             this.Children = null;
             this.Parent = null;
+        }
+
+        public void UpdateNode(INode node)
+        {
+            this.DocumentHierarchyNode = node;
         }
 
         /*public TreeViewEntryItemModel Clone(TreeViewEntryItemModel newParent)
