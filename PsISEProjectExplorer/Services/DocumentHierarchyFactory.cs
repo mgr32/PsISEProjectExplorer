@@ -53,6 +53,7 @@ namespace PsISEProjectExplorer.Services
                 {
                     docHierarchy.RemoveNode(node);
                 }
+                // TODO: check if still matches pattern
                 if (File.Exists(path))
                 {
                     fileSystemEntryList.Add(new FileSystemParser(path, false));
