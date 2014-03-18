@@ -46,6 +46,11 @@ namespace PsISEProjectExplorer
             this.MainViewModel.FindAllOccurrences();
         }
 
+        public void LocateFileInTree()
+        {
+            this.MainViewModel.LocateCurrentFileInTree();
+        }
+
         private void SearchResults_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount > 1)

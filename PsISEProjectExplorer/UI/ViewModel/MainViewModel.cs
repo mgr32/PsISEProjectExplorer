@@ -166,9 +166,25 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 return;
             }
-            this.searchText = funcName;
-            this.SearchInFiles = true;
-            this.OnPropertyChanged("SearchText");
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                // TODO: this is hacky...
+                this.searchText = string.Empty;
+                this.SearchInFiles = true;
+                this.SearchText = funcName;
+               
+            }));
+            
+        }
+
+        public void LocateCurrentFileInTree()
+        {
+            string path = this.IseIntegrator.SelectedFilePath;
+            if (path == null)
+            {
+                return;
+            }
+            // TODO: WPF suxx - http://blog.quantumbitdesigns.com/2008/07/22/programmatically-selecting-an-item-in-a-treeview
         }
 
         private string GetFunctionNameAtCurrentPosition()

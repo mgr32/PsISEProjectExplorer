@@ -107,9 +107,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         }
 
-        
-
-
         public void SelectItem(TreeViewEntryItemModel item)
         {
             if (this.IseIntegrator == null)

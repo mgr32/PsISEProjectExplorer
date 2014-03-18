@@ -46,7 +46,7 @@ namespace PsISEProjectExplorer.Services
         private void ParseFile()
         {
             // TODO: error handling
-            using (FileStream fs = File.Open(this.Path, FileMode.Open))
+            using (FileStream fs = File.Open(this.Path, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
                 using (BufferedStream bs = new BufferedStream(fs))
                 {
