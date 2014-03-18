@@ -19,7 +19,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         // less = will be before other nodes
         int OrderValue { get; }
 
-        void CutOff();
+        void Remove();
 
     }
 }

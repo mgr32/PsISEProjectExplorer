@@ -83,9 +83,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.searchInFiles = value;
                 this.OnPropertyChanged();
+                this.SearchOptions.SearchField = (this.searchInFiles ? FullTextFieldType.CATCH_ALL : FullTextFieldType.NAME);
                 if (!String.IsNullOrEmpty(this.SearchText))
                 {
-                    this.SearchOptions.SearchField = (this.searchInFiles ? FullTextFieldType.CATCH_ALL : FullTextFieldType.NAME);
                     this.RunSearch();
                 }
             }
@@ -159,7 +159,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             
         }
 
-        public void FindAllReferences()
+        public void FindAllOccurrences()
         {
             string funcName = this.GetFunctionNameAtCurrentPosition();
             if (funcName == null)
@@ -209,27 +209,33 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void OnFileSystemChanged(object sender, FileSystemEventArgs args)
         {
-            IList<string> pathsChanged = new List<string>() { this.GetParentDir(args.FullPath) };
+            IList<string> pathsChanged = new List<string>() { args.FullPath };
+            // workspace directory change
+            if (args.FullPath.ToLowerInvariant() == this.rootDirectoryToSearch.ToLowerInvariant())
+            {
+                pathsChanged = null;
+            }
             Application.Current.Dispatcher.Invoke(new Action(() => { this.ReindexSearchTree(pathsChanged); }));
         }
 
         private void OnFileSystemRenamed(object sender, RenamedEventArgs args)
         {
             IList<string> pathsChanged = new List<string>();
-            string oldParent = this.GetParentDir(args.OldFullPath);
-            string newParent = this.GetParentDir(args.FullPath);
-            pathsChanged.Add(newParent);
-            if (oldParent.ToLowerInvariant() != newParent.ToLowerInvariant())
+            // workspace directory change
+            if (args.OldFullPath.ToLowerInvariant() == this.rootDirectoryToSearch.ToLowerInvariant())
             {
-                pathsChanged.Add(oldParent);
+                pathsChanged = null;
             }
-            // TODO: handle workspace directory rename
+            else
+            {
+                pathsChanged.Add(args.OldFullPath);
+                if (args.OldFullPath.ToLowerInvariant() != args.FullPath.ToLowerInvariant())
+                {
+                    pathsChanged.Add(args.FullPath);
+                }
+            }
+            
             Application.Current.Dispatcher.Invoke(new Action(() => { this.ReindexSearchTree(pathsChanged); }));
-        }
-
-        private string GetParentDir(string path)
-        {
-           return path.Substring(0, path.LastIndexOf('\\'));
         }
 
         private void ReloadRootDirectory()

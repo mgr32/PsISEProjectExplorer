@@ -83,9 +83,12 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             return this.Path.GetHashCode();
         }
 
-        public void CutOff()
+        public void Remove()
         {
-            this.Node.CutOff();
+            if (this.Parent != null)
+            {
+                this.Parent.Children.Remove(this);
+            }
         }
 
     }
