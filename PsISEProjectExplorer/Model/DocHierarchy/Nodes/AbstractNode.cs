@@ -52,9 +52,12 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             return this.Path.GetHashCode();
         }
 
-        public void CutOff()
+        public void Remove()
         {
-            this.Children.Clear();
+            if (this.Parent != null)
+            {
+                this.Parent.Children.Remove(this);
+            }
         }
 
     }

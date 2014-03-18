@@ -41,9 +41,9 @@ namespace PsISEProjectExplorer
             this.MainViewModel.GoToDefinition();
         }
 
-        public void FindAllReferences()
+        public void FindAllOccurrences()
         {
-            this.MainViewModel.FindAllReferences();
+            this.MainViewModel.FindAllOccurrences();
         }
 
         private void SearchResults_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -32,15 +32,15 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             return value;
         }
 
-        public void CutOffNode(INode node)
+        public void RemoveNode(INode node)
         {
+            this.NodeMap.Remove(node.Path);
+            this.FullTextDirectory.DeleteDocument(node.Path);
+            node.Remove();
             foreach (INode child in node.Children)
             {
-                this.NodeMap.Remove(child.Path);
-                this.FullTextDirectory.DeleteDocument(child.Path);
-                this.CutOffNode(child);
+                this.RemoveNode(child);
             }
-            node.CutOff();
         }
 
 

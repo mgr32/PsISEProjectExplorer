@@ -30,10 +30,7 @@ namespace PsISEProjectExplorer.UI.Workers
             }
             else
             {
-                foreach (string path in indexerParams.PathsChanged)
-                {
-                    docHierarchy = indexerParams.DocumentHierarchyIndexer.UpdateDocumentHierarchy(indexerParams.RootDirectory, path);
-                }
+                docHierarchy = indexerParams.DocumentHierarchyIndexer.UpdateDocumentHierarchy(indexerParams.RootDirectory, indexerParams.PathsChanged);
             }
 
             e.Result = new DocumentHierarchySearcher(docHierarchy);

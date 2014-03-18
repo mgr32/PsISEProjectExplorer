@@ -30,25 +30,39 @@ namespace PsISEProjectExplorer.Services
             }
             docHierarchy = new DocumentHierarchy(new RootNode(path));
             this.DocumentHierarchies.Add(path, docHierarchy);
-            this.UpdateDocumentHierarchy(docHierarchy, path);
+            this.UpdateDocumentHierarchy(docHierarchy, new List<string>() { path });
             return docHierarchy;
         }
 
-        public DocumentHierarchy UpdateDocumentHierarchy(string rootPath, string pathToUpdate)
+        public DocumentHierarchy UpdateDocumentHierarchy(string rootPath, IEnumerable<string> pathsToUpdate)
         {
             DocumentHierarchy docHierarchy = this.DocumentHierarchies[rootPath];
-            this.UpdateDocumentHierarchy(docHierarchy, pathToUpdate);
+            this.UpdateDocumentHierarchy(docHierarchy, pathsToUpdate);
             return docHierarchy;
         }
 
-        private void UpdateDocumentHierarchy(DocumentHierarchy docHierarchy, string pathToUpdate)
+        private void UpdateDocumentHierarchy(DocumentHierarchy docHierarchy, IEnumerable<string> pathsToUpdate)
         {
             DocumentHierarchyIndexer documentHierarchyIndexer = new DocumentHierarchyIndexer(docHierarchy);
             IList<FileSystemParser> fileSystemEntryList = new List<FileSystemParser>();
-            this.FillFileListRecursively(pathToUpdate, fileSystemEntryList);
 
-            INode node = docHierarchy.GetNode(pathToUpdate);
-            docHierarchy.CutOffNode(node);
+            foreach (string path in pathsToUpdate)
+            {
+                INode node = docHierarchy.GetNode(path);
+                if (node != null)
+                {
+                    docHierarchy.RemoveNode(node);
+                }
+                if (File.Exists(path))
+                {
+                    fileSystemEntryList.Add(new FileSystemParser(path, false));
+                }
+                else if (Directory.Exists(path))
+                {
+                    this.FillFileListRecursively(path, fileSystemEntryList);
+                }
+            }           
+            
             foreach (FileSystemParser fileSystemEntry in fileSystemEntryList)
             {
                 documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
