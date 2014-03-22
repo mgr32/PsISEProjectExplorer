@@ -54,20 +54,32 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.OnPropertyChanged("TreeViewItems");
         }
 
+        public TreeViewEntryItemModel FindTreeViewEntryItemByPath(string path)
+        {
+            return this.FindTreeViewEntryItemByPath(this.RootTreeViewEntryItem, path);
+        }
+
+        private TreeViewEntryItemModel FindTreeViewEntryItemByPath(TreeViewEntryItemModel item, string path)
+        {
+            foreach (TreeViewEntryItemModel child in item.Children)
+            {
+                if (child.Path == path)
+                {
+                    return child;
+                }
+                var result = this.FindTreeViewEntryItemByPath(child, path);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+            return null;
+        }
+
         private void SetNewRootItem(TreeViewEntryItemModel rootItem)
         {
             this.RootTreeViewEntryItem = rootItem;
         }
-
-        /*private TreeViewEntryItemModel CloneTree(TreeViewEntryItemModel item, TreeViewEntryItemModel parent)
-        {
-            TreeViewEntryItemModel newItem = item.Clone(parent);
-            foreach (TreeViewEntryItemModel child in item.Children)
-            {
-                this.CloneTree(child, newItem);
-            }
-            return newItem;
-        }*/
 
         private void RefreshFromIntermediateNode(INode node, TreeViewEntryItemModel treeViewEntryItem, bool expandAllNodes)
         {

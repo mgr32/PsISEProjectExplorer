@@ -58,6 +58,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        public string Path
+        {
+            get
+            {
+                return this.DocumentHierarchyNode.Path;
+            }
+        }
+
         public TreeViewEntryItemModel Parent { get; private set; }
 
         public bool IsExpanded
@@ -105,13 +113,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             this.DocumentHierarchyNode = node;
         }
-
-        /*public TreeViewEntryItemModel Clone(TreeViewEntryItemModel newParent)
-        {
-            TreeViewEntryItemModel newItem = new TreeViewEntryItemModel(this.Node, newParent);
-            newItem.IsExpanded = this.IsExpanded;
-            return newItem;
-        }*/
 
         public override bool Equals(object obj)
         {

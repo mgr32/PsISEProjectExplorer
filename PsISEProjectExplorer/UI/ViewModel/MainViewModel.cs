@@ -181,16 +181,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
             
         }
 
-        public void LocateCurrentFileInTree()
-        {
-            string path = this.IseIntegrator.SelectedFilePath;
-            if (path == null)
-            {
-                return;
-            }
-            // TODO: WPF suxx - http://blog.quantumbitdesigns.com/2008/07/22/programmatically-selecting-an-item-in-a-treeview
-        }
-
         private string GetFunctionNameAtCurrentPosition()
         {
             if (this.DocumentHierarchySearcher == null)
