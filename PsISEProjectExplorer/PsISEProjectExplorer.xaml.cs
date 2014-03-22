@@ -5,9 +5,11 @@ using NLog.Layouts;
 using NLog.Targets;
 using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.ViewModel;
+using PsISEProjectExplorer.UI;
 using System;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows;
 
 namespace PsISEProjectExplorer
 {
@@ -53,7 +55,22 @@ namespace PsISEProjectExplorer
 
         public void LocateFileInTree()
         {
-            this.MainViewModel.LocateCurrentFileInTree();
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                string path = this.MainViewModel.IseIntegrator.SelectedFilePath;
+                if (path == null)
+                {
+                    return;
+                }
+                TreeViewEntryItemModel item = this.MainViewModel.TreeViewModel.FindTreeViewEntryItemByPath(path);
+                if (item == null)
+                {
+                    return;
+                }
+
+                SearchResults.SelectItem(item);
+                this.MainViewModel.IseIntegrator.SetFocusOnCurrentTab();
+            }));
         }
 
         private void configureLogging()

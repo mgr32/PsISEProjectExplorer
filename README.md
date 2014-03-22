@@ -9,7 +9,8 @@ Provides a tree view that enables to index and explore whole directory structure
 * Visualize directory structure (also files not loaded to ISE yet) in a Solution Explorer-like tree view.
 * Show functions in leafs of the tree view and enable to jump to the function definition (F12, similarly to some available Function Explorer plugins).
 * Search the tree view (file names, function names, optionally file contents).
-* Find all occurrences of the symbol under the cursor (SHIFT+F12).
+* Find all occurrences of the text under the cursor (SHIFT+F12).
+* Locate current file in the tree view (SHIFT+ALT+L).
 * Automatic reindex on file system change.
 
 ##### Screenshot 
@@ -31,7 +32,7 @@ If this is not enough for your work, please create an issue with a suggestion ho
 
 ##### Why?
 
-Because I work on complex Powershell modules with lots of functions, and navigating between them in ISE is painful. I wasn't able to find an ISE plugin that could search through whole directory structure, without requiring the user to load the files into the ISE first. Also, I was lacking 'Go to Definition' and 'Find all references' features from Visual Studio.
+Because I work on complex Powershell modules with lots of functions, and navigating between them in ISE is painful. I wasn't able to find an ISE plugin that could search through whole directory structure, without requiring the user to load the files into the ISE first. Also, I was lacking 'Go to Definition' and 'Find all references' features from Visual Studio and 'Locate in Solution Explorer' from Resharper.
 
 ##### Implementation details
 

@@ -60,6 +60,16 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             return new EditorInfo(file.Editor.CaretLineText, file.Editor.CaretColumn);           
         }
 
+        public void SetFocusOnCurrentTab()
+        {
+            var file = this.HostObject.CurrentPowerShellTab.Files.SelectedFile;
+            if (file == null)
+            {
+                return;
+            }
+            file.Editor.Focus();
+        }
+
         private void OnIseTabChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "LastEditorWithFocus")

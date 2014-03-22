@@ -91,6 +91,7 @@
     <Compile Include="UI\ViewModel\DefaultTreeViewEntryItemComparer.cs" />
     <Compile Include="UI\ViewModel\MainViewModel.cs" />
     <Compile Include="UI\ViewModel\TreeViewEntryItemObservableSet.cs" />
+    <Compile Include="UI\TreeViewHelper.cs" />
     <Compile Include="UI\ViewModel\TreeViewModel.cs" />
     <Compile Include="UI\Workers\BackgroundIndexer.cs">
       <SubType>Component</SubType>
