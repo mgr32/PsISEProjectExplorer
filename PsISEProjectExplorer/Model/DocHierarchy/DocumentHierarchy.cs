@@ -37,7 +37,8 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             this.NodeMap.Remove(node.Path);
             this.FullTextDirectory.DeleteDocument(node.Path);
             node.Remove();
-            foreach (INode child in node.Children)
+            var itemsToBeRemoved = new List<INode>(node.Children);
+            foreach (INode child in itemsToBeRemoved)
             {
                 this.RemoveNode(child);
             }

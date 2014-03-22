@@ -72,7 +72,5 @@ namespace PsISEProjectExplorer.Services
             }
             return currentNode;
         }
-
-        
     }
 }

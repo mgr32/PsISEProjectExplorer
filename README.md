@@ -42,7 +42,7 @@ Uses two background threads:
 * Second one for searching the indexes.
 
 ##### Third party libraries
-Uses Apache Lucene .Net 3.0.3 - https://lucenenet.apache.org/ 
-
-Uses icons created by Mark James - Silk icon set 1.3 - http://www.famfamfam.com/lab/icons/silk/
+* Apache Lucene .Net 3.0.3 - https://lucenenet.apache.org/ 
+* NLog 2.1 - http://nlog-project.org/
+* Silk icon set 1.3 by Mark James - http://www.famfamfam.com/lab/icons/silk/
 

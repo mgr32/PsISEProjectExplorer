@@ -45,18 +45,27 @@ namespace PsISEProjectExplorer.Services
 
         private void ParseFile()
         {
-            // TODO: error handling
-            using (FileStream fs = File.Open(this.Path, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+
+            try
             {
-                using (BufferedStream bs = new BufferedStream(fs))
+                using (
+                    FileStream fs = File.Open(this.Path, FileMode.Open, FileAccess.Read,
+                        FileShare.Delete | FileShare.ReadWrite))
                 {
-                    using (StreamReader sr = new StreamReader(bs))
+                    using (BufferedStream bs = new BufferedStream(fs))
                     {
-                        this.FileContents = sr.ReadToEnd();
+                        using (StreamReader sr = new StreamReader(bs))
+                        {
+                            this.FileContents = sr.ReadToEnd();
+                        }
                     }
                 }
+                this.PowershellFunctions = PowershellTokenizer.GetFunctions(this.FileContents);
             }
-            this.PowershellFunctions = PowershellTokenizer.GetFunctions(this.FileContents);
+            catch (IOException e)
+            {
+                //TODO: for now just swallowing but need to log!
+            }
         }
     }
 }

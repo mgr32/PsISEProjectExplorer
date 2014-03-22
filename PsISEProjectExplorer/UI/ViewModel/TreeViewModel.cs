@@ -79,7 +79,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
 
             // add new items
-            foreach (INode docHierarchyChild in node.Children)
+            IList<INode> childrenToIterate = new List<INode>(node.Children);
+            foreach (INode docHierarchyChild in childrenToIterate)
             {
                 TreeViewEntryItemModel newTreeViewItem = null;
                 foreach (TreeViewEntryItemModel treeViewChild in treeViewEntryItem.Children)

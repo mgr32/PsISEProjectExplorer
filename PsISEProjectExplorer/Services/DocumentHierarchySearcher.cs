@@ -21,29 +21,34 @@ namespace PsISEProjectExplorer.Services
 
         public INode GetFilteredDocumentHierarchyNodes(string filter, SearchOptions searchOptions)
         {
-            
-            if (String.IsNullOrWhiteSpace(filter))
+            lock (this.DocumentHierarchy)
             {
-                return this.DocumentHierarchy.RootNode;
-            }
+                if (String.IsNullOrWhiteSpace(filter))
+                {
+                    return this.DocumentHierarchy.RootNode;
+                }
 
-            INode newRoot = new RootNode(this.DocumentHierarchy.RootNode.Path);
-            IEnumerable<INode> nodes = this.DocumentHierarchy.SearchNodesFullText(filter, searchOptions.SearchField);
-            if (searchOptions.IncludeAllParents)
-            {
-                this.FillNewFilteredDocumentHierarchyRecursively(nodes, newRoot, this.DocumentHierarchy.RootNode);
+                INode newRoot = new RootNode(this.DocumentHierarchy.RootNode.Path);
+                IEnumerable<INode> nodes = this.DocumentHierarchy.SearchNodesFullText(filter, searchOptions.SearchField);
+                if (searchOptions.IncludeAllParents)
+                {
+                    this.FillNewFilteredDocumentHierarchyRecursively(nodes, newRoot, this.DocumentHierarchy.RootNode);
+                }
+                else
+                {
+                    this.FillNewDocumentHierarchyRecursively(nodes, newRoot);
+                }
+
+                return newRoot;
             }
-            else
-            {
-                this.FillNewDocumentHierarchyRecursively(nodes, newRoot);
-            }
-        
-           return newRoot;
         }
 
         public INode GetFunctionNodeByName(string name)
         {
-            return this.DocumentHierarchy.SearchNodesByTerm(name, FullTextFieldType.NAME_NOT_ANALYZED).Where(node => node.NodeType == NodeType.FUNCTION).FirstOrDefault();
+            lock (this.DocumentHierarchy)
+            {
+                return this.DocumentHierarchy.SearchNodesByTerm(name, FullTextFieldType.NAME_NOT_ANALYZED).Where(node => node.NodeType == NodeType.FUNCTION).FirstOrDefault();
+            }
         }
 
         private void FillNewDocumentHierarchyRecursively(IEnumerable<INode> filteredNodes, INode newParent) 

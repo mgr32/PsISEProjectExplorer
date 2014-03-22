@@ -1,4 +1,8 @@
 ﻿using Microsoft.PowerShell.Host.ISE;
+using NLog;
+using NLog.Config;
+using NLog.Layouts;
+using NLog.Targets;
 using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.ViewModel;
 using System;
@@ -31,6 +35,7 @@ namespace PsISEProjectExplorer
 
         public ProjectExplorerWindow()
         {
+            this.configureLogging();
             this.MainViewModel = new MainViewModel();
             this.DataContext = this.MainViewModel;
             InitializeComponent();
@@ -51,6 +56,19 @@ namespace PsISEProjectExplorer
             this.MainViewModel.LocateCurrentFileInTree();
         }
 
+        private void configureLogging()
+        {
+            #if DEBUG
+            LoggingConfiguration config = new LoggingConfiguration();
+            FileTarget target = new FileTarget();
+            target.FileName = "C:\\PSIseProjectExplorer.log.txt";
+            target.Layout = "${longdate}|${level:uppercase=true}|${logger}|${threadid}|${message}";
+            config.AddTarget("file", target);
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, target));
+            LogManager.Configuration = config;
+            #endif
+        }
+
         private void SearchResults_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount > 1)
@@ -67,8 +85,5 @@ namespace PsISEProjectExplorer
                 this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem);
             }
         }
-
-
-       
     }
 }

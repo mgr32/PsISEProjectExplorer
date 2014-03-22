@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NLog;
+using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -9,8 +11,13 @@ namespace PsISEProjectExplorer.UI.Workers
 {
     public class BackgroundSearcher : BackgroundWorker
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        public DateTime StartTimestamp { get; private set; }
+
         public BackgroundSearcher()
         {
+            this.StartTimestamp = DateTime.Now;
             this.DoWork += new DoWorkEventHandler(doWork);
         }
 
@@ -22,7 +29,9 @@ namespace PsISEProjectExplorer.UI.Workers
                 e.Result = null;
                 return;
             }
-            e.Result = indexerParams.DocumentHierarchySearcher.GetFilteredDocumentHierarchyNodes(indexerParams.SearchText, indexerParams.SearchOptions);
+            logger.Info("Searching started, text: " + indexerParams.SearchText);
+            INode result = indexerParams.DocumentHierarchySearcher.GetFilteredDocumentHierarchyNodes(indexerParams.SearchText, indexerParams.SearchOptions);
+            e.Result = new WorkerResult(this.StartTimestamp, result);
         }
     }
 

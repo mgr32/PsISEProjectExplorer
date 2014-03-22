@@ -43,30 +43,33 @@ namespace PsISEProjectExplorer.Services
 
         private void UpdateDocumentHierarchy(DocumentHierarchy docHierarchy, IEnumerable<string> pathsToUpdate)
         {
-            DocumentHierarchyIndexer documentHierarchyIndexer = new DocumentHierarchyIndexer(docHierarchy);
-            IList<FileSystemParser> fileSystemEntryList = new List<FileSystemParser>();
+            lock (docHierarchy)
+            {
+                DocumentHierarchyIndexer documentHierarchyIndexer = new DocumentHierarchyIndexer(docHierarchy);
+                IList<FileSystemParser> fileSystemEntryList = new List<FileSystemParser>();
 
-            foreach (string path in pathsToUpdate)
-            {
-                INode node = docHierarchy.GetNode(path);
-                if (node != null)
+                foreach (string path in pathsToUpdate)
                 {
-                    docHierarchy.RemoveNode(node);
+                    INode node = docHierarchy.GetNode(path);
+                    if (node != null)
+                    {
+                        docHierarchy.RemoveNode(node);
+                    }
+                    // TODO: check if still matches pattern
+                    if (File.Exists(path))
+                    {
+                        fileSystemEntryList.Add(new FileSystemParser(path, false));
+                    }
+                    else if (Directory.Exists(path))
+                    {
+                        this.FillFileListRecursively(path, fileSystemEntryList);
+                    }
                 }
-                // TODO: check if still matches pattern
-                if (File.Exists(path))
+
+                foreach (FileSystemParser fileSystemEntry in fileSystemEntryList)
                 {
-                    fileSystemEntryList.Add(new FileSystemParser(path, false));
+                    documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
                 }
-                else if (Directory.Exists(path))
-                {
-                    this.FillFileListRecursively(path, fileSystemEntryList);
-                }
-            }           
-            
-            foreach (FileSystemParser fileSystemEntry in fileSystemEntryList)
-            {
-                documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
             }
         }
 
