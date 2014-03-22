@@ -1,4 +1,5 @@
-﻿using PsISEProjectExplorer.EnumsAndOptions;
+﻿using NLog;
+using PsISEProjectExplorer.EnumsAndOptions;
 using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
@@ -19,6 +20,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
 {
     public class MainViewModel : BaseViewModel
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         public TreeViewModel TreeViewModel { get; private set; }
 
         private string rootDirectoryToSearch;
@@ -69,6 +72,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             set
             {
                 this.searchText = value;
+                logger.Debug("Search text changed to: " + this.searchText);
                 this.OnPropertyChanged();
                 this.RunSearch();
             }
@@ -108,6 +112,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private DocumentHierarchyFactory DocumentHierarchyIndexer { get; set; }
 
+        private DateTime LastSearchStartTime { get; set; }
+
+        private DateTime LastIndexStartTime { get; set; }
+
         private IseIntegrator iseIntegrator;
 
         public IseIntegrator IseIntegrator
@@ -133,10 +141,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             this.TreeViewModel = new TreeViewModel();
             this.SearchOptions = new SearchOptions { IncludeAllParents = true, SearchField = FullTextFieldType.NAME };
-            this.BackgroundIndexer = new BackgroundIndexer();
-            this.BackgroundSearcher = new BackgroundSearcher();
-            this.BackgroundIndexer.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundIndexerWorkCompleted);
-            this.BackgroundSearcher.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundSearcherWorkCompleted);
             this.DocumentHierarchyIndexer = new DocumentHierarchyFactory();
             FileSystemChangeNotifier.FileSystemChanged += OnFileSystemChanged;
             FileSystemChangeNotifier.FileSystemRenamed += OnFileSystemRenamed;
@@ -206,7 +210,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private void BackgroundIndexerWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             this.IndexingInProgress = false;
-            this.DocumentHierarchySearcher = (DocumentHierarchySearcher)e.Result;
+            WorkerResult result = (WorkerResult)e.Result;
+            if (result.StartTimestamp != this.LastIndexStartTime)
+            {
+                return;
+            }
+            logger.Debug("Indexing ended, searchTreeInitialized: " + this.SearchTreeInitialized);
+            this.DocumentHierarchySearcher = (DocumentHierarchySearcher)result.Result;
             if (!this.SearchTreeInitialized)
             {
                 this.RunSearch();
@@ -218,7 +228,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private void BackgroundSearcherWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             this.SearchingInProgress = false;
-            INode rootNode = (INode)e.Result;
+            WorkerResult result = (WorkerResult)e.Result;
+            if (result.StartTimestamp != this.LastSearchStartTime)
+            {
+                return;
+            }
+            logger.Debug("Searching ended");
+            INode rootNode = (INode)result.Result;
             bool expandNewNodes = !String.IsNullOrWhiteSpace(this.SearchText);
             this.TreeViewModel.RefreshFromRoot(rootNode, expandNewNodes);
         }
@@ -231,6 +247,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 pathsChanged = null;
             }
+            logger.Debug("OnFileSystemChanged: " + string.Join(",", pathsChanged));
             Application.Current.Dispatcher.Invoke(new Action(() => { this.ReindexSearchTree(pathsChanged); }));
         }
 
@@ -250,7 +267,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     pathsChanged.Add(args.FullPath);
                 }
             }
-            
+            logger.Debug("OnFileSystemRenamed: " + string.Join(",", pathsChanged));
             Application.Current.Dispatcher.Invoke(new Action(() => { this.ReindexSearchTree(pathsChanged); }));
         }
 
@@ -269,25 +286,21 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private void ReindexSearchTree(IEnumerable<string> pathsChanged)
         {
             this.SearchTreeInitialized = false;
-            if (this.IndexingInProgress)
-            {
-                // TODO: handle it more nicely
-                return;
-            }
             BackgroundIndexerParams indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyIndexer, this.rootDirectoryToSearch, pathsChanged);
             this.IndexingInProgress = true;
+            this.BackgroundIndexer = new BackgroundIndexer();
+            this.LastIndexStartTime = this.BackgroundIndexer.StartTimestamp;
+            this.BackgroundIndexer.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundIndexerWorkCompleted);
             this.BackgroundIndexer.RunWorkerAsync(indexerParams);
         }
 
         private void RunSearch()
         {
             BackgroundSearcherParams searcherParams = new BackgroundSearcherParams(this.DocumentHierarchySearcher, this.SearchOptions, this.SearchText);
-            if (this.SearchingInProgress)
-            {
-                // TODO: handle it more nicely
-                return;
-            }
-            this.SearchingInProgress = true;           
+            this.SearchingInProgress = true;
+            this.BackgroundSearcher = new BackgroundSearcher();
+            this.LastSearchStartTime = this.BackgroundSearcher.StartTimestamp;
+            this.BackgroundSearcher.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundSearcherWorkCompleted);
             this.BackgroundSearcher.RunWorkerAsync(searcherParams);
         }
 
