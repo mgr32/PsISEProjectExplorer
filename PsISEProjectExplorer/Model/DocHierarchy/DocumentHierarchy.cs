@@ -1,4 +1,4 @@
-﻿using PsISEProjectExplorer.EnumsAndOptions;
+﻿using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.FullText;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using System;
@@ -69,16 +69,26 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             return functionNode;
         }
 
-        public IEnumerable<INode> SearchNodesFullText(string filter, FullTextFieldType fieldType)
+        public IEnumerable<SearchResult> SearchNodesFullText(string filter, FullTextFieldType fieldType)
         {
-            IEnumerable<string> paths = this.FullTextDirectory.Search(filter, fieldType);
-            return paths.Select(path => this.GetNode(path));
+            IEnumerable<SearchResult> searchResults = this.FullTextDirectory.Search(filter, fieldType);
+            this.AddNodesToSearchResults(searchResults);
+            return searchResults;
         }
 
-        public IEnumerable<INode> SearchNodesByTerm(string filter, FullTextFieldType fieldType)
+        public IEnumerable<SearchResult> SearchNodesByTerm(string filter, FullTextFieldType fieldType)
         {
-            IEnumerable<string> paths = this.FullTextDirectory.SearchTerm(filter, fieldType);
-            return paths.Select(path => this.GetNode(path));
+            IEnumerable<SearchResult> searchResults = this.FullTextDirectory.SearchTerm(filter, fieldType);
+            this.AddNodesToSearchResults(searchResults);
+            return searchResults;
+        }
+
+        private void AddNodesToSearchResults(IEnumerable<SearchResult> searchResults)
+        {
+            foreach (SearchResult searchResult in searchResults)
+            {
+                searchResult.Node = this.GetNode(searchResult.Path);
+            }
         }
 
     }

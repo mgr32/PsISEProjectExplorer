@@ -66,13 +66,17 @@
     <Reference Include="System.Management.Automation" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\LineInfo.cs" />
+    <Compile Include="Model\TokenPosition.cs" />
+    <Compile Include="Model\SearchResult.cs" />
     <Compile Include="FullText\TokenizeRules.cs" />
     <Compile Include="Model\DocHierarchy\DocumentHierarchy.cs" />
     <Compile Include="Model\EditorInfo.cs" />
     <Compile Include="Services\DocumentHierarchyIndexer.cs" />
+    <Compile Include="Services\FileReader.cs" />
     <Compile Include="Services\FileSystemChangeNotifier.cs" />
-    <Compile Include="Services\FileSystemParser.cs" />
-    <Compile Include="EnumsAndOptions\FullTextFieldType.cs" />
+    <Compile Include="Services\PowershellFileParser.cs" />
+    <Compile Include="Enums\FullTextFieldType.cs" />
     <Compile Include="FullText\CustomAnalyzer.cs" />
     <Compile Include="FullText\CustomQueryParser.cs" />
     <Compile Include="FullText\CustomTokenizer.cs" />
@@ -83,8 +87,9 @@
     <Compile Include="Model\DocHierarchy\Nodes\RootNode.cs" />
     <Compile Include="Model\DocHierarchy\Nodes\ViewNode.cs" />
     <Compile Include="Model\PowershellFunction.cs" />
-    <Compile Include="EnumsAndOptions\NodeType.cs" />
+    <Compile Include="Enums\NodeType.cs" />
     <Compile Include="Services\PowershellTokenizer.cs" />
+    <Compile Include="Services\TokenLocator.cs" />
     <Compile Include="UI\IseIntegration\IseEventArgs.cs" />
     <Compile Include="UI\IseIntegration\IseIntegrator.cs" />
     <Compile Include="UI\ViewModel\BaseViewModel.cs" />
@@ -110,7 +115,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="EnumsAndOptions\SearchOptions.cs" />
+    <Compile Include="Model\SearchOptions.cs" />
     <Compile Include="UI\ViewModel\TreeViewEntryItemModel.cs" />
     <Compile Include="Services\DocumentHierarchyFactory.cs" />
     <Compile Include="Services\DocumentHierarchySearcher.cs" />

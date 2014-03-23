@@ -1,4 +1,5 @@
-﻿using PsISEProjectExplorer.EnumsAndOptions;
+﻿using PsISEProjectExplorer.Enums;
+using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI.IseIntegration;
@@ -29,7 +30,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         public IseIntegrator IseIntegrator { get; set; }
 
         private TreeViewEntryItemModel RootTreeViewEntryItem { get; set; }
-
+        
         public TreeViewModel()
         {
         }
@@ -120,26 +121,56 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         }
 
-        public void SelectItem(TreeViewEntryItemModel item)
+        public void SelectItem(TreeViewEntryItemModel item, string searchText)
         {
             if (this.IseIntegrator == null)
             {
                 throw new InvalidOperationException("IseIntegrator has not ben set yet.");
             }
-            if (item != null)
+            if (item == null)
             {
-                if (item.Node.NodeType == NodeType.FILE)
+                return;
+            }
+
+            if (item.Node.NodeType == NodeType.FILE)
+            {
+                bool wasOpen = (this.IseIntegrator.SelectedFilePath == item.Node.Path);
+                if (!wasOpen)
                 {
                     this.IseIntegrator.GoToFile(item.Node.Path);
                 }
-                else if (item.Node.NodeType == NodeType.FUNCTION)
+                else
                 {
-                    PowershellFunctionNode node = ((PowershellFunctionNode)item.Node);
-                    this.IseIntegrator.GoToFile(node.FilePath);
-                    this.IseIntegrator.SetCursor(node.PowershellFunction.StartLine, node.PowershellFunction.StartColumn);
+                    this.IseIntegrator.SetFocusOnCurrentTab();
+                }
+                if (searchText != null && searchText.Length > 2)
+                {
+                    EditorInfo editorInfo = (wasOpen ? this.IseIntegrator.GetCurrentLineWithColumnIndex() : null);
+                    TokenPosition tokenPos = TokenLocator.LocateNextToken(item.Node.Path, searchText, editorInfo);
+                    if (tokenPos.MatchLength > 2)
+                    {
+                        this.IseIntegrator.SelectText(tokenPos.Line, tokenPos.Column, tokenPos.MatchLength);
+                    }
+                    else if (string.IsNullOrEmpty(this.IseIntegrator.SelectedText))
+                    {
+                        tokenPos = TokenLocator.LocateSubtoken(item.Node.Path, searchText);
+                        if (tokenPos.MatchLength > 2)
+                        {
+                            this.IseIntegrator.SelectText(tokenPos.Line, tokenPos.Column, tokenPos.MatchLength);
+                        }
+                    }
                 }
             }
+            else if (item.Node.NodeType == NodeType.FUNCTION)
+            {
+                PowershellFunctionNode node = ((PowershellFunctionNode)item.Node);
+                this.IseIntegrator.GoToFile(node.FilePath);
+                this.IseIntegrator.SetCursor(node.PowershellFunction.StartLine, node.PowershellFunction.StartColumn);
+            }
+            
         }
+
+        
 
     }
 }

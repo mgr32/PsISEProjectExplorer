@@ -90,7 +90,7 @@ namespace PsISEProjectExplorer
         {
             if (e.ClickCount > 1)
             {
-                this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem);
+                this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.MainViewModel.SearchText);
                 e.Handled = true;
             }
         }
@@ -99,7 +99,7 @@ namespace PsISEProjectExplorer
         {
             if (e.Key == Key.Enter)
             {
-                this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem);
+                this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.MainViewModel.SearchText);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using PsISEProjectExplorer.Model;
+﻿using NLog;
+using PsISEProjectExplorer.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,8 +11,10 @@ using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Services
 {
-    public class FileSystemParser
+    public class PowershellFileParser
     {
+        
+
         public string Path { get; private set; }
 
         public string FileContents { get; private set; }
@@ -28,7 +31,7 @@ namespace PsISEProjectExplorer.Services
             }
         }
         
-        public FileSystemParser(string path, bool isDirectory)
+        public PowershellFileParser(string path, bool isDirectory)
         {
             this.Path = path;
             this.IsDirectory = isDirectory;
@@ -46,26 +49,11 @@ namespace PsISEProjectExplorer.Services
         private void ParseFile()
         {
 
-            try
-            {
-                using (
-                    FileStream fs = File.Open(this.Path, FileMode.Open, FileAccess.Read,
-                        FileShare.Delete | FileShare.ReadWrite))
-                {
-                    using (BufferedStream bs = new BufferedStream(fs))
-                    {
-                        using (StreamReader sr = new StreamReader(bs))
-                        {
-                            this.FileContents = sr.ReadToEnd();
-                        }
-                    }
-                }
-                this.PowershellFunctions = PowershellTokenizer.GetFunctions(this.FileContents);
-            }
-            catch (IOException e)
-            {
-                //TODO: for now just swallowing but need to log!
-            }
+           this.FileContents = FileReader.ReadFileAsString(this.Path);
+           if (this.FileContents != null)
+           {
+               this.PowershellFunctions = PowershellTokenizer.GetFunctions(this.FileContents);
+           }
         }
     }
 }

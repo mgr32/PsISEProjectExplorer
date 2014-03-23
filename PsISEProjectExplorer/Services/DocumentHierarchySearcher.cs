@@ -1,4 +1,5 @@
-﻿using PsISEProjectExplorer.EnumsAndOptions;
+﻿using PsISEProjectExplorer.Enums;
+using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using System;
@@ -29,7 +30,9 @@ namespace PsISEProjectExplorer.Services
                 }
 
                 INode newRoot = new RootNode(this.DocumentHierarchy.RootNode.Path);
-                IEnumerable<INode> nodes = this.DocumentHierarchy.SearchNodesFullText(filter, searchOptions.SearchField);
+                IEnumerable<INode> nodes = this.DocumentHierarchy
+                                                .SearchNodesFullText(filter, searchOptions.SearchField)
+                                                .Select(result => result.Node);
                 if (searchOptions.IncludeAllParents)
                 {
                     this.FillNewFilteredDocumentHierarchyRecursively(nodes, newRoot, this.DocumentHierarchy.RootNode);
@@ -47,7 +50,11 @@ namespace PsISEProjectExplorer.Services
         {
             lock (this.DocumentHierarchy)
             {
-                return this.DocumentHierarchy.SearchNodesByTerm(name, FullTextFieldType.NAME_NOT_ANALYZED).Where(node => node.NodeType == NodeType.FUNCTION).FirstOrDefault();
+                return this.DocumentHierarchy
+                            .SearchNodesByTerm(name, FullTextFieldType.NAME_NOT_ANALYZED)
+                            .Select(result => result.Node)
+                            .Where(node => node.NodeType == NodeType.FUNCTION)
+                            .FirstOrDefault();
             }
         }
 

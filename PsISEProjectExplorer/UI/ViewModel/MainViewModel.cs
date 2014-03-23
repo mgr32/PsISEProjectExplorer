@@ -1,5 +1,5 @@
 ﻿using NLog;
-using PsISEProjectExplorer.EnumsAndOptions;
+using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
