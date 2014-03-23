@@ -14,7 +14,7 @@ Provides a tree view that enables to index and explore whole directory structure
 * Automatic reindex on file system change.
 
 ##### Screenshots
-![Image](./PsISEExplorer_screen1.png?raw=true)
+![Image](./PsISEExplorer_screen.png?raw=true)
 
 ##### Installation
 
