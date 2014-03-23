@@ -21,6 +21,14 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             }
         }
 
+        public string SelectedText
+        {
+            get
+            {
+                var file = this.HostObject.CurrentPowerShellTab.Files.SelectedFile;
+                return (file == null ? null : file.Editor.SelectedText);
+            }
+        }
 
         public event EventHandler<IseEventArgs> FileTabChanged;
 
@@ -50,6 +58,14 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             }
         }
 
+        public void SelectText(int line, int column, int length)
+        {
+            if (this.HostObject.CurrentPowerShellTab.Files.SelectedFile != null)
+            {
+                this.HostObject.CurrentPowerShellTab.Files.SelectedFile.Editor.Select(line, column, line, column + length);
+            }
+        }
+
         public EditorInfo GetCurrentLineWithColumnIndex()
         {
             var file = this.HostObject.CurrentPowerShellTab.Files.SelectedFile;
@@ -57,7 +73,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             {
                 return null;
             }
-            return new EditorInfo(file.Editor.CaretLineText, file.Editor.CaretColumn);           
+            return new EditorInfo(file.Editor.CaretLineText, file.Editor.CaretLine, file.Editor.CaretColumn);           
         }
 
         public void SetFocusOnCurrentTab()

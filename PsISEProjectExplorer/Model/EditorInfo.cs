@@ -11,11 +11,14 @@ namespace PsISEProjectExplorer.Model
     {
         public string CurrentLine { get; private set; }
 
+        public int CurrentLineNum { get; private set; }
+
         public int CurrentColumn { get; private set; }
 
-        public EditorInfo(string currentLine, int currentColumn)
+        public EditorInfo(string currentLine, int currentLineNum, int currentColumn)
         {
             this.CurrentLine = currentLine;
+            this.CurrentLineNum = currentLineNum;
             this.CurrentColumn = currentColumn;
         }
 

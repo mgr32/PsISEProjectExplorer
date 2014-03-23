@@ -1,4 +1,4 @@
-﻿using PsISEProjectExplorer.EnumsAndOptions;
+﻿using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.FullText;
 using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy;
@@ -29,7 +29,7 @@ namespace PsISEProjectExplorer.Services
             
         }
 
-        public bool AddFileSystemNode(FileSystemParser parser)
+        public bool AddFileSystemNode(PowershellFileParser parser)
         {
             if (this.DocumentHierarchy.GetNode(parser.Path) != null)
             {

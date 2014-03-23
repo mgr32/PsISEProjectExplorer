@@ -5,7 +5,8 @@ using Lucene.Net.Index;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
-using PsISEProjectExplorer.EnumsAndOptions;
+using PsISEProjectExplorer.Enums;
+using PsISEProjectExplorer.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,16 +39,16 @@ namespace PsISEProjectExplorer.FullText
             this.DocumentCreator = new DocumentFactory(this.IndexWriter);
         }
 
-        public IEnumerable<string> SearchTerm(string searchTerm, FullTextFieldType field)
+        public IEnumerable<SearchResult> SearchTerm(string searchTerm, FullTextFieldType field)
         {
             Query query = new TermQuery(new Term(field.ToString(), searchTerm));
-            return this.RunQuery(query);   
+            return this.RunQuery(query, field);   
         }
 
-        public IEnumerable<string> Search(string searchText, FullTextFieldType field)
+        public IEnumerable<SearchResult> Search(string searchText, FullTextFieldType field)
         {
             Query query = this.CustomQueryParser.Parse(searchText, field.ToString());
-            return this.RunQuery(query);
+            return this.RunQuery(query, field);
             
         }
 
@@ -56,7 +57,7 @@ namespace PsISEProjectExplorer.FullText
             this.IndexWriter.DeleteDocuments(new Term(FullTextFieldType.PATH.ToString(), path));
         }
 
-        private IEnumerable<string> RunQuery(Query query)
+        private IEnumerable<SearchResult> RunQuery(Query query, FullTextFieldType field)
         {
             IndexReader newReader = this.IndexReader.Reopen();
             if (newReader != this.IndexReader)
@@ -67,11 +68,20 @@ namespace PsISEProjectExplorer.FullText
             IndexSearcher searcher = new IndexSearcher(this.IndexReader);
             if (query == null)
             {
-                return Enumerable.Empty<string>();
+                return Enumerable.Empty<SearchResult>();
             }
             TopDocs hits = searcher.Search(query, 1000);
-            IEnumerable<string> paths = hits.ScoreDocs.Select(scoreDoc => searcher.Doc(scoreDoc.Doc).Get(FullTextFieldType.PATH.ToString()));
-            return paths;
+
+            var result = new List<SearchResult>();
+            
+            foreach (ScoreDoc scoreDoc in hits.ScoreDocs)
+            {
+                string path = searcher.Doc(scoreDoc.Doc).Get(FullTextFieldType.PATH.ToString());
+                ITermFreqVector freqVector = this.IndexReader.GetTermFreqVector(scoreDoc.Doc, field.ToString());
+                result.Add(new SearchResult(path));
+            }
+
+            return result;
         }
 
     }

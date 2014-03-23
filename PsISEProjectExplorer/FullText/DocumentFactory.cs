@@ -1,6 +1,6 @@
 ﻿using Lucene.Net.Documents;
 using Lucene.Net.Index;
-using PsISEProjectExplorer.EnumsAndOptions;
+using PsISEProjectExplorer.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,8 +44,7 @@ namespace PsISEProjectExplorer.FullText
             field = new Field(FullTextFieldType.NAME_NOT_ANALYZED.ToString(), name, Field.Store.NO, Field.Index.NOT_ANALYZED);
             field.OmitTermFreqAndPositions = true;
             doc.Add(field);
-            field = new Field(FullTextFieldType.CATCH_ALL.ToString(), name + " " + contents, Field.Store.NO, Field.Index.ANALYZED);
-            field.OmitTermFreqAndPositions = true;
+            field = new Field(FullTextFieldType.CATCH_ALL.ToString(), name + " " + contents, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS);
             doc.Add(field);
             this.IndexWriter.AddDocument(doc);
             this.IndexWriter.Commit();

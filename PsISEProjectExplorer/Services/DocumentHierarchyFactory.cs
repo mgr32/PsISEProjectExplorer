@@ -46,7 +46,7 @@ namespace PsISEProjectExplorer.Services
             lock (docHierarchy)
             {
                 DocumentHierarchyIndexer documentHierarchyIndexer = new DocumentHierarchyIndexer(docHierarchy);
-                IList<FileSystemParser> fileSystemEntryList = new List<FileSystemParser>();
+                IList<PowershellFileParser> fileSystemEntryList = new List<PowershellFileParser>();
 
                 foreach (string path in pathsToUpdate)
                 {
@@ -58,7 +58,7 @@ namespace PsISEProjectExplorer.Services
                     // TODO: check if still matches pattern
                     if (File.Exists(path))
                     {
-                        fileSystemEntryList.Add(new FileSystemParser(path, false));
+                        fileSystemEntryList.Add(new PowershellFileParser(path, false));
                     }
                     else if (Directory.Exists(path))
                     {
@@ -66,27 +66,27 @@ namespace PsISEProjectExplorer.Services
                     }
                 }
 
-                foreach (FileSystemParser fileSystemEntry in fileSystemEntryList)
+                foreach (PowershellFileParser fileSystemEntry in fileSystemEntryList)
                 {
                     documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
                 }
             }
         }
 
-        private bool FillFileListRecursively(string path, IList<FileSystemParser> result)
+        private bool FillFileListRecursively(string path, IList<PowershellFileParser> result)
         {           
             foreach (string dir in Directory.EnumerateDirectories(path))
             {
                 if (this.FillFileListRecursively(dir, result))
                 {
-                    result.Add(new FileSystemParser(dir, true));
+                    result.Add(new PowershellFileParser(dir, true));
                 }
             }
 
             var files = Directory.EnumerateFiles(path, FILES_PATTERN);
             foreach (string file in files)
             {
-                result.Add(new FileSystemParser(file, false));
+                result.Add(new PowershellFileParser(file, false));
             }
             return files.Any();
 
