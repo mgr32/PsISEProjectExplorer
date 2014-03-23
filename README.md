@@ -13,8 +13,8 @@ Provides a tree view that enables to index and explore whole directory structure
 * Locate current file in the tree view (ALT+SHIFT+L).
 * Automatic reindex on file system change.
 
-##### Screenshot 
-![Image](./PsISEExplorer_screen2.png?raw=true)
+##### Screenshots
+![Image](./PsISEExplorer_screen1.png?raw=true)
 
 ##### Installation
 
