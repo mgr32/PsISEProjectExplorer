@@ -4,17 +4,22 @@ function Register-PsISEProjectExplorer() {
 }
 
 function Register-PsISEProjectExplorerMenus() {
-	Register-PsISEProjectExplorerMenu -name "Go To Definition" -scriptblock { (Get-PSISEProjectExplorerControlHandle).GoToDefinition() } -hotkey "F12"
-	Register-PsISEProjectExplorerMenu -name "Find All Occurrences" -scriptblock { (Get-PSISEProjectExplorerControlHandle).FindAllOccurrences() } -hotkey "SHIFT+F12"
-	Register-PsISEProjectExplorerMenu -name "Locate Current File" -scriptblock { (Get-PSISEProjectExplorerControlHandle).LocateFileInTree() } -hotkey "ALT+SHIFT+L"
+	$root = Register-PsISEProjectExplorerMenuRoot
+	Register-PsISEProjectExplorerMenu -root $root -name "Go To Definition" -scriptblock { (Get-PSISEProjectExplorerControlHandle).GoToDefinition() } -hotkey "F12"
+	Register-PsISEProjectExplorerMenu -root $root -name "Find All Occurrences" -scriptblock { (Get-PSISEProjectExplorerControlHandle).FindAllOccurrences() } -hotkey "SHIFT+F12"
+	Register-PsISEProjectExplorerMenu -root $root -name "Locate Current File" -scriptblock { (Get-PSISEProjectExplorerControlHandle).LocateFileInTree() } -hotkey "ALT+SHIFT+L"
+	Register-PsISEProjectExplorerMenu -root $root -name "Find In Files" -scriptblock { (Get-PSISEProjectExplorerControlHandle).FindInFiles() } -hotkey "CTRL+SHIFT+F"
 }
 
 function Get-PSISEProjectExplorerControlHandle() {
 	return ($psISE.CurrentPowerShellTab.VerticalAddOnTools | where { $_.Name -eq 'Project Explorer' }).Control
 }
 
-function Register-PsISEProjectExplorerMenu($name, $scriptblock, $hotkey) {
-	$submenus = $psISE.CurrentPowershellTab.AddOnsMenu.Submenus
+function Register-PsISEProjectExplorerMenuRoot() {
+	return $psISE.CurrentPowershellTab.AddOnsMenu.Submenus.Add("PsISEProjectExplorer", $null, $null);
+}
+function Register-PsISEProjectExplorerMenu($root, $name, $scriptblock, $hotkey) {
+	$submenus = $root.Submenus
 	$submenu = ($submenus | where { $_.DisplayName -eq $name })
 	if (!$submenu) {
 		$submenus.Add($name, $scriptblock, $hotkey)

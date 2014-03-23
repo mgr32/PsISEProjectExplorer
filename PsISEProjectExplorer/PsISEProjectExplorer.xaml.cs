@@ -45,12 +45,18 @@ namespace PsISEProjectExplorer
 
         public void GoToDefinition()
         {
-            this.MainViewModel.GoToDefinition();
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                this.MainViewModel.GoToDefinition();
+            }));
         }
 
         public void FindAllOccurrences()
         {
-            this.MainViewModel.FindAllOccurrences();
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                this.MainViewModel.FindAllOccurrences();
+            }));
         }
 
         public void LocateFileInTree()
@@ -70,6 +76,15 @@ namespace PsISEProjectExplorer
 
                 SearchResults.SelectItem(item);
                 this.MainViewModel.IseIntegrator.SetFocusOnCurrentTab();
+            }));
+        }
+
+        public void FindInFiles()
+        {
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                this.MainViewModel.FindInFiles();
+                this.TextBoxSearchText.Focus();
             }));
         }
 
