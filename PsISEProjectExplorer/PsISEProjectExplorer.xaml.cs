@@ -10,6 +10,7 @@ using System;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows;
+using Ookii.Dialogs.Wpf;
 
 namespace PsISEProjectExplorer
 {
@@ -88,6 +89,18 @@ namespace PsISEProjectExplorer
             }));
         }
 
+        private void ChangeWorkspace_Click(object sender, RoutedEventArgs e)
+        {
+            VistaFolderBrowserDialog dialog = new VistaFolderBrowserDialog();
+            dialog.SelectedPath = this.MainViewModel.RootDirectoryToSearch;
+            dialog.Description = "Please select the new project root folder.";
+            dialog.UseDescriptionForTitle = true;
+            if ((bool)dialog.ShowDialog())
+            {
+                this.MainViewModel.ChangeRootDirectory(dialog.SelectedPath);
+            }
+        }
+
         private void configureLogging()
         {
             #if DEBUG
@@ -117,5 +130,6 @@ namespace PsISEProjectExplorer
                 this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.MainViewModel.SearchText);
             }
         }
-    }
+
+   }
 }

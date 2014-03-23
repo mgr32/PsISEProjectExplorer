@@ -23,22 +23,28 @@ namespace PsISEProjectExplorer.Services
         public DocumentHierarchy CreateDocumentHierarchy(string path)
         {
             DocumentHierarchy docHierarchy;
-            this.DocumentHierarchies.TryGetValue(path, out docHierarchy);
-            if (docHierarchy != null)
+            lock (this.DocumentHierarchies)
             {
+                this.DocumentHierarchies.TryGetValue(path, out docHierarchy);
+                if (docHierarchy != null)
+                {
+                    return docHierarchy;
+                }
+                docHierarchy = new DocumentHierarchy(new RootNode(path));
+                this.DocumentHierarchies.Add(path, docHierarchy);
+                this.UpdateDocumentHierarchy(docHierarchy, new List<string>() { path });
                 return docHierarchy;
             }
-            docHierarchy = new DocumentHierarchy(new RootNode(path));
-            this.DocumentHierarchies.Add(path, docHierarchy);
-            this.UpdateDocumentHierarchy(docHierarchy, new List<string>() { path });
-            return docHierarchy;
         }
 
         public DocumentHierarchy UpdateDocumentHierarchy(string rootPath, IEnumerable<string> pathsToUpdate)
         {
-            DocumentHierarchy docHierarchy = this.DocumentHierarchies[rootPath];
-            this.UpdateDocumentHierarchy(docHierarchy, pathsToUpdate);
-            return docHierarchy;
+            lock (this.DocumentHierarchies)
+            {
+                DocumentHierarchy docHierarchy = this.DocumentHierarchies[rootPath];
+                this.UpdateDocumentHierarchy(docHierarchy, pathsToUpdate);
+                return docHierarchy;
+            }
         }
 
         private void UpdateDocumentHierarchy(DocumentHierarchy docHierarchy, IEnumerable<string> pathsToUpdate)

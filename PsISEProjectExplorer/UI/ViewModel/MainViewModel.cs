@@ -29,13 +29,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
         public string RootDirectoryToSearch
         {
             get { return this.rootDirectoryToSearch; }
-            set
+            private set
             {
                 this.rootDirectoryToSearch = value;
                 this.DocumentHierarchySearcher = null;
                 this.OnPropertyChanged();
                 this.OnPropertyChanged("RootDirectoryLabel");
-            }
+           }
         }
 
         private bool indexingInProgress;
@@ -95,6 +95,22 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        private bool freezeRootDirectory;
+
+        public bool FreezeRootDirectory
+        {
+            get { return this.freezeRootDirectory; }
+            set
+            {
+                this.freezeRootDirectory = value;
+                this.OnPropertyChanged();
+                if (!this.freezeRootDirectory)
+                {
+                    this.RecalculateRootDirectory();
+                }
+            }
+        }
+
         public string RootDirectoryLabel
         {
             get { return "Project root: " + this.RootDirectoryToSearch; }
@@ -131,7 +147,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.iseIntegrator.FileTabChanged += OnFileTabChanged;
                 if (this.IseIntegrator.SelectedFilePath != null)
                 {
-                    this.ReloadRootDirectory();
+                    this.RecalculateRootDirectory();
                 }
             }
 
@@ -263,16 +279,29 @@ namespace PsISEProjectExplorer.UI.ViewModel
             Application.Current.Dispatcher.Invoke(new Action(() => { this.ReindexSearchTree(pathsChanged); }));
         }
 
-        private void ReloadRootDirectory()
+        public void ChangeRootDirectory(string newPath)
         {
-            var selectedFilePath = this.IseIntegrator.SelectedFilePath;
-            string newRootDirectoryToSearch = RootDirectoryProvider.GetRootDirectoryToSearch(selectedFilePath);
-            if (newRootDirectoryToSearch != null && (this.RootDirectoryToSearch == null || !newRootDirectoryToSearch.StartsWith(this.RootDirectoryToSearch)))
+            this.FreezeRootDirectory = true;
+            this.RootDirectoryToSearch = newPath;
+            this.RecalculateRootDirectory();
+        }
+
+        private void RecalculateRootDirectory()
+        {
+            if (!this.FreezeRootDirectory)
             {
-                this.RootDirectoryToSearch = newRootDirectoryToSearch;
+                string selectedFilePath = this.IseIntegrator.SelectedFilePath;
+                string newRootDirectoryToSearch = RootDirectoryProvider.GetRootDirectoryToSearch(selectedFilePath);
+                if (newRootDirectoryToSearch != null && (this.RootDirectoryToSearch == null || newRootDirectoryToSearch != this.RootDirectoryToSearch))
+                {
+                    this.RootDirectoryToSearch = newRootDirectoryToSearch;
+                    this.ReindexSearchTree(null);
+                }
+            }
+            else
+            {
                 this.ReindexSearchTree(null);
             }
-
         }
 
         private void ReindexSearchTree(IEnumerable<string> pathsChanged)
@@ -298,7 +327,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void OnFileTabChanged(object sender, IseEventArgs args)
         {
-            this.ReloadRootDirectory();
+            if (!this.FreezeRootDirectory)
+            {
+                this.RecalculateRootDirectory();
+            }
         }      
 
     }
