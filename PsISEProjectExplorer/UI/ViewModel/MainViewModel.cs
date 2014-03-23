@@ -170,15 +170,17 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 return;
             }
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                // TODO: this is hacky...
-                this.searchText = string.Empty;
-                this.SearchInFiles = true;
-                this.SearchText = funcName;
-               
-            }));
             
+            // TODO: this is hacky...
+            this.searchText = string.Empty;
+            this.SearchInFiles = true;
+            this.SearchText = funcName;
+        }
+
+        public void FindInFiles()
+        {
+            this.searchText = string.Empty;
+            this.SearchInFiles = true;
         }
 
         private string GetFunctionNameAtCurrentPosition()
