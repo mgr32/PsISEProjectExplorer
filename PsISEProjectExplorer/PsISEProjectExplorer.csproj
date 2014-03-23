@@ -92,6 +92,13 @@
     <Compile Include="Services\TokenLocator.cs" />
     <Compile Include="UI\IseIntegration\IseEventArgs.cs" />
     <Compile Include="UI\IseIntegration\IseIntegrator.cs" />
+    <Compile Include="UI\Ookii.Dialogs.Wpf\Interop\COMGuids.cs" />
+    <Compile Include="UI\Ookii.Dialogs.Wpf\Interop\ErrorHelper.cs" />
+    <Compile Include="UI\Ookii.Dialogs.Wpf\Interop\ShellComInterfaces.cs" />
+    <Compile Include="UI\Ookii.Dialogs.Wpf\Interop\ShellWrapperDefinitions.cs" />
+    <Compile Include="UI\Ookii.Dialogs.Wpf\NativeMethods.cs" />
+    <Compile Include="UI\Ookii.Dialogs.Wpf\SafeHandles.cs" />
+    <Compile Include="UI\Ookii.Dialogs.Wpf\VistaFolderBrowserDialog.cs" />
     <Compile Include="UI\ViewModel\BaseViewModel.cs" />
     <Compile Include="UI\ViewModel\DefaultTreeViewEntryItemComparer.cs" />
     <Compile Include="UI\ViewModel\MainViewModel.cs" />
@@ -165,6 +172,10 @@
   <ItemGroup>
     <Resource Include="Resources\function.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\Ookii.Dialogs.Wpf\license.txt" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

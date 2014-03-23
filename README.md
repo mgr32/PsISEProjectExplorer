@@ -7,7 +7,7 @@ Project not released yet - you can compile it manually or wait for first officia
 Provides a tree view that enables to index and explore whole directory structure containing Powershell scripts. It has following features:
 
 * Visualize directory structure (also files not loaded to ISE yet) in a Solution Explorer-like tree view.
-* Show functions in leafs of the tree view and enable to jump to the function definition (F12, similarly to some available Function Explorer plugins).
+* Show functions in leafs of the tree view and jump to the function definition (F12, similarly to some available Function Explorer plugins).
 * Search the tree view (file names, function names, optionally file contents).
 * Find all occurrences of the text under the cursor (SHIFT+F12).
 * Locate current file in the tree view (ALT+SHIFT+L).
@@ -19,16 +19,15 @@ Provides a tree view that enables to index and explore whole directory structure
 ##### Installation
 
 * Run Install_to_UserModules.bat or copy PSISEProjectExplorer folder manually to $env:USERPROFILE\Documents\WindowsPowerShell\Modules.
-* Launch PowerShell ISE
-* Run 'Import-Module PsISEProjectExplorer'
+* Launch PowerShell ISE.
+* Run 'Import-Module PsISEProjectExplorer'.
 * If you want it to be loaded automatically, add the line above to your ISE profile (see $profile).
 
 ##### Usage
 
 When you open a Powershell file in ISE, Project Explorer will automatically set its project root directory to the first parent directory of the opened file where a .psm1 file resides. If there's no .psm1 file in any parent directory, it will take the last parent containing .ps1 files.
 
-This is assuming you'll be working on a single Powershell module with subdirectories. When you load a file from another module (which is not a submodule of the current one), the root directory will be updated. 
-If this is not enough for your work, please create an issue with a suggestion how to improve.
+You can also select the root directory manually (by clicking 'Change' button) and ensure it doesn't update automatically (by selecting 'Freeze root dir' checkbox).
 
 ##### Why?
 
@@ -45,5 +44,5 @@ Uses two background threads:
 ##### Third party libraries
 * Apache Lucene .Net 3.0.3 - https://lucenenet.apache.org/ 
 * NLog 2.1 - http://nlog-project.org/
+* Ookii.Dialogs - http://www.ookii.org/software/dialogs/
 * Silk icon set 1.3 by Mark James - http://www.famfamfam.com/lab/icons/silk/
-
