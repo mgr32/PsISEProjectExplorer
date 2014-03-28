@@ -68,15 +68,17 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public TreeViewEntryItemModel Parent { get; private set; }
 
+        private bool isExpanded;
+
         public bool IsExpanded
         {
             get
             {
-                return this.Node.IsExpanded;
+                return this.isExpanded;
             }
             set
             {
-                this.Node.IsExpanded = value;
+                this.isExpanded = value;
                 this.OnPropertyChanged();
             }
         }

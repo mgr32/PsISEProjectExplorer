@@ -30,7 +30,15 @@ namespace PsISEProjectExplorer.Services
                     return (rootDir.ToLowerInvariant() == driveRoot ? null : rootDir);
                 }
                 currentDir = currentDirInfo.FullName;
-                IList<string> allFilesInCurrentDir = Directory.GetFiles(currentDir).ToList();
+                IList<string> allFilesInCurrentDir;
+                try
+                {
+                    allFilesInCurrentDir = Directory.GetFiles(currentDir).ToList();
+                }
+                catch (IOException)
+                {
+                    return null;
+                }
                 bool onlyDirectories = true;
                 foreach (string file in allFilesInCurrentDir)
                 {
