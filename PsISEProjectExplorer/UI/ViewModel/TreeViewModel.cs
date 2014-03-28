@@ -171,8 +171,5 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
             
         }
-
-        
-
     }
 }

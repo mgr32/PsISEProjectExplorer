@@ -29,17 +29,24 @@ namespace PsISEProjectExplorer.UI.Workers
         {
             BackgroundIndexerParams indexerParams = (BackgroundIndexerParams)e.Argument;
             DocumentHierarchy docHierarchy = null;
+            DocumentHierarchySearcher newSearcher = null;
             logger.Info("Indexing started");
             if (indexerParams.PathsChanged == null)
             {
                 docHierarchy = indexerParams.DocumentHierarchyIndexer.CreateDocumentHierarchy(indexerParams.RootDirectory);
+                newSearcher = new DocumentHierarchySearcher(docHierarchy);
             }
             else
             {
-                docHierarchy = indexerParams.DocumentHierarchyIndexer.UpdateDocumentHierarchy(indexerParams.RootDirectory, indexerParams.PathsChanged);
+                docHierarchy = indexerParams.DocumentHierarchyIndexer.GetDocumentHierarchy(indexerParams.RootDirectory);
+                bool changed = indexerParams.DocumentHierarchyIndexer.UpdateDocumentHierarchy(docHierarchy, indexerParams.PathsChanged);
+                if (changed)
+                {
+                    newSearcher = new DocumentHierarchySearcher(docHierarchy);
+                }
             }
 
-            e.Result = new WorkerResult(this.StartTimestamp, new DocumentHierarchySearcher(docHierarchy));
+            e.Result = new WorkerResult(this.StartTimestamp, newSearcher);
         }
 
     }
