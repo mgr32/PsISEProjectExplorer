@@ -50,8 +50,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.SetNewRootItem(newRootItem);
                 FileSystemChangeNotifier.Watch(newRootItem.Node.Path);
             }
-
-            this.RefreshFromIntermediateNode(newDocumentHierarchyRoot, this.RootTreeViewEntryItem, expandAllNodes);
+            lock (newDocumentHierarchyRoot)
+            {
+                this.RefreshFromIntermediateNode(newDocumentHierarchyRoot, this.RootTreeViewEntryItem, expandAllNodes);
+            }
             this.OnPropertyChanged("TreeViewItems");
         }
 

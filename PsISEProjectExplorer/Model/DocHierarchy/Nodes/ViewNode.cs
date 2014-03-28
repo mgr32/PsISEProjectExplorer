@@ -41,18 +41,6 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 
         public ISet<INode> Children { get; private set; }
 
-        public bool IsExpanded
-        {
-            get
-            {
-                return this.Node.IsExpanded;
-            }
-            set
-            {
-                this.Node.IsExpanded = value;
-            }
-        }
-
         public ViewNode(INode viewedNode, INode parent)
         {
             if (viewedNode == null)
