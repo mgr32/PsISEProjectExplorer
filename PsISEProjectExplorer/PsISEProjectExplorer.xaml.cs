@@ -11,6 +11,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows;
 using Ookii.Dialogs.Wpf;
+using System.Configuration;
+using System.Reflection;
+using PsISEProjectExplorer.Config;
 
 namespace PsISEProjectExplorer
 {
@@ -129,6 +132,12 @@ namespace PsISEProjectExplorer
             {
                 this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.MainViewModel.SearchText);
             }
+        }
+
+        private void TextBoxSearchClear_Click(object sender, RoutedEventArgs e)
+        {
+            this.MainViewModel.SearchText = string.Empty;
+
         }
 
    }

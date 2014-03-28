@@ -1,17 +1,18 @@
-﻿using PsISEProjectExplorer.Model.DocHierarchy;
+﻿using PsISEProjectExplorer.Model;
+using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Services
 {
     public class DocumentHierarchyFactory
     {
-        private static string FILES_PATTERN = "*.ps*1";
 
         private IDictionary<string, DocumentHierarchy> DocumentHierarchies { get; set; }
 
@@ -37,22 +38,21 @@ namespace PsISEProjectExplorer.Services
             }
         }
 
-        public DocumentHierarchy UpdateDocumentHierarchy(string rootPath, IEnumerable<string> pathsToUpdate)
+        public DocumentHierarchy GetDocumentHierarchy(string rootPath)
         {
             lock (this.DocumentHierarchies)
             {
-                DocumentHierarchy docHierarchy = this.DocumentHierarchies[rootPath];
-                this.UpdateDocumentHierarchy(docHierarchy, pathsToUpdate);
-                return docHierarchy;
+                return this.DocumentHierarchies[rootPath];
             }
         }
 
-        private void UpdateDocumentHierarchy(DocumentHierarchy docHierarchy, IEnumerable<string> pathsToUpdate)
+        public bool UpdateDocumentHierarchy(DocumentHierarchy docHierarchy, IEnumerable<string> pathsToUpdate)
         {
-            lock (docHierarchy)
+            lock (docHierarchy.RootNode)
             {
                 DocumentHierarchyIndexer documentHierarchyIndexer = new DocumentHierarchyIndexer(docHierarchy);
                 IList<PowershellFileParser> fileSystemEntryList = new List<PowershellFileParser>();
+                bool changed = false;
 
                 foreach (string path in pathsToUpdate)
                 {
@@ -60,9 +60,9 @@ namespace PsISEProjectExplorer.Services
                     if (node != null)
                     {
                         docHierarchy.RemoveNode(node);
+                        changed = true;
                     }
-                    // TODO: check if still matches pattern
-                    if (File.Exists(path))
+                    if (File.Exists(path) && FilesPatternProvider.POWERSHELL_FILES_REGEX.IsMatch(path))
                     {
                         fileSystemEntryList.Add(new PowershellFileParser(path, false));
                     }
@@ -76,6 +76,11 @@ namespace PsISEProjectExplorer.Services
                 {
                     documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
                 }
+                if (fileSystemEntryList.Any())
+                {
+                    changed = true;
+                }
+                return changed;
             }
         }
 
@@ -89,7 +94,7 @@ namespace PsISEProjectExplorer.Services
                 }
             }
 
-            var files = Directory.EnumerateFiles(path, FILES_PATTERN);
+            var files = Directory.EnumerateFiles(path, FilesPatternProvider.POWERSHELL_FILES_PATTERN);
             foreach (string file in files)
             {
                 result.Add(new PowershellFileParser(file, false));

@@ -1,4 +1,5 @@
 ﻿using NLog;
+using PsISEProjectExplorer.Config;
 using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy;
@@ -35,6 +36,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.DocumentHierarchySearcher = null;
                 this.OnPropertyChanged();
                 this.OnPropertyChanged("RootDirectoryLabel");
+                ConfigHandler.SaveConfigValue("RootDirectory", value);
            }
         }
 
@@ -92,6 +94,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 {
                     this.RunSearch();
                 }
+                ConfigHandler.SaveConfigValue("SearchInFiles", value.ToString());
             }
         }
 
@@ -108,6 +111,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 {
                     this.RecalculateRootDirectory();
                 }
+                ConfigHandler.SaveConfigValue("FreezeRootDirectory", value.ToString());
             }
         }
 
@@ -155,6 +159,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public MainViewModel()
         {
+            this.freezeRootDirectory = ConfigHandler.ReadConfigBoolValue("FreezeRootDirectory");
+            this.searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles");
+            this.rootDirectoryToSearch = ConfigHandler.ReadConfigStringValue("RootDirectory");
+            if (this.rootDirectoryToSearch == string.Empty || !Directory.Exists(this.rootDirectoryToSearch))
+            { 
+                this.rootDirectoryToSearch = null;
+            }
             this.TreeViewModel = new TreeViewModel();
             this.SearchOptions = new SearchOptions { IncludeAllParents = true, SearchField = FullTextFieldType.NAME };
             this.DocumentHierarchyIndexer = new DocumentHierarchyFactory();
@@ -219,7 +230,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             this.IndexingInProgress = false;
             WorkerResult result = (WorkerResult)e.Result;
-            if (result.StartTimestamp != this.LastIndexStartTime)
+            if (result.StartTimestamp != this.LastIndexStartTime || result.Result == null)
             {
                 return;
             }
@@ -288,7 +299,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void RecalculateRootDirectory()
         {
-            if (!this.FreezeRootDirectory)
+            if (!this.FreezeRootDirectory || this.RootDirectoryToSearch == null)
             {
                 string selectedFilePath = this.IseIntegrator.SelectedFilePath;
                 string newRootDirectoryToSearch = RootDirectoryProvider.GetRootDirectoryToSearch(selectedFilePath);
