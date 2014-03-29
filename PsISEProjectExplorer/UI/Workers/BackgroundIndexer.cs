@@ -33,20 +33,31 @@ namespace PsISEProjectExplorer.UI.Workers
             logger.Info("Indexing started");
             if (indexerParams.PathsChanged == null)
             {
-                docHierarchy = indexerParams.DocumentHierarchyIndexer.CreateDocumentHierarchy(indexerParams.RootDirectory);
-                newSearcher = new DocumentHierarchySearcher(docHierarchy);
+                newSearcher = this.CreateNewDocHierarchy(indexerParams.DocumentHierarchyFactory, indexerParams.RootDirectory);
             }
             else
             {
-                docHierarchy = indexerParams.DocumentHierarchyIndexer.GetDocumentHierarchy(indexerParams.RootDirectory);
-                bool changed = indexerParams.DocumentHierarchyIndexer.UpdateDocumentHierarchy(docHierarchy, indexerParams.PathsChanged);
-                if (changed)
+                docHierarchy = indexerParams.DocumentHierarchyFactory.GetDocumentHierarchy(indexerParams.RootDirectory);
+                if (docHierarchy == null)
                 {
-                    newSearcher = new DocumentHierarchySearcher(docHierarchy);
+                    newSearcher = this.CreateNewDocHierarchy(indexerParams.DocumentHierarchyFactory, indexerParams.RootDirectory);
+                }
+                else
+                {
+                    bool changed = indexerParams.DocumentHierarchyFactory.UpdateDocumentHierarchy(docHierarchy, indexerParams.PathsChanged);
+                    if (changed)
+                    {
+                        newSearcher = new DocumentHierarchySearcher(docHierarchy);
+                    }
                 }
             }
-
             e.Result = new WorkerResult(this.StartTimestamp, newSearcher);
+        }
+
+        private DocumentHierarchySearcher CreateNewDocHierarchy(DocumentHierarchyFactory factory, string rootDirectory)
+        {
+            var docHierarchy = factory.CreateDocumentHierarchy(rootDirectory);
+            return new DocumentHierarchySearcher(docHierarchy);
         }
 
     }

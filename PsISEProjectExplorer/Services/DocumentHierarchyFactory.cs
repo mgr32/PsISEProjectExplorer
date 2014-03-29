@@ -42,7 +42,9 @@ namespace PsISEProjectExplorer.Services
         {
             lock (this.DocumentHierarchies)
             {
-                return this.DocumentHierarchies[rootPath];
+                DocumentHierarchy docHierarchy;
+                this.DocumentHierarchies.TryGetValue(rootPath, out docHierarchy);
+                return docHierarchy;
             }
         }
 
