@@ -16,6 +16,10 @@ namespace PsISEProjectExplorer.Services
 
         public static event EventHandler<FileSystemChangedInfo> FileSystemChanged;
 
+        private static ISet<string> changePool = new HashSet<string>();
+
+        private static Task changeNotifyTask;
+
         private static FileSystemWatcher watcher = new FileSystemWatcher();
 
         public static void Watch(string path)
@@ -25,6 +29,7 @@ namespace PsISEProjectExplorer.Services
             {
                 return;
             }
+            changeNotifyTask = Task.Factory.StartNew(() => ChangeNotifier());
             watcher.Path = path;
             watcher.NotifyFilter = NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Security;
             watcher.IncludeSubdirectories = true;
@@ -35,6 +40,7 @@ namespace PsISEProjectExplorer.Services
             watcher.EnableRaisingEvents = true;
         }
 
+        // runs on a separate thread (from system)
         private static void OnFileChanged(object source, FileSystemEventArgs e)
         {
             bool isDir = Directory.Exists(e.FullPath);
@@ -46,25 +52,47 @@ namespace PsISEProjectExplorer.Services
             {
                 return;
             }
-            FileSystemChangedInfo changedInfo = new FileSystemChangedInfo(new List<string>() { e.FullPath });
-            FileSystemChanged(source, changedInfo);
+            lock (changePool)
+            {
+                changePool.Add(e.FullPath);
+            }
         }
 
+        // runs on a separate thread (from system)
         private static void OnFileRenamed(object source, RenamedEventArgs e)
         {
-            IList<string> pathsChanged = new List<string>();
             bool isDir = Directory.Exists(e.FullPath) || Directory.Exists(e.OldFullPath);
-            if (isDir || FilesPatternProvider.POWERSHELL_FILES_REGEX.IsMatch(e.OldFullPath))
+            lock (changePool)
             {
-                pathsChanged.Add(e.OldFullPath);
+                if (isDir || FilesPatternProvider.POWERSHELL_FILES_REGEX.IsMatch(e.OldFullPath))
+                {
+                    changePool.Add(e.OldFullPath);
+                }
+                if ((isDir || FilesPatternProvider.POWERSHELL_FILES_REGEX.IsMatch(e.FullPath)) &&
+                    e.FullPath.ToLowerInvariant() != e.OldFullPath.ToLowerInvariant())
+                {
+                    changePool.Add(e.FullPath);
+                }
             }
-            if ((isDir || FilesPatternProvider.POWERSHELL_FILES_REGEX.IsMatch(e.FullPath)) &&
-                e.FullPath.ToLowerInvariant() != e.OldFullPath.ToLowerInvariant())
+        }
+
+        // runs on a separate thread (created in constructor)
+        private static void ChangeNotifier()
+        {
+            while (true)
             {
-                pathsChanged.Add(e.FullPath);
+                System.Threading.Thread.Sleep(100);
+                lock (changePool)
+                {
+                    if (changePool.Any())
+                    {
+                        IList<string> pathsChanged = new List<string>(changePool);
+                        FileSystemChangedInfo changedInfo = new FileSystemChangedInfo(pathsChanged);
+                        FileSystemChanged(null, changedInfo);
+                        changePool.Clear();
+                    }
+                }
             }
-            FileSystemChangedInfo changedInfo = new FileSystemChangedInfo(new List<string>() { e.FullPath });
-            FileSystemChanged(source, changedInfo);
         }
     }
 }
