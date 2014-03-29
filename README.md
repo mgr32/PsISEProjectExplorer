@@ -13,19 +13,23 @@ Provides a tree view that enables to index and explore whole directory structure
 * Locate current file in the tree view (ALT+SHIFT+L).
 * Automatic reindex on file system change.
 
+Requires Powershell 3.0 or above.
+
 ##### Screenshots
 ![Image](./PsISEExplorer_screen.png?raw=true)
 
 ##### Installation
 
-* Run Install_to_UserModules.bat or copy PSISEProjectExplorer folder manually to $env:USERPROFILE\Documents\WindowsPowerShell\Modules.
-* Launch PowerShell ISE.
-* Run 'Import-Module PsISEProjectExplorer'.
-* If you want it to be loaded automatically, add the line above to your ISE profile (see $profile).
+* Automatic - run Install_to_UserModules.bat
+* Manual:
+ * Copy PSISEProjectExplorer to $env:USERPROFILE\Documents\WindowsPowerShell\Modules.
+ * Launch PowerShell ISE.
+ * Run 'Import-Module PsISEProjectExplorer'.
+ * If you want it to be loaded automatically when ISE starts, add the line above to your ISE profile (see $profile).
 
 ##### Usage
 
-When you open a Powershell file in ISE, Project Explorer will automatically set its project root directory to the first parent directory of the opened file where a .psm1 file resides. If there's no .psm1 file in any parent directory, it will take the last parent containing .ps1 files.
+When you open a Powershell file in ISE, Project Explorer will automatically set its project root directory to the last parent directory of the opened file where any .ps*1 file resides. 
 
 You can also select the root directory manually (by clicking 'Change' button) and ensure it doesn't update automatically (by selecting 'Freeze root dir' checkbox).
 
@@ -42,8 +46,10 @@ Uses three background threads:
 * Second one for searching the indexes.
 * Third one for listening on file system changes (checking for accumulated changes each 100 ms).
 
+Uses a configuration file PsISEProjectExplorer.config stored next to PsISEProjectExplorer.dll ($env:USERPROFILE\Documents\WindowsPowerShell\Modules\PsISEProjectExplorer). Currently it contains only the last state of the UI.
+
 ##### Third party libraries
-* Apache Lucene .Net 3.0.3 - https://lucenenet.apache.org/ 
-* NLog 2.1 - http://nlog-project.org/
-* Ookii.Dialogs - http://www.ookii.org/software/dialogs/
-* Silk icon set 1.3 by Mark James - http://www.famfamfam.com/lab/icons/silk/
+* <a href="https://lucenenet.apache.org">Apache Lucene .Net 3.0.3</a> (<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>)
+* <a href="http://nlog-project.org">NLog 2.1</a> (<a href="https://github.com/NLog/NLog/blob/master/LICENSE.txt">BSD license</a>)
+* <a href="http://www.ookii.org/software/dialogs">Ookii.Dialogs</a> (<a href="PsISEProjectExplorer/UI/Ookii.Dialogs.Wpf/license.txt">License</a>)
+* All icons come from <a href="http://www.famfamfam.com/lab/icons/silk">Silk icon set 1.3 by Mark James</a>
