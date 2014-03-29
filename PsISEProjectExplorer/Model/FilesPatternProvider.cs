@@ -11,6 +11,6 @@ namespace PsISEProjectExplorer.Model
     {
         public static string POWERSHELL_FILES_PATTERN = "*.ps*1";
 
-        public static Regex POWERSHELL_FILES_REGEX = new Regex(@".*\.ps.*1", RegexOptions.Compiled);
+        public static Regex POWERSHELL_FILES_REGEX = new Regex(@".*\.ps.*1$", RegexOptions.Compiled);
     }
 }

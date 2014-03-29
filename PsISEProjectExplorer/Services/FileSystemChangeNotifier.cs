@@ -18,18 +18,17 @@ namespace PsISEProjectExplorer.Services
 
         private static ISet<string> changePool = new HashSet<string>();
 
-        private static Task changeNotifyTask;
+        private static Task changeNotifyTask = Task.Factory.StartNew(() => ChangeNotifier());
 
         private static FileSystemWatcher watcher = new FileSystemWatcher();
 
         public static void Watch(string path)
         {
             watcher.EnableRaisingEvents = false;
-            if (String.IsNullOrEmpty(path))
+            if (String.IsNullOrEmpty(path) || !Directory.Exists(path))
             {
                 return;
             }
-            changeNotifyTask = Task.Factory.StartNew(() => ChangeNotifier());
             watcher.Path = path;
             watcher.NotifyFilter = NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Security;
             watcher.IncludeSubdirectories = true;
