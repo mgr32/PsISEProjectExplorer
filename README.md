@@ -37,9 +37,10 @@ Because I work on complex Powershell modules with lots of functions, and navigat
 
 Written in C#, .NET 4.5, WPF using Microsoft Visual Studio Express 2012 for Desktop.
 
-Uses two background threads:
+Uses three background threads:
 * One for indexing directory structure and file contents. Indexes are stored in RAM only (not stored on disk), so they need full refresh after closing Powershell ISE.
 * Second one for searching the indexes.
+* Third one for listening on file system changes (checking for accumulated changes each 100 ms).
 
 ##### Third party libraries
 * Apache Lucene .Net 3.0.3 - https://lucenenet.apache.org/ 
