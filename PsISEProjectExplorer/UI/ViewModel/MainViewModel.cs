@@ -8,6 +8,7 @@ using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.Workers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -109,7 +110,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.OnPropertyChanged();
                 if (!this.freezeRootDirectory)
                 {
-                    this.RecalculateRootDirectory();
+                    this.RecalculateRootDirectory(false);
                 }
                 ConfigHandler.SaveConfigValue("FreezeRootDirectory", value.ToString());
             }
@@ -149,10 +150,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.iseIntegrator = value;
                 this.TreeViewModel.IseIntegrator = this.iseIntegrator;
                 this.iseIntegrator.FileTabChanged += OnFileTabChanged;
-                if (this.IseIntegrator.SelectedFilePath != null)
-                {
-                    this.RecalculateRootDirectory();
-                }
+                this.RecalculateRootDirectory(true);
             }
 
         }
@@ -161,16 +159,16 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             this.freezeRootDirectory = ConfigHandler.ReadConfigBoolValue("FreezeRootDirectory");
             this.searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles");
+            var searchField = (this.searchInFiles ? FullTextFieldType.CATCH_ALL : FullTextFieldType.NAME);
             this.rootDirectoryToSearch = ConfigHandler.ReadConfigStringValue("RootDirectory");
             if (this.rootDirectoryToSearch == string.Empty || !Directory.Exists(this.rootDirectoryToSearch))
             { 
                 this.rootDirectoryToSearch = null;
             }
             this.TreeViewModel = new TreeViewModel();
-            this.SearchOptions = new SearchOptions { IncludeAllParents = true, SearchField = FullTextFieldType.NAME };
+            this.SearchOptions = new SearchOptions { IncludeAllParents = true, SearchField = searchField };
             this.DocumentHierarchyIndexer = new DocumentHierarchyFactory();
             FileSystemChangeNotifier.FileSystemChanged += OnFileSystemChanged;
-            FileSystemChangeNotifier.FileSystemRenamed += OnFileSystemRenamed;
         }
 
         public void GoToDefinition()
@@ -230,7 +228,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             this.IndexingInProgress = false;
             WorkerResult result = (WorkerResult)e.Result;
-            if (result.StartTimestamp != this.LastIndexStartTime || result.Result == null)
+            if (result == null ||  result.Result == null || result.StartTimestamp != this.LastIndexStartTime)
             {
                 return;
             }
@@ -248,7 +246,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             this.SearchingInProgress = false;
             WorkerResult result = (WorkerResult)e.Result;
-            if (result.StartTimestamp != this.LastSearchStartTime)
+            if (result == null || result.StartTimestamp != this.LastSearchStartTime)
             {
                 return;
             }
@@ -258,11 +256,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.TreeViewModel.RefreshFromRoot(rootNode, expandNewNodes);
         }
 
-        private void OnFileSystemChanged(object sender, FileSystemEventArgs args)
+        private void OnFileSystemChanged(object sender, FileSystemChangedInfo changedInfo)
         {
-            IList<string> pathsChanged = new List<string>() { args.FullPath };
-            // workspace directory change
-            if (args.FullPath.ToLowerInvariant() == this.rootDirectoryToSearch.ToLowerInvariant())
+            var pathsChanged = changedInfo.PathsChanged;
+            if (pathsChanged.Contains(this.RootDirectoryToSearch, StringComparer.InvariantCultureIgnoreCase))
             {
                 pathsChanged = null;
             }
@@ -270,42 +267,26 @@ namespace PsISEProjectExplorer.UI.ViewModel
             Application.Current.Dispatcher.Invoke(new Action(() => { this.ReindexSearchTree(pathsChanged); }));
         }
 
-        private void OnFileSystemRenamed(object sender, RenamedEventArgs args)
-        {
-            IList<string> pathsChanged = new List<string>();
-            // workspace directory change
-            if (args.OldFullPath.ToLowerInvariant() == this.rootDirectoryToSearch.ToLowerInvariant())
-            {
-                pathsChanged = null;
-            }
-            else
-            {
-                pathsChanged.Add(args.OldFullPath);
-                if (args.OldFullPath.ToLowerInvariant() != args.FullPath.ToLowerInvariant())
-                {
-                    pathsChanged.Add(args.FullPath);
-                }
-            }
-            logger.Debug("OnFileSystemRenamed: " + string.Join(",", pathsChanged));
-            Application.Current.Dispatcher.Invoke(new Action(() => { this.ReindexSearchTree(pathsChanged); }));
-        }
-
         public void ChangeRootDirectory(string newPath)
         {
             this.FreezeRootDirectory = true;
             this.RootDirectoryToSearch = newPath;
-            this.RecalculateRootDirectory();
+            this.RecalculateRootDirectory(false);
         }
 
-        private void RecalculateRootDirectory()
+        private void RecalculateRootDirectory(bool alwaysReindex)
         {
-            if (!this.FreezeRootDirectory || this.RootDirectoryToSearch == null)
+            if (this.IseIntegrator.SelectedFilePath != null && (!this.FreezeRootDirectory || this.RootDirectoryToSearch == null))
             {
                 string selectedFilePath = this.IseIntegrator.SelectedFilePath;
                 string newRootDirectoryToSearch = RootDirectoryProvider.GetRootDirectoryToSearch(selectedFilePath);
                 if (newRootDirectoryToSearch != null && (this.RootDirectoryToSearch == null || newRootDirectoryToSearch != this.RootDirectoryToSearch))
                 {
                     this.RootDirectoryToSearch = newRootDirectoryToSearch;
+                    this.ReindexSearchTree(null);
+                }
+                else if (alwaysReindex)
+                {
                     this.ReindexSearchTree(null);
                 }
             }
@@ -340,7 +321,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             if (!this.FreezeRootDirectory)
             {
-                this.RecalculateRootDirectory();
+                this.RecalculateRootDirectory(false);
             }
         }      
 

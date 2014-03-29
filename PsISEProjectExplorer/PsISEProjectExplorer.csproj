@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="Config\ConfigHandler.cs" />
     <Compile Include="Model\FilesPatternProvider.cs" />
+    <Compile Include="Model\FileSystemChangedInfo.cs" />
     <Compile Include="Model\LineInfo.cs" />
     <Compile Include="Model\TokenPosition.cs" />
     <Compile Include="Model\SearchResult.cs" />
