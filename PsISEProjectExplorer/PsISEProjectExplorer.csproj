@@ -193,7 +193,7 @@
   <PropertyGroup>
     <PostBuildEvent>del *.pdb
 del *.xml
-copy $(ProjectDir)Install_to_UserModules.bat $(TargetDir).. /Y</PostBuildEvent>
+copy $(ProjectDir)Install_to_UserModules* $(TargetDir).. /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
