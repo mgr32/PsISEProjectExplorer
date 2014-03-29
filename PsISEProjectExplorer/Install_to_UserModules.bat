@@ -1,2 +1,2 @@
-xcopy PsISEProjectExplorer %USERPROFILE%\Documents\WindowsPowerShell\Modules\PsISEProjectExplorer\ /R /E /H /Y
-pause
+@powershell -File Install_to_UserModules.ps1
+@pause
