@@ -6,9 +6,9 @@ using System.Management.Automation;
 
 namespace PsISEProjectExplorer.Services
 {
-    public class PowershellTokenizer
+    public static class PowershellTokenizer
     {
-        public static IList<PowershellFunction> GetFunctions(string contents)
+        public static IEnumerable<PowershellFunction> GetFunctions(string contents)
         {
             Collection<PSParseError> errors;
             IEnumerable<PSToken> tokens = PSParser.Tokenize(contents, out errors);

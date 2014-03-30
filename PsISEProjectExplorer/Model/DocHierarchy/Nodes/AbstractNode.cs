@@ -9,7 +9,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         public abstract NodeType NodeType { get; }
         public virtual string Path { get; private set; }
         public virtual string Name { get; private set; }
-        public INode Parent { get; protected set; }
+        public INode Parent { get; private set; }
         public ISet<INode> Children { get; private set; }
 
         // less = will be before other nodes

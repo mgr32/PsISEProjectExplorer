@@ -12,7 +12,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
     public class TreeViewModel : BaseViewModel
     {
 
-        public TreeViewEntryItemObservableSet TreeViewItems
+        public IEnumerable<TreeViewEntryItemModel> TreeViewItems
         {
             get
             {
@@ -25,7 +25,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         }
 
 
-        public IseIntegrator IseIntegrator { get; set; }
+        public IseIntegrator IseIntegrator { private get; set; }
 
         private TreeViewEntryItemModel RootTreeViewEntryItem { get; set; }
         
@@ -155,7 +155,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 var node = ((PowershellFunctionNode)item.Node);
                 this.IseIntegrator.GoToFile(node.FilePath);
-                this.IseIntegrator.SetCursor(node.PowershellFunction.StartLine, node.PowershellFunction.StartColumn);
+                this.IseIntegrator.SelectText(node.PowershellFunction.StartLine, node.PowershellFunction.StartColumn, node.Name.Length);
             }
             
         }

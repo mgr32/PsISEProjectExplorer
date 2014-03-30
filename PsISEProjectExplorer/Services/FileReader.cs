@@ -5,7 +5,7 @@ using System.IO;
 
 namespace PsISEProjectExplorer.Services
 {
-    public class FileReader
+    public static class FileReader
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 

@@ -64,14 +64,14 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             return functionNode;
         }
 
-        public IList<SearchResult> SearchNodesFullText(string filter, FullTextFieldType fieldType)
+        public IEnumerable<SearchResult> SearchNodesFullText(string filter, FullTextFieldType fieldType)
         {
             IList<SearchResult> searchResults = this.FullTextDirectory.Search(filter, fieldType);
             this.AddNodesToSearchResults(searchResults);
             return searchResults;
         }
 
-        public IList<SearchResult> SearchNodesByTerm(string filter, FullTextFieldType fieldType)
+        public IEnumerable<SearchResult> SearchNodesByTerm(string filter, FullTextFieldType fieldType)
         {
             IList<SearchResult> searchResults = this.FullTextDirectory.SearchTerm(filter, fieldType);
             this.AddNodesToSearchResults(searchResults);

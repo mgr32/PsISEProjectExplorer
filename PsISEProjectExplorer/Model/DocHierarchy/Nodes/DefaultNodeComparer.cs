@@ -5,7 +5,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 {
     public class DefaultNodeComparer : IComparer<INode>
     {
-        public static IComparer<INode> NodeComparer = new DefaultNodeComparer();
+        public static readonly IComparer<INode> NodeComparer = new DefaultNodeComparer();
 
         public int Compare(INode x, INode y)
         {
