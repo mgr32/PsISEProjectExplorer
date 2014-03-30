@@ -49,19 +49,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        private bool searchingInProgress;
-
-        public bool SearchingInProgress
-        {
-            get { return this.searchingInProgress; }
-            set
-            {
-                this.searchingInProgress = value;
-                this.OnPropertyChanged();
-
-            }
-        }
-
         private string searchText;
 
         public string SearchText
@@ -239,7 +226,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void BackgroundSearcherWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            this.SearchingInProgress = false;
             var result = (WorkerResult)e.Result;
             if (result == null || result.StartTimestamp != this.LastSearchStartTime)
             {
@@ -305,7 +291,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private void RunSearch()
         {
             var searcherParams = new BackgroundSearcherParams(this.DocumentHierarchySearcher, this.SearchOptions, this.SearchText);
-            this.SearchingInProgress = true;
             this.BackgroundSearcher = new BackgroundSearcher();
             this.LastSearchStartTime = this.BackgroundSearcher.StartTimestamp;
             this.BackgroundSearcher.RunWorkerCompleted += this.BackgroundSearcherWorkCompleted;

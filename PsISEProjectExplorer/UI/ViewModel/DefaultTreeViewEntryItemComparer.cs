@@ -5,7 +5,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 {
     public class DefaultTreeViewEntryItemComparer : IComparer<TreeViewEntryItemModel>
     {
-        public static IComparer<TreeViewEntryItemModel> TreeViewEntryItemComparer = new DefaultTreeViewEntryItemComparer();
+        public static readonly IComparer<TreeViewEntryItemModel> TreeViewEntryItemComparer = new DefaultTreeViewEntryItemComparer();
 
         public int Compare(TreeViewEntryItemModel x, TreeViewEntryItemModel y)
         {

@@ -11,16 +11,18 @@
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
+    <Grid d:DataContext="{d:DesignInstance viewModel:MainViewModel}">
         <TextBlock HorizontalAlignment="Stretch" Margin="10,5,66,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Text="{Binding Path=RootDirectoryLabel}" VerticalAlignment="Top" />
-        <TextBox Name="TextBoxSearchText" HorizontalAlignment="Stretch" Height="21" Margin="10,25,36,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged, Delay=150}" MaxLength="100"/>
-        <Button Name="TextBoxSearchClear" VerticalAlignment="Top" Height="21" Margin="10,25,10,0" HorizontalAlignment="Right" Click="TextBoxSearchClear_Click">
+        <TextBox Name="TextBoxSearchText" HorizontalAlignment="Stretch" Height="21" Margin="10,25,36,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged, Delay=150}" MaxLength="100"
+                 x:FieldModifier="private" />
+        <Button VerticalAlignment="Top" Height="21" Margin="10,25,10,0" HorizontalAlignment="Right" Click="TextBoxSearchClear_Click">
             <Image Source="Resources/cancel.png" />
         </Button>
-        <CheckBox Name="FreezeRootDir" HorizontalAlignment="Right" Margin="10,54,100,5" Content="Freeze root dir" VerticalAlignment="Top" Width="100" IsChecked="{Binding Path=FreezeRootDirectory}" />
-        <CheckBox Name="SearchInFiles" HorizontalAlignment="Right" Margin="10,54,0,5" Content="Search in files" VerticalAlignment="Top" Width="100" IsChecked="{Binding Path=SearchInFiles}" />
+        <CheckBox HorizontalAlignment="Right" Margin="10,54,100,5" Content="Freeze root dir" VerticalAlignment="Top" Width="100" IsChecked="{Binding Path=FreezeRootDirectory}" />
+        <CheckBox HorizontalAlignment="Right" Margin="10,54,0,5" Content="Search in files" VerticalAlignment="Top" Width="100" IsChecked="{Binding Path=SearchInFiles}" />
         <TextBlock HorizontalAlignment="Left" Margin="10,54,0,5" TextWrapping="Wrap" Text="Indexing..." VerticalAlignment="Top" Width="70" Visibility="{Binding Path=IndexingInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <TreeView Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewModel.TreeViewItems}" KeyUp="SearchResults_KeyUp" PreviewMouseLeftButtonDown="SearchResults_PreviewMouseLeftButtonDown" >
+        <TreeView Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewModel.TreeViewItems}" KeyUp="SearchResults_KeyUp" PreviewMouseLeftButtonDown="SearchResults_PreviewMouseLeftButtonDown"
+                  x:FieldModifier="private">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}" DataType="{x:Type viewModel:TreeViewEntryItemModel}">
                     <StackPanel Orientation="Horizontal">
@@ -45,7 +47,7 @@
                 </Style>
             </TreeView.ItemContainerStyle>
         </TreeView>
-        <Button Name="ChangeWorkspace" Content="Change" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Top" Width="51" Click="ChangeWorkspace_Click"/>
+        <Button Content="Change" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Top" Width="51" Click="ChangeWorkspace_Click"/>
 
     </Grid>
 </UserControl>

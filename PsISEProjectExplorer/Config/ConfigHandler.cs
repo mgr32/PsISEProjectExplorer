@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace PsISEProjectExplorer.Config
 {
-    public class ConfigHandler
+    public static class ConfigHandler
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 

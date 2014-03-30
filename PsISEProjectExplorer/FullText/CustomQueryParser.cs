@@ -1,5 +1,4 @@
-﻿using Lucene.Net.Analysis;
-using Lucene.Net.Index;
+﻿using Lucene.Net.Index;
 using Lucene.Net.Search;
 using System;
 using System.Collections.Generic;
@@ -13,13 +12,6 @@ namespace PsISEProjectExplorer.FullText
     /// </summary>
     public class CustomQueryParser
     {
-        public Analyzer Analyzer { get; private set; }
-
-        public CustomQueryParser(Analyzer analyzer)
-        {
-            this.Analyzer = analyzer;
-        }
-
         public Query Parse(string text, string field)
         {
             if (string.IsNullOrWhiteSpace(text))

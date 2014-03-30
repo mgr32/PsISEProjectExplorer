@@ -2,7 +2,7 @@
 
 namespace PsISEProjectExplorer.Services
 {
-    public class TokenLocator
+    public static class TokenLocator
     {
 
         public static TokenPosition LocateNextToken(string filePath, string searchText, EditorInfo editorInfo)

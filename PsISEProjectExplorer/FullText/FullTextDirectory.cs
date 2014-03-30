@@ -29,7 +29,7 @@ namespace PsISEProjectExplorer.FullText
             this.LuceneDirectory = new RAMDirectory();
             this.IndexWriter = new IndexWriter(this.LuceneDirectory, this.Analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
             this.IndexReader = this.IndexWriter.GetReader();
-            this.CustomQueryParser = new CustomQueryParser(this.Analyzer);
+            this.CustomQueryParser = new CustomQueryParser();
             this.DocumentCreator = new DocumentFactory(this.IndexWriter);
         }
 

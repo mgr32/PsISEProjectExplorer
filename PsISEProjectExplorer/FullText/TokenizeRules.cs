@@ -2,7 +2,7 @@
 
 namespace PsISEProjectExplorer.FullText
 {
-    public class TokenizeRules
+    public static class TokenizeRules
     {
         private static readonly char[] TokenSeparators = { '.', ',', ':', '(', ')', '[', ']', '{', '}', '\\', '/', '`' };
 

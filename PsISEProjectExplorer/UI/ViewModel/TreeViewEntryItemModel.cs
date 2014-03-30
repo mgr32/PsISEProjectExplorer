@@ -56,7 +56,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        public TreeViewEntryItemModel Parent { get; private set; }
+        private TreeViewEntryItemModel Parent { get; set; }
 
         private bool isExpanded;
 

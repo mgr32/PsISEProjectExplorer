@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace PsISEProjectExplorer.Services
 {
-    public class RootDirectoryProvider
+    public static class RootDirectoryProvider
     {
         public static string GetRootDirectoryToSearch(string filePath)
         {
