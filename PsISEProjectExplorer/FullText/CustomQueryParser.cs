@@ -1,13 +1,9 @@
 ﻿using Lucene.Net.Analysis;
-using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.FullText
 {
@@ -30,15 +26,15 @@ namespace PsISEProjectExplorer.FullText
             {
                 return null;
             }
-            var tokens = this.Tokenize(text);
+            var tokens = this.Tokenize(text).ToList();
             if (!tokens.Any())
             {
                 return null;
             }
-            BooleanQuery outerQuery = new BooleanQuery();
+            var outerQuery = new BooleanQuery();
             foreach (string token in tokens)
             {
-                PrefixQuery query = new PrefixQuery(new Term(field, token));
+                var query = new PrefixQuery(new Term(field, token));
                 outerQuery.Add(query, Occur.MUST);
             }
             return outerQuery;
@@ -50,7 +46,7 @@ namespace PsISEProjectExplorer.FullText
             int tokenLen = 0;
 
             int len = text.Length;
-            char[] buf = new char[255];
+            var buf = new char[255];
             for (int i = 0; i <= len; i++)
             {
                 char c = '\x00';

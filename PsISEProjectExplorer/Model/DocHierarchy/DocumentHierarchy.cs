@@ -1,11 +1,7 @@
 ﻿using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.FullText;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Model.DocHierarchy
 {
@@ -21,8 +17,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
         {
             this.RootNode = rootNode;
             this.FullTextDirectory = new FullTextDirectory();
-            this.NodeMap = new Dictionary<string, INode>();
-            this.NodeMap.Add(rootNode.Path, rootNode);
+            this.NodeMap = new Dictionary<string, INode> {{rootNode.Path, rootNode}};
         }
 
         public INode GetNode(string path)
@@ -69,16 +64,16 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             return functionNode;
         }
 
-        public IEnumerable<SearchResult> SearchNodesFullText(string filter, FullTextFieldType fieldType)
+        public IList<SearchResult> SearchNodesFullText(string filter, FullTextFieldType fieldType)
         {
-            IEnumerable<SearchResult> searchResults = this.FullTextDirectory.Search(filter, fieldType);
+            IList<SearchResult> searchResults = this.FullTextDirectory.Search(filter, fieldType);
             this.AddNodesToSearchResults(searchResults);
             return searchResults;
         }
 
-        public IEnumerable<SearchResult> SearchNodesByTerm(string filter, FullTextFieldType fieldType)
+        public IList<SearchResult> SearchNodesByTerm(string filter, FullTextFieldType fieldType)
         {
-            IEnumerable<SearchResult> searchResults = this.FullTextDirectory.SearchTerm(filter, fieldType);
+            IList<SearchResult> searchResults = this.FullTextDirectory.SearchTerm(filter, fieldType);
             this.AddNodesToSearchResults(searchResults);
             return searchResults;
         }

@@ -1,43 +1,35 @@
 ﻿using NLog;
 using PsISEProjectExplorer.Model.DocHierarchy;
-using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.Services;
-using PsISEProjectExplorer.UI.ViewModel;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.UI.Workers
 {
     public class BackgroundIndexer : BackgroundWorker
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public DateTime StartTimestamp { get; private set; }
 
         public BackgroundIndexer()
         {
             this.StartTimestamp = DateTime.Now;
-            this.DoWork += new DoWorkEventHandler(doWork);
+            this.DoWork += RunIndexing;
         }
 
-        private void doWork(object sender, DoWorkEventArgs e)
+        private void RunIndexing(object sender, DoWorkEventArgs e)
         {
-            BackgroundIndexerParams indexerParams = (BackgroundIndexerParams)e.Argument;
-            DocumentHierarchy docHierarchy = null;
+            var indexerParams = (BackgroundIndexerParams)e.Argument;
             DocumentHierarchySearcher newSearcher = null;
-            logger.Info("Indexing started");
+            Logger.Info("Indexing started");
             if (indexerParams.PathsChanged == null)
             {
                 newSearcher = this.CreateNewDocHierarchy(indexerParams.DocumentHierarchyFactory, indexerParams.RootDirectory);
             }
             else
             {
-                docHierarchy = indexerParams.DocumentHierarchyFactory.GetDocumentHierarchy(indexerParams.RootDirectory);
+                DocumentHierarchy docHierarchy = indexerParams.DocumentHierarchyFactory.GetDocumentHierarchy(indexerParams.RootDirectory);
                 if (docHierarchy == null)
                 {
                     newSearcher = this.CreateNewDocHierarchy(indexerParams.DocumentHierarchyFactory, indexerParams.RootDirectory);

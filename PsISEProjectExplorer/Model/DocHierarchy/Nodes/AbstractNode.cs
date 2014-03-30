@@ -1,9 +1,6 @@
 ﻿using PsISEProjectExplorer.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 {
@@ -18,7 +15,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         // less = will be before other nodes
         public virtual int OrderValue { get { return 0; } }
 
-        public AbstractNode(string path, string name, INode parent)
+        protected AbstractNode(string path, string name, INode parent)
         {
             if (path == null) {
                 throw new ArgumentNullException("path");
@@ -26,23 +23,23 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             this.Path = path;
             this.Name = name;
             this.Parent = parent;
-            this.Children = new SortedSet<INode>(DefaultNodeComparer.NODE_COMPARER);
+            this.Children = new SortedSet<INode>(DefaultNodeComparer.NodeComparer);
             if (this.Parent != null)
             {
                 if (!this.Parent.Children.Add(this))
                 {
-                    throw new InvalidOperationException(String.Format("Adding element '{0}' failed", this.Path));
+                    throw new InvalidOperationException(String.Format("Adding element '{0}' failed", path));
                 }
             }
         }
 
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is INode))
+            if (!(obj is INode))
             {
                 return false;
             }
-            INode node = (INode)obj;
+            var node = (INode)obj;
             return (node.Path == this.Path);
         }
 

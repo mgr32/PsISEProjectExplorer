@@ -1,14 +1,9 @@
-﻿using PsISEProjectExplorer.Enums;
-using PsISEProjectExplorer.FullText;
-using PsISEProjectExplorer.Model;
+﻿using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Services
 {
@@ -63,12 +58,8 @@ namespace PsISEProjectExplorer.Services
             foreach (string segment in segments)
             {
                 currentAbsolutePath = Path.Combine(currentAbsolutePath, segment);
-                INode node = this.DocumentHierarchy.GetNode(currentAbsolutePath);
-                if (node == null)
-                {
-                    node = this.DocumentHierarchy.CreateNewIntermediateDirectoryNode(currentAbsolutePath, segment, currentNode);
-                }
-                currentNode = (INode)node;
+                currentNode = this.DocumentHierarchy.GetNode(currentAbsolutePath) ??
+                             this.DocumentHierarchy.CreateNewIntermediateDirectoryNode(currentAbsolutePath, segment, currentNode);
             }
             return currentNode;
         }

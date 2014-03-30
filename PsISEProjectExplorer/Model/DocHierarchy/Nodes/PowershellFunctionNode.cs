@@ -1,15 +1,12 @@
-﻿using PsISEProjectExplorer.Enums;
+﻿using System.Globalization;
+using PsISEProjectExplorer.Enums;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 {
     public class PowershellFunctionNode : AbstractNode
     {
-        public override NodeType NodeType { get { return NodeType.FUNCTION; } }
+        public override NodeType NodeType { get { return NodeType.Function; } }
 
         public string FilePath { get; private set; }
 
@@ -33,7 +30,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
                 throw new ArgumentNullException("func");
             }
 
-            return System.IO.Path.Combine(filePath, func.StartLine.ToString());
+            return System.IO.Path.Combine(filePath, func.StartLine.ToString(CultureInfo.InvariantCulture));
         }
     }
 }

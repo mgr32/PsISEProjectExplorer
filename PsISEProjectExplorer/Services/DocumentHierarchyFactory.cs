@@ -1,13 +1,9 @@
 ﻿using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Services
 {
@@ -23,9 +19,9 @@ namespace PsISEProjectExplorer.Services
 
         public DocumentHierarchy CreateDocumentHierarchy(string path)
         {
-            DocumentHierarchy docHierarchy;
             lock (this.DocumentHierarchies)
             {
+                DocumentHierarchy docHierarchy;
                 this.DocumentHierarchies.TryGetValue(path, out docHierarchy);
                 if (docHierarchy != null)
                 {
@@ -33,7 +29,7 @@ namespace PsISEProjectExplorer.Services
                 }
                 docHierarchy = new DocumentHierarchy(new RootNode(path));
                 this.DocumentHierarchies.Add(path, docHierarchy);
-                this.UpdateDocumentHierarchy(docHierarchy, new List<string>() { path });
+                this.UpdateDocumentHierarchy(docHierarchy, new List<string> { path });
                 return docHierarchy;
             }
         }
@@ -52,7 +48,7 @@ namespace PsISEProjectExplorer.Services
         {
             lock (docHierarchy.RootNode)
             {
-                DocumentHierarchyIndexer documentHierarchyIndexer = new DocumentHierarchyIndexer(docHierarchy);
+                var documentHierarchyIndexer = new DocumentHierarchyIndexer(docHierarchy);
                 IList<PowershellFileParser> fileSystemEntryList = new List<PowershellFileParser>();
                 bool changed = false;
 
@@ -64,7 +60,7 @@ namespace PsISEProjectExplorer.Services
                         docHierarchy.RemoveNode(node);
                         changed = true;
                     }
-                    if (File.Exists(path) && FilesPatternProvider.POWERSHELL_FILES_REGEX.IsMatch(path))
+                    if (File.Exists(path) && FilesPatternProvider.PowershellFilesRegex.IsMatch(path))
                     {
                         fileSystemEntryList.Add(new PowershellFileParser(path, false));
                     }
@@ -96,7 +92,7 @@ namespace PsISEProjectExplorer.Services
                 }
             }
 
-            var files = Directory.EnumerateFiles(path, FilesPatternProvider.POWERSHELL_FILES_PATTERN);
+            var files = Directory.GetFiles(path, FilesPatternProvider.PowershellFilesPattern);
             foreach (string file in files)
             {
                 result.Add(new PowershellFileParser(file, false));
