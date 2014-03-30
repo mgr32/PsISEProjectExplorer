@@ -4,10 +4,7 @@ using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Services
 {
@@ -30,9 +27,10 @@ namespace PsISEProjectExplorer.Services
                 }
 
                 INode newRoot = new RootNode(this.DocumentHierarchy.RootNode.Path);
-                IEnumerable<INode> nodes = this.DocumentHierarchy
-                                                .SearchNodesFullText(filter, searchOptions.SearchField)
-                                                .Select(result => result.Node);
+                ICollection<INode> nodes = this.DocumentHierarchy
+                    .SearchNodesFullText(filter, searchOptions.SearchField)
+                    .Select(result => result.Node)
+                    .ToList();
                 if (searchOptions.IncludeAllParents)
                 {
                     this.FillNewFilteredDocumentHierarchyRecursively(nodes, newRoot, this.DocumentHierarchy.RootNode);
@@ -51,10 +49,9 @@ namespace PsISEProjectExplorer.Services
             lock (this.DocumentHierarchy.RootNode)
             {
                 return this.DocumentHierarchy
-                            .SearchNodesByTerm(name, FullTextFieldType.NAME_NOT_ANALYZED)
-                            .Select(result => result.Node)
-                            .Where(node => node.NodeType == NodeType.FUNCTION)
-                            .FirstOrDefault();
+                    .SearchNodesByTerm(name, FullTextFieldType.NameNotAnalyzed)
+                    .Select(result => result.Node)
+                    .FirstOrDefault(node => node.NodeType == NodeType.Function);
             }
         }
 
@@ -70,7 +67,7 @@ namespace PsISEProjectExplorer.Services
             }
         }
 
-        private void FillNewFilteredDocumentHierarchyRecursively(IEnumerable<INode> filteredNodes, INode newParent, INode oldParent)
+        private void FillNewFilteredDocumentHierarchyRecursively(ICollection<INode> filteredNodes, INode newParent, INode oldParent)
         {
             if (!oldParent.Children.Any())
             {

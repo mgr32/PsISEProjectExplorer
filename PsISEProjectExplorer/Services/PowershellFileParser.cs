@@ -1,20 +1,11 @@
-﻿using NLog;
-using PsISEProjectExplorer.Model;
-using System;
+﻿using PsISEProjectExplorer.Model;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Management.Automation;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Services
 {
     public class PowershellFileParser
     {
-        
-
         public string Path { get; private set; }
 
         public string FileContents { get; private set; }

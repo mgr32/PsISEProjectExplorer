@@ -2,27 +2,22 @@
 using PsISEProjectExplorer.Config;
 using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
-using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.Workers;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
     public class MainViewModel : BaseViewModel
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public TreeViewModel TreeViewModel { get; private set; }
 
@@ -75,7 +70,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             set
             {
                 this.searchText = value;
-                logger.Debug("Search text changed to: " + this.searchText);
+                Logger.Debug("Search text changed to: " + this.searchText);
                 this.OnPropertyChanged();
                 this.RunSearch();
             }
@@ -90,7 +85,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.searchInFiles = value;
                 this.OnPropertyChanged();
-                this.SearchOptions.SearchField = (this.searchInFiles ? FullTextFieldType.CATCH_ALL : FullTextFieldType.NAME);
+                this.SearchOptions.SearchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
                 if (!String.IsNullOrEmpty(this.SearchText))
                 {
                     this.RunSearch();
@@ -159,7 +154,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             this.freezeRootDirectory = ConfigHandler.ReadConfigBoolValue("FreezeRootDirectory");
             this.searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles");
-            var searchField = (this.searchInFiles ? FullTextFieldType.CATCH_ALL : FullTextFieldType.NAME);
+            var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
             this.rootDirectoryToSearch = ConfigHandler.ReadConfigStringValue("RootDirectory");
             if (this.rootDirectoryToSearch == string.Empty || !Directory.Exists(this.rootDirectoryToSearch))
             { 
@@ -178,7 +173,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 return;
             }
-            PowershellFunctionNode node = (PowershellFunctionNode)this.DocumentHierarchySearcher.GetFunctionNodeByName(funcName);
+            var node = (PowershellFunctionNode)this.DocumentHierarchySearcher.GetFunctionNodeByName(funcName);
             if (node == null)
             {
                 return;
@@ -227,12 +222,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private void BackgroundIndexerWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             this.IndexingInProgress = false;
-            WorkerResult result = (WorkerResult)e.Result;
+            var result = (WorkerResult)e.Result;
             if (result == null ||  result.Result == null || result.StartTimestamp != this.LastIndexStartTime)
             {
                 return;
             }
-            logger.Debug("Indexing ended, searchTreeInitialized: " + this.SearchTreeInitialized);
+            Logger.Debug("Indexing ended, searchTreeInitialized: " + this.SearchTreeInitialized);
             this.DocumentHierarchySearcher = (DocumentHierarchySearcher)result.Result;
             if (!this.SearchTreeInitialized)
             {
@@ -245,26 +240,26 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private void BackgroundSearcherWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             this.SearchingInProgress = false;
-            WorkerResult result = (WorkerResult)e.Result;
+            var result = (WorkerResult)e.Result;
             if (result == null || result.StartTimestamp != this.LastSearchStartTime)
             {
                 return;
             }
-            logger.Debug("Searching ended");
-            INode rootNode = (INode)result.Result;
+            Logger.Debug("Searching ended");
+            var rootNode = (INode)result.Result;
             bool expandNewNodes = !String.IsNullOrWhiteSpace(this.SearchText);
             this.TreeViewModel.RefreshFromRoot(rootNode, expandNewNodes);
         }
 
         private void OnFileSystemChanged(object sender, FileSystemChangedInfo changedInfo)
         {
-            var pathsChanged = changedInfo.PathsChanged;
+            var pathsChanged = changedInfo.PathsChanged.ToList();
             if (pathsChanged.Contains(this.RootDirectoryToSearch, StringComparer.InvariantCultureIgnoreCase))
             {
                 pathsChanged = null;
             }
-            logger.Debug("OnFileSystemChanged: " + string.Join(",", pathsChanged));
-            Application.Current.Dispatcher.Invoke(new Action(() => { this.ReindexSearchTree(pathsChanged); }));
+            Logger.Debug("OnFileSystemChanged: " + (pathsChanged == null ? "root" : string.Join(",", pathsChanged)));
+            Application.Current.Dispatcher.Invoke(() => this.ReindexSearchTree(pathsChanged));
         }
 
         public void ChangeRootDirectory(string newPath)
@@ -299,21 +294,21 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private void ReindexSearchTree(IEnumerable<string> pathsChanged)
         {
             this.SearchTreeInitialized = false;
-            BackgroundIndexerParams indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyIndexer, this.rootDirectoryToSearch, pathsChanged);
+            var indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyIndexer, this.rootDirectoryToSearch, pathsChanged);
             this.IndexingInProgress = true;
             this.BackgroundIndexer = new BackgroundIndexer();
             this.LastIndexStartTime = this.BackgroundIndexer.StartTimestamp;
-            this.BackgroundIndexer.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundIndexerWorkCompleted);
+            this.BackgroundIndexer.RunWorkerCompleted += this.BackgroundIndexerWorkCompleted;
             this.BackgroundIndexer.RunWorkerAsync(indexerParams);
         }
 
         private void RunSearch()
         {
-            BackgroundSearcherParams searcherParams = new BackgroundSearcherParams(this.DocumentHierarchySearcher, this.SearchOptions, this.SearchText);
+            var searcherParams = new BackgroundSearcherParams(this.DocumentHierarchySearcher, this.SearchOptions, this.SearchText);
             this.SearchingInProgress = true;
             this.BackgroundSearcher = new BackgroundSearcher();
             this.LastSearchStartTime = this.BackgroundSearcher.StartTimestamp;
-            this.BackgroundSearcher.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.BackgroundSearcherWorkCompleted);
+            this.BackgroundSearcher.RunWorkerCompleted += this.BackgroundSearcherWorkCompleted;
             this.BackgroundSearcher.RunWorkerAsync(searcherParams);
         }
 

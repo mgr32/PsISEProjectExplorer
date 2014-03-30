@@ -1,42 +1,43 @@
-﻿using NLog;
+﻿using System.Threading;
 using PsISEProjectExplorer.Model;
-using PsISEProjectExplorer.Model.DocHierarchy;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Services
 {
     public static class FileSystemChangeNotifier
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
         public static event EventHandler<FileSystemChangedInfo> FileSystemChanged;
 
-        private static ISet<string> changePool = new HashSet<string>();
+        private static readonly ISet<string> ChangePool = new HashSet<string>();
 
-        private static Task changeNotifyTask = Task.Factory.StartNew(() => ChangeNotifier());
+        private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
-        private static FileSystemWatcher watcher = new FileSystemWatcher();
+        private static readonly FileSystemWatcher Watcher = new FileSystemWatcher();
+
+        static FileSystemChangeNotifier()
+        {
+            Task.Factory.StartNew(ChangeNotifier);
+        }
 
         public static void Watch(string path)
         {
-            watcher.EnableRaisingEvents = false;
+            Watcher.EnableRaisingEvents = false;
             if (String.IsNullOrEmpty(path) || !Directory.Exists(path))
             {
                 return;
             }
-            watcher.Path = path;
-            watcher.NotifyFilter = NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Security;
-            watcher.IncludeSubdirectories = true;
-            watcher.Changed += new FileSystemEventHandler(OnFileChanged);
-            watcher.Created += new FileSystemEventHandler(OnFileChanged);
-            watcher.Deleted += new FileSystemEventHandler(OnFileChanged);
-            watcher.Renamed += new RenamedEventHandler(OnFileRenamed);
-            watcher.EnableRaisingEvents = true;
+            Watcher.Path = path;
+            Watcher.NotifyFilter = NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Security;
+            Watcher.IncludeSubdirectories = true;
+            Watcher.Changed += OnFileChanged;
+            Watcher.Created += OnFileChanged;
+            Watcher.Deleted += OnFileChanged;
+            Watcher.Renamed += OnFileRenamed;
+            Watcher.EnableRaisingEvents = true;
         }
 
         // runs on a separate thread (from system)
@@ -47,13 +48,13 @@ namespace PsISEProjectExplorer.Services
             {
                 return;
             }
-            if (!isDir && !FilesPatternProvider.POWERSHELL_FILES_REGEX.IsMatch(e.FullPath))
+            if (!isDir && !FilesPatternProvider.PowershellFilesRegex.IsMatch(e.FullPath))
             {
                 return;
             }
-            lock (changePool)
+            lock (ChangePool)
             {
-                changePool.Add(e.FullPath);
+                ChangePool.Add(e.FullPath);
             }
         }
 
@@ -61,16 +62,16 @@ namespace PsISEProjectExplorer.Services
         private static void OnFileRenamed(object source, RenamedEventArgs e)
         {
             bool isDir = Directory.Exists(e.FullPath) || Directory.Exists(e.OldFullPath);
-            lock (changePool)
+            lock (ChangePool)
             {
-                if (isDir || FilesPatternProvider.POWERSHELL_FILES_REGEX.IsMatch(e.OldFullPath))
+                if (isDir || FilesPatternProvider.PowershellFilesRegex.IsMatch(e.OldFullPath))
                 {
-                    changePool.Add(e.OldFullPath);
+                    ChangePool.Add(e.OldFullPath);
                 }
-                if ((isDir || FilesPatternProvider.POWERSHELL_FILES_REGEX.IsMatch(e.FullPath)) &&
+                if ((isDir || FilesPatternProvider.PowershellFilesRegex.IsMatch(e.FullPath)) &&
                     e.FullPath.ToLowerInvariant() != e.OldFullPath.ToLowerInvariant())
                 {
-                    changePool.Add(e.FullPath);
+                    ChangePool.Add(e.FullPath);
                 }
             }
         }
@@ -80,15 +81,19 @@ namespace PsISEProjectExplorer.Services
         {
             while (true)
             {
-                System.Threading.Thread.Sleep(100);
-                lock (changePool)
+                Thread.Sleep(100);
+                if (CancellationTokenSource.Token.IsCancellationRequested)
                 {
-                    if (changePool.Any())
+                    return;
+                }
+                lock (ChangePool)
+                {
+                    if (ChangePool.Any())
                     {
-                        IList<string> pathsChanged = new List<string>(changePool);
-                        FileSystemChangedInfo changedInfo = new FileSystemChangedInfo(pathsChanged);
+                        IList<string> pathsChanged = new List<string>(ChangePool);
+                        var changedInfo = new FileSystemChangedInfo(pathsChanged);
                         FileSystemChanged(null, changedInfo);
-                        changePool.Clear();
+                        ChangePool.Clear();
                     }
                 }
             }

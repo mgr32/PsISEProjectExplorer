@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
@@ -28,7 +24,7 @@ namespace PsISEProjectExplorer.UI
         {
             foreach (Object item in parentContainer.Items)
             {
-                TreeViewItem currentContainer = parentContainer.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
+                var currentContainer = parentContainer.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
                 if (currentContainer != null && currentContainer.Items.Count > 0)
                 {
                     //expand the item
@@ -39,7 +35,7 @@ namespace PsISEProjectExplorer.UI
                     {
                         //store the event handler in a variable so we can remove it (in the handler itself)
                         EventHandler eh = null;
-                        eh = new EventHandler(delegate
+                        eh = delegate
                         {
                             //once the children have been generated, expand those children's children then remove the event handler
                             if (currentContainer.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
@@ -47,7 +43,7 @@ namespace PsISEProjectExplorer.UI
                                 ExpandSubContainers(currentContainer);
                                 currentContainer.ItemContainerGenerator.StatusChanged -= eh;
                             }
-                        });
+                        };
 
                         currentContainer.ItemContainerGenerator.StatusChanged += eh;
                     }
@@ -80,7 +76,7 @@ namespace PsISEProjectExplorer.UI
             //check all items at the current level
             foreach (Object item in parentContainer.Items)
             {
-                TreeViewItem currentContainer = parentContainer.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
+                var currentContainer = parentContainer.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
 
                 //if the data item matches the item we want to select, set the corresponding
                 //TreeViewItem IsSelected to true
@@ -98,7 +94,7 @@ namespace PsISEProjectExplorer.UI
             //if we get to this point, the selected item was not found at the current level, so we must check the children
             foreach (Object item in parentContainer.Items)
             {
-                TreeViewItem currentContainer = parentContainer.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
+                var currentContainer = parentContainer.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
 
                 //if children exist
                 if (currentContainer != null && currentContainer.Items.Count > 0)
@@ -115,7 +111,7 @@ namespace PsISEProjectExplorer.UI
                     {
                         //store the event handler in a variable so we can remove it (in the handler itself)
                         EventHandler eh = null;
-                        eh = new EventHandler(delegate
+                        eh = delegate
                         {
                             if (currentContainer.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
                             {
@@ -130,7 +126,7 @@ namespace PsISEProjectExplorer.UI
                                 //remove the StatusChanged event handler since we just handled it (we only needed it once)
                                 currentContainer.ItemContainerGenerator.StatusChanged -= eh;
                             }
-                        });
+                        };
                         currentContainer.ItemContainerGenerator.StatusChanged += eh;
                     }
                     else //otherwise the containers have been generated, so look for item to select in the children

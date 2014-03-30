@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 {
     public class DefaultNodeComparer : IComparer<INode>
     {
-        public static IComparer<INode> NODE_COMPARER = new DefaultNodeComparer();
+        public static IComparer<INode> NodeComparer = new DefaultNodeComparer();
 
         public int Compare(INode x, INode y)
         {
@@ -16,11 +13,11 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             {
                 return 0;
             }
-            if (x == null && y != null)
+            if (x == null)
             {
                 return -1;
             }
-            if (x != null && y == null)
+            if (y == null)
             {
                 return 1;
             }
@@ -28,12 +25,12 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             {
                 return x.OrderValue.CompareTo(y.OrderValue);
             }
-            int nameCompare = x.Name.CompareTo(y.Name);
+            int nameCompare = string.Compare(x.Name, y.Name, StringComparison.InvariantCulture);
             if (nameCompare != 0)
             {
                 return nameCompare;
             }
-            return x.Path.CompareTo(y.Path);
+            return string.Compare(x.Path, y.Path, StringComparison.InvariantCulture);
         }
     }
 }

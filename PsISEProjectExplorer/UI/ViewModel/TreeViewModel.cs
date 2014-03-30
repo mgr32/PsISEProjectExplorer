@@ -6,8 +6,6 @@ using PsISEProjectExplorer.UI.IseIntegration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
@@ -31,10 +29,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private TreeViewEntryItemModel RootTreeViewEntryItem { get; set; }
         
-        public TreeViewModel()
-        {
-        }
-
         public void RefreshFromRoot(INode newDocumentHierarchyRoot, bool expandAllNodes)
         {
             if (newDocumentHierarchyRoot == null)
@@ -46,7 +40,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
             if (this.RootTreeViewEntryItem == null || !this.RootTreeViewEntryItem.Node.Equals(newDocumentHierarchyRoot))
             {
-                TreeViewEntryItemModel newRootItem = new TreeViewEntryItemModel(newDocumentHierarchyRoot, null);
+                var newRootItem = new TreeViewEntryItemModel(newDocumentHierarchyRoot, null);
                 this.SetNewRootItem(newRootItem);
                 FileSystemChangeNotifier.Watch(newRootItem.Node.Path);
             }
@@ -97,15 +91,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
             IList<INode> childrenToIterate = new List<INode>(node.Children);
             foreach (INode docHierarchyChild in childrenToIterate)
             {
-                TreeViewEntryItemModel newTreeViewItem = null;
-                foreach (TreeViewEntryItemModel treeViewChild in treeViewEntryItem.Children)
-                {
-                    if (treeViewChild.Node.Equals(docHierarchyChild))
-                    {
-                        newTreeViewItem = treeViewChild;
-                        break;
-                    }
-                }
+                TreeViewEntryItemModel newTreeViewItem = 
+                    treeViewEntryItem.Children
+                    .FirstOrDefault(treeViewChild => treeViewChild.Node.Equals(docHierarchyChild));
                 if (newTreeViewItem == null)
                 {
                     newTreeViewItem = new TreeViewEntryItemModel(docHierarchyChild, treeViewEntryItem);
@@ -134,7 +122,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 return;
             }
 
-            if (item.Node.NodeType == NodeType.FILE)
+            if (item.Node.NodeType == NodeType.File)
             {
                 bool wasOpen = (this.IseIntegrator.SelectedFilePath == item.Node.Path);
                 if (!wasOpen)
@@ -163,9 +151,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     }
                 }
             }
-            else if (item.Node.NodeType == NodeType.FUNCTION)
+            else if (item.Node.NodeType == NodeType.Function)
             {
-                PowershellFunctionNode node = ((PowershellFunctionNode)item.Node);
+                var node = ((PowershellFunctionNode)item.Node);
                 this.IseIntegrator.GoToFile(node.FilePath);
                 this.IseIntegrator.SetCursor(node.PowershellFunction.StartLine, node.PowershellFunction.StartColumn);
             }

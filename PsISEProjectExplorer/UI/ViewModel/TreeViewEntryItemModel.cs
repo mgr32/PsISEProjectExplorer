@@ -1,13 +1,5 @@
 ﻿using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
-using PsISEProjectExplorer.Properties;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
@@ -31,14 +23,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                if (this.DocumentHierarchyNode is ViewNode)
+                var node = this.DocumentHierarchyNode as ViewNode;
+                if (node != null)
                 {
-                    return ((ViewNode)this.DocumentHierarchyNode).Node;
+                    return node.Node;
                 }
-                else
-                {
-                    return this.DocumentHierarchyNode;
-                }                   
+                return this.DocumentHierarchyNode;
             }
         }
 
@@ -122,7 +112,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 return false;
             }
-            TreeViewEntryItemModel item = (TreeViewEntryItemModel)obj;
+            var item = (TreeViewEntryItemModel)obj;
             return (this.Node == item.Node);
         }
 

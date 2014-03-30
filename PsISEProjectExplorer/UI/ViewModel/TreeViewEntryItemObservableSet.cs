@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
-    public class TreeViewEntryItemObservableSet : INotifyCollectionChanged, INotifyPropertyChanged, IEnumerable<TreeViewEntryItemModel>
+    public class TreeViewEntryItemObservableSet : INotifyCollectionChanged, IEnumerable<TreeViewEntryItemModel>
     {
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         private List<TreeViewEntryItemModel> Items { get; set; }
 
@@ -25,7 +17,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public bool Add(TreeViewEntryItemModel item)
         {
-            int result = this.Items.BinarySearch(item, DefaultTreeViewEntryItemComparer.TREEVIEWENTRYITEM_COMPARER);
+            int result = this.Items.BinarySearch(item, DefaultTreeViewEntryItemComparer.TreeViewEntryItemComparer);
             if (result >= 0)
             {
                 // already on list
@@ -45,7 +37,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public bool Remove(TreeViewEntryItemModel item)
         {
-            int index = this.Items.BinarySearch(item, DefaultTreeViewEntryItemComparer.TREEVIEWENTRYITEM_COMPARER);
+            int index = this.Items.BinarySearch(item, DefaultTreeViewEntryItemComparer.TreeViewEntryItemComparer);
             if (index < 0)
             {
                 // not in list;

@@ -3,9 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Services
 {
@@ -19,6 +16,10 @@ namespace PsISEProjectExplorer.Services
             }
             string driveRoot = Path.GetPathRoot(filePath).ToLowerInvariant();
             string rootDir = Path.GetDirectoryName(filePath);
+            if (rootDir == null)
+            {
+                return null;
+            }
             string currentDir = rootDir;
             while (true)
             {
@@ -39,10 +40,9 @@ namespace PsISEProjectExplorer.Services
                 }
                 foreach (string file in allFilesInCurrentDir)
                 {
-                    if (FilesPatternProvider.POWERSHELL_FILES_REGEX.IsMatch(file))
+                    if (FilesPatternProvider.PowershellFilesRegex.IsMatch(file))
                     {
                         rootDir = currentDir;
-                        continue;
                     }
                 }
             }

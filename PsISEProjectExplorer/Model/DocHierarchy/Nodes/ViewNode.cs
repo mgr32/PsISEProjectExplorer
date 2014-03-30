@@ -1,15 +1,12 @@
 ﻿using PsISEProjectExplorer.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 {
     public class ViewNode : INode
     {
-        public NodeType NodeType { get { return NodeType.INTERMEDIATE; } }
+        public NodeType NodeType { get { return NodeType.Intermediate; } }
 
         public INode Node { get; private set; }
 
@@ -49,7 +46,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             }
             this.Node = viewedNode;
             this.Parent = parent;
-            this.Children = new SortedSet<INode>(DefaultNodeComparer.NODE_COMPARER);
+            this.Children = new SortedSet<INode>(DefaultNodeComparer.NodeComparer);
             if (this.Parent != null)
             {
                 this.Parent.Children.Add(this);
@@ -58,11 +55,11 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is INode))
+            if (!(obj is INode))
             {
                 return false;
             }
-            INode node = (INode)obj;
+            var node = (INode)obj;
             return (node.Path == this.Path);
         }
 

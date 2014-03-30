@@ -1,11 +1,4 @@
-﻿using NLog;
-using PsISEProjectExplorer.Model;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PsISEProjectExplorer.Model;
 
 namespace PsISEProjectExplorer.Services
 {
@@ -33,7 +26,7 @@ namespace PsISEProjectExplorer.Services
                 startColumnInFirstLine = editorInfo.CurrentColumn;
             }
             int queryLen = searchText.Length;
-            TokenPosition bestSubtokenPosition = new TokenPosition(-1, 0, 0);
+            var bestSubtokenPosition = new TokenPosition(-1, 0, 0);
             foreach (LineInfo lineInfo in FileReader.ReadFileAsEnumerableWithWrap(filePath, startLine))
             {
                 int columnsToIgnore = (lineInfo.LineNumber == startLine ? startColumnInFirstLine : 0);
