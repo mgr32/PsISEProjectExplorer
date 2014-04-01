@@ -1,8 +1,8 @@
 ## Powershell ISE Addon - Project Explorer
 
-##### Description
+<a href="https://github.com/mgrzywa/PsISEProjectExplorer/releases/latest">Download</a>
 
-Project not released yet - you can compile it manually or wait for first official release.
+##### Description
 
 Provides a tree view that enables to index and explore whole directory structure containing Powershell scripts. It has following features:
 
