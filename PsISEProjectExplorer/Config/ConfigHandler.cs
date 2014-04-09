@@ -48,11 +48,14 @@ namespace PsISEProjectExplorer.Config
             }
         }
 
-        public static bool ReadConfigBoolValue(string key)
+        public static bool ReadConfigBoolValue(string key, bool defaultValue)
         {
             string value = ReadConfigStringValue(key);
             bool result;
-            Boolean.TryParse(value, out result);
+            if (!Boolean.TryParse(value, out result))
+            {
+                return defaultValue;
+            }
             return result;
         }
 

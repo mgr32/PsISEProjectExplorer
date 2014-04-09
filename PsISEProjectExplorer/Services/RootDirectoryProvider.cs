@@ -16,7 +16,7 @@ namespace PsISEProjectExplorer.Services
             }
             string driveRoot = Path.GetPathRoot(filePath).ToLowerInvariant();
             string rootDir = Path.GetDirectoryName(filePath);
-            if (rootDir == null)
+            if (String.IsNullOrEmpty(rootDir))
             {
                 return null;
             }

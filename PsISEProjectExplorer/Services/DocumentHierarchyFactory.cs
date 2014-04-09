@@ -19,6 +19,10 @@ namespace PsISEProjectExplorer.Services
 
         public DocumentHierarchy CreateDocumentHierarchy(string path)
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                return null;
+            }
             lock (this.DocumentHierarchies)
             {
                 DocumentHierarchy docHierarchy;

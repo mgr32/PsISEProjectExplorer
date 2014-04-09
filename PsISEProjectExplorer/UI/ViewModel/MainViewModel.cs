@@ -81,20 +81,20 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        private bool freezeRootDirectory;
+        private bool autoUpdateRootDirectory;
 
-        public bool FreezeRootDirectory
+        public bool AutoUpdateRootDirectory
         {
-            get { return this.freezeRootDirectory; }
+            get { return this.autoUpdateRootDirectory; }
             set
             {
-                this.freezeRootDirectory = value;
+                this.autoUpdateRootDirectory = value;
                 this.OnPropertyChanged();
-                if (!this.freezeRootDirectory)
+                if (!this.autoUpdateRootDirectory)
                 {
                     this.RecalculateRootDirectory(false);
                 }
-                ConfigHandler.SaveConfigValue("FreezeRootDirectory", value.ToString());
+                ConfigHandler.SaveConfigValue("AutoUpdateRootDirectory", value.ToString());
             }
         }
 
@@ -139,8 +139,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public MainViewModel()
         {
-            this.freezeRootDirectory = ConfigHandler.ReadConfigBoolValue("FreezeRootDirectory");
-            this.searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles");
+            this.autoUpdateRootDirectory = ConfigHandler.ReadConfigBoolValue("AutoUpdateRootDirectory", true);
+            this.searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles", false);
             var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
             this.rootDirectoryToSearch = ConfigHandler.ReadConfigStringValue("RootDirectory");
             if (this.rootDirectoryToSearch == string.Empty || !Directory.Exists(this.rootDirectoryToSearch))
@@ -250,14 +250,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public void ChangeRootDirectory(string newPath)
         {
-            this.FreezeRootDirectory = true;
+            this.AutoUpdateRootDirectory = false;
             this.RootDirectoryToSearch = newPath;
             this.RecalculateRootDirectory(false);
         }
 
         private void RecalculateRootDirectory(bool alwaysReindex)
         {
-            if (this.IseIntegrator.SelectedFilePath != null && (!this.FreezeRootDirectory || this.RootDirectoryToSearch == null))
+            if (this.IseIntegrator.SelectedFilePath != null && (this.AutoUpdateRootDirectory || this.RootDirectoryToSearch == null))
             {
                 string selectedFilePath = this.IseIntegrator.SelectedFilePath;
                 string newRootDirectoryToSearch = RootDirectoryProvider.GetRootDirectoryToSearch(selectedFilePath);
@@ -299,7 +299,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void OnFileTabChanged(object sender, IseEventArgs args)
         {
-            if (!this.FreezeRootDirectory)
+            if (this.AutoUpdateRootDirectory)
             {
                 this.RecalculateRootDirectory(false);
             }

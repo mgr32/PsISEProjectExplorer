@@ -18,7 +18,7 @@
         <Button VerticalAlignment="Top" Height="21" Margin="10,25,10,0" HorizontalAlignment="Right" Click="TextBoxSearchClear_Click">
             <Image Source="Resources/cancel.png" />
         </Button>
-        <CheckBox HorizontalAlignment="Right" Margin="10,54,100,5" Content="Freeze root dir" VerticalAlignment="Top" Width="100" IsChecked="{Binding Path=FreezeRootDirectory}" />
+        <CheckBox HorizontalAlignment="Right" Margin="10,54,105,5" Content="Auto-update root dir" VerticalAlignment="Top" Width="128" IsChecked="{Binding Path=AutoUpdateRootDirectory}" />
         <CheckBox HorizontalAlignment="Right" Margin="10,54,0,5" Content="Search in files" VerticalAlignment="Top" Width="100" IsChecked="{Binding Path=SearchInFiles}" />
         <TextBlock HorizontalAlignment="Left" Margin="10,54,0,5" TextWrapping="Wrap" Text="Indexing..." VerticalAlignment="Top" Width="70" Visibility="{Binding Path=IndexingInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <TreeView Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewModel.TreeViewItems}" KeyUp="SearchResults_KeyUp" PreviewMouseLeftButtonDown="SearchResults_PreviewMouseLeftButtonDown"

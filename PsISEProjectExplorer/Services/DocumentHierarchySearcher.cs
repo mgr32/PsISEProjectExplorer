@@ -19,6 +19,10 @@ namespace PsISEProjectExplorer.Services
 
         public INode GetFilteredDocumentHierarchyNodes(string filter, SearchOptions searchOptions)
         {
+            if (this.DocumentHierarchy == null)
+            {
+                return null;
+            }
             lock (this.DocumentHierarchy.RootNode)
             {
                 if (String.IsNullOrWhiteSpace(filter))
@@ -46,6 +50,10 @@ namespace PsISEProjectExplorer.Services
 
         public INode GetFunctionNodeByName(string name)
         {
+            if (this.DocumentHierarchy == null)
+            {
+                return null;
+            }
             lock (this.DocumentHierarchy.RootNode)
             {
                 return this.DocumentHierarchy
