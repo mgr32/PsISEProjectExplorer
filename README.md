@@ -16,7 +16,7 @@ Provides a tree view that enables to index and explore whole directory structure
 Requires Powershell 3.0 or above.
 
 ##### Screenshots
-![Image](./PsISEExplorer_screen.png?raw=true)
+![ScreenShot](./PsISEExplorer_screen.png?raw=true)
 
 ##### Installation
 
