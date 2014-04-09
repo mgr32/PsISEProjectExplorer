@@ -31,7 +31,7 @@ Requires Powershell 3.0 or above.
 
 When you open a Powershell file in ISE, Project Explorer will automatically set its project root directory to the last parent directory of the opened file where any .ps*1 file resides. 
 
-You can also select the root directory manually (by clicking 'Change' button) and ensure it doesn't update automatically (by selecting 'Freeze root dir' checkbox).
+You can also select the root directory manually (by clicking 'Change' button) and ensure it doesn't update automatically (by unselecting 'Auto-update root dir' checkbox).
 
 ##### Why?
 
