@@ -4,7 +4,7 @@ namespace PsISEProjectExplorer.FullText
 {
     public static class TokenizeRules
     {
-        private static readonly char[] TokenSeparators = { '.', ',', ':', '(', ')', '[', ']', '{', '}', '\\', '/', '`' };
+        private static readonly char[] TokenSeparators = { '.', ',', ':', '(', ')', '[', ']', '{', '}', '\\', '/', '`', '\'', '"', '$' };
 
         public static bool IsTokenChar(char c)
         {

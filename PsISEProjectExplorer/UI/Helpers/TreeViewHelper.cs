@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 
-namespace PsISEProjectExplorer.UI
+namespace PsISEProjectExplorer.UI.Helpers
 {
     // http://blog.quantumbitdesigns.com/2008/07/22/programmatically-selecting-an-item-in-a-treeview/
     public static class TreeViewHelper
@@ -60,10 +62,48 @@ namespace PsISEProjectExplorer.UI
         /// </summary>
         /// <param name="treeView">The TreeView containing the item</param>
         /// <param name="item">The item to search and select</param>
-        public static void SelectItem(this TreeView treeView, object item)
+        public static void ExpandAndSelectItem(this TreeView treeView, object item)
         {
             ExpandAndSelectItem(treeView, item);
         }
+
+        /// <summary>
+        /// Searches a TreeView and selectes it if found.
+        /// </summary>
+        /// <param name="treeView">treeView</param>
+        /// <param name="source">Source of event</param>
+        /// <returns>True if item has been selected</returns>
+        public static bool SelectItemFromSource(this TreeView treeView, DependencyObject source)
+        {
+            while (source != null && source.GetType() != typeof(TreeViewItem))
+            {
+                source = VisualTreeHelper.GetParent(source);
+            }
+            if (source != null)
+            {
+                ((TreeViewItem)source).IsSelected = true;
+                return true;
+            }
+            return false;
+        }
+
+        public static TreeViewItem GetSelectedTreeViewItem(this TreeView treeView)
+        {
+            object selectedItem = treeView.SelectedItem;
+            foreach (Object item in treeView.Items)
+            {
+                var currentContainer = treeView.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
+
+                //if the data item matches the item we want to select, set the corresponding
+                //TreeViewItem IsSelected to true
+                if (item == selectedItem && currentContainer != null)
+                {
+                    return currentContainer;
+                }
+            }
+            return null;
+        }
+
 
         /// <summary>
         /// Finds the provided object in an ItemsControl's children and selects it

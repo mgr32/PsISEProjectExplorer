@@ -17,7 +17,7 @@ namespace PsISEProjectExplorer.Services
             this.DocumentHierarchies = new Dictionary<string, DocumentHierarchy>();
         }
 
-        public DocumentHierarchy CreateDocumentHierarchy(string path)
+        public DocumentHierarchy CreateDocumentHierarchy(string path, bool includeAllFiles)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -33,7 +33,7 @@ namespace PsISEProjectExplorer.Services
                 }
                 docHierarchy = new DocumentHierarchy(new RootNode(path));
                 this.DocumentHierarchies.Add(path, docHierarchy);
-                this.UpdateDocumentHierarchy(docHierarchy, new List<string> { path });
+                this.UpdateDocumentHierarchy(docHierarchy, new List<string> { path }, includeAllFiles);
                 return docHierarchy;
             }
         }
@@ -48,7 +48,7 @@ namespace PsISEProjectExplorer.Services
             }
         }
 
-        public bool UpdateDocumentHierarchy(DocumentHierarchy docHierarchy, IEnumerable<string> pathsToUpdate)
+        public bool UpdateDocumentHierarchy(DocumentHierarchy docHierarchy, IEnumerable<string> pathsToUpdate, bool includeAllFiles)
         {
             lock (docHierarchy.RootNode)
             {
@@ -64,13 +64,13 @@ namespace PsISEProjectExplorer.Services
                         docHierarchy.RemoveNode(node);
                         changed = true;
                     }
-                    if (File.Exists(path) && FilesPatternProvider.PowershellFilesRegex.IsMatch(path))
+                    if (File.Exists(path) && FilesPatternProvider.DoesFileMatch(path, includeAllFiles))
                     {
                         fileSystemEntryList.Add(new PowershellFileParser(path, false));
                     }
                     else if (Directory.Exists(path))
                     {
-                        this.FillFileListRecursively(path, fileSystemEntryList);
+                        this.FillFileListRecursively(path, fileSystemEntryList, includeAllFiles);
                     }
                 }
 
@@ -86,23 +86,23 @@ namespace PsISEProjectExplorer.Services
             }
         }
 
-        private bool FillFileListRecursively(string path, IList<PowershellFileParser> result)
+        private bool FillFileListRecursively(string path, IList<PowershellFileParser> result, bool includeAllFiles)
         {           
             foreach (string dir in Directory.EnumerateDirectories(path))
             {
-                if (this.FillFileListRecursively(dir, result))
+                var anyMatchingFilesInDir = this.FillFileListRecursively(dir, result, includeAllFiles);
+                if (includeAllFiles || anyMatchingFilesInDir)
                 {
                     result.Add(new PowershellFileParser(dir, true));
                 }
             }
 
-            var files = Directory.GetFiles(path, FilesPatternProvider.PowershellFilesPattern);
+            var files = Directory.GetFiles(path, FilesPatternProvider.GetFilesPattern(includeAllFiles));
             foreach (string file in files)
             {
                 result.Add(new PowershellFileParser(file, false));
             }
             return files.Any();
-
         }
 
     }

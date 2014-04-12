@@ -40,7 +40,7 @@ namespace PsISEProjectExplorer.Services
                 }
                 foreach (string file in allFilesInCurrentDir)
                 {
-                    if (FilesPatternProvider.PowershellFilesRegex.IsMatch(file))
+                    if (FilesPatternProvider.DoesFileMatch(file, false))
                     {
                         rootDir = currentDir;
                     }

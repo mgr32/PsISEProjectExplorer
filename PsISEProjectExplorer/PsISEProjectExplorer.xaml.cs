@@ -3,11 +3,15 @@ using NLog;
 using NLog.Config;
 using NLog.Targets;
 using Ookii.Dialogs.Wpf;
+using PsISEProjectExplorer.Enums;
+using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI;
+using PsISEProjectExplorer.UI.Helpers;
 using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.ViewModel;
 using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace PsISEProjectExplorer
@@ -67,7 +71,7 @@ namespace PsISEProjectExplorer
                     return;
                 }
 
-                SearchResults.SelectItem(item);
+                SearchResults.ExpandAndSelectItem(item);
                 this.MainViewModel.IseIntegrator.SetFocusOnCurrentTab();
             });
         }
@@ -115,16 +119,26 @@ namespace PsISEProjectExplorer
         {
             if (e.ClickCount > 1)
             {
-                this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.MainViewModel.SearchText);
+                this.MainViewModel.TreeViewModel.OpenItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.MainViewModel.SearchText);
                 e.Handled = true;
             }
         }
 
+        private void SearchResults_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            this.SearchResults.SelectItemFromSource((DependencyObject)e.OriginalSource);
+        }
+
         private void SearchResults_KeyUp(object sender, KeyEventArgs e)
         {
+            var selectedItem = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
             if (e.Key == Key.Enter)
             {
-                this.MainViewModel.TreeViewModel.SelectItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.MainViewModel.SearchText);
+                this.MainViewModel.TreeViewModel.OpenItem(selectedItem, this.MainViewModel.SearchText);
+            }
+            else if (e.Key == Key.Up)
+            {
+                // TODO + prefix search
             }
         }
 
@@ -133,6 +147,104 @@ namespace PsISEProjectExplorer
             this.MainViewModel.SearchText = string.Empty;
 
         }
+
+        private void SearchResults_AddDirectory(object sender, RoutedEventArgs e)
+        {
+            var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
+            if (item == null)
+            {
+                return;
+            }
+            this.MainViewModel.TreeViewModel.AddNewItem(item, NodeType.Directory);
+        }
+
+        private void SearchResults_AddFile(object sender, RoutedEventArgs e)
+        {
+            var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
+            if (item == null)
+            {
+                return;
+            }
+            this.MainViewModel.TreeViewModel.AddNewItem(item, NodeType.File);
+        }
+
+        private void SearchResults_Rename(object sender, RoutedEventArgs e)
+        {
+            var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
+            if (item == null)
+            {
+                return;
+            }
+            item.IsBeingEdited = true;
+        }
+
+        private void SearchResults_Delete(object sender, RoutedEventArgs e)
+        {
+            var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
+            if (item == null)
+            {
+                return;
+            }
+            this.MainViewModel.TreeViewModel.DeleteItem(item);
+        }
+
+        private void SearchResults_EditKeyDown(object sender, KeyEventArgs e)
+        {
+            var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
+            if (item == null)
+            {
+                return;
+            }
+            var newValue = ((TextBox)sender).Text;
+            if (e.Key == Key.Escape)
+            {
+                this.MainViewModel.TreeViewModel.EndEdit(newValue, false, item);
+                e.Handled = true;
+                return;
+            }
+            if (e.Key == Key.Enter)
+            {
+                this.MainViewModel.TreeViewModel.EndEdit(newValue, true, item);
+                e.Handled = true;
+                return;
+            }
+        }
+
+        private void SearchResults_EndEdit(object sender, RoutedEventArgs e)
+        {
+            var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
+            if (item == null)
+            {
+                return;
+            }
+            var newValue = ((TextBox)sender).Text;
+            this.MainViewModel.TreeViewModel.EndEdit(newValue, true, item);
+        }
+
+        private void SearchResults_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
+            if (item == null)
+            {
+                this.SearchResults.ContextMenu = null;
+                return;
+            }
+            if (item.NodeType == Enums.NodeType.Directory)
+            {
+                this.SearchResults.ContextMenu = this.SearchResults.Resources["DirectoryContext"] as ContextMenu;
+            }
+            else if (item.NodeType == Enums.NodeType.File)
+            {
+                this.SearchResults.ContextMenu = this.SearchResults.Resources["FileContext"] as ContextMenu;
+            }
+            else
+            {
+                this.SearchResults.ContextMenu = null;
+            }
+
+        }
+
+        
 
    }
 }

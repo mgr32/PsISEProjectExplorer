@@ -18,18 +18,21 @@ namespace PsISEProjectExplorer.Services
 
         private static readonly FileSystemWatcher Watcher = new FileSystemWatcher();
 
+        private static bool IncludeAllFiles { get; set; }
+
         static FileSystemChangeNotifier()
         {
             Task.Factory.StartNew(ChangeNotifier);
         }
 
-        public static void Watch(string path)
+        public static void Watch(string path, bool includeAllFiles)
         {
             Watcher.EnableRaisingEvents = false;
             if (String.IsNullOrEmpty(path) || !Directory.Exists(path))
             {
                 return;
             }
+            IncludeAllFiles = includeAllFiles;
             Watcher.Path = path;
             Watcher.NotifyFilter = NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Security;
             Watcher.IncludeSubdirectories = true;
@@ -48,7 +51,7 @@ namespace PsISEProjectExplorer.Services
             {
                 return;
             }
-            if (!isDir && !FilesPatternProvider.PowershellFilesRegex.IsMatch(e.FullPath))
+            if (!isDir && !FilesPatternProvider.DoesFileMatch(e.FullPath, IncludeAllFiles))
             {
                 return;
             }
@@ -64,11 +67,11 @@ namespace PsISEProjectExplorer.Services
             bool isDir = Directory.Exists(e.FullPath) || Directory.Exists(e.OldFullPath);
             lock (ChangePool)
             {
-                if (isDir || FilesPatternProvider.PowershellFilesRegex.IsMatch(e.OldFullPath))
+                if (isDir || FilesPatternProvider.DoesFileMatch(e.OldFullPath, IncludeAllFiles))
                 {
                     ChangePool.Add(e.OldFullPath);
                 }
-                if ((isDir || FilesPatternProvider.PowershellFilesRegex.IsMatch(e.FullPath)) &&
+                if ((isDir || FilesPatternProvider.DoesFileMatch(e.FullPath, IncludeAllFiles)) &&
                     e.FullPath.ToLowerInvariant() != e.OldFullPath.ToLowerInvariant())
                 {
                     ChangePool.Add(e.FullPath);

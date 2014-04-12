@@ -98,6 +98,19 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        private bool showAllFiles;
+
+        public bool ShowAllFiles
+        {
+            get { return this.showAllFiles; }
+            set
+            {
+                this.showAllFiles = value;
+                this.OnPropertyChanged();
+                ConfigHandler.SaveConfigValue("ShowAllFiles", value.ToString());
+            }
+        }
+
         public string RootDirectoryLabel
         {
             get { return "Project root: " + this.RootDirectoryToSearch; }
@@ -141,6 +154,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             this.autoUpdateRootDirectory = ConfigHandler.ReadConfigBoolValue("AutoUpdateRootDirectory", true);
             this.searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles", false);
+            this.showAllFiles = ConfigHandler.ReadConfigBoolValue("ShowAllFiles", false);
             var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
             this.rootDirectoryToSearch = ConfigHandler.ReadConfigStringValue("RootDirectory");
             if (this.rootDirectoryToSearch == string.Empty || !Directory.Exists(this.rootDirectoryToSearch))
@@ -234,7 +248,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             Logger.Debug("Searching ended");
             var rootNode = (INode)result.Result;
             bool expandNewNodes = !String.IsNullOrWhiteSpace(this.SearchText);
-            this.TreeViewModel.RefreshFromRoot(rootNode, expandNewNodes);
+            this.TreeViewModel.RefreshFromRoot(rootNode, expandNewNodes, this.ShowAllFiles);
         }
 
         private void OnFileSystemChanged(object sender, FileSystemChangedInfo changedInfo)
@@ -280,7 +294,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private void ReindexSearchTree(IEnumerable<string> pathsChanged)
         {
             this.SearchTreeInitialized = false;
-            var indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyIndexer, this.rootDirectoryToSearch, pathsChanged);
+            var indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyIndexer, this.rootDirectoryToSearch, pathsChanged, this.ShowAllFiles);
             this.IndexingInProgress = true;
             this.BackgroundIndexer = new BackgroundIndexer();
             this.LastIndexStartTime = this.BackgroundIndexer.StartTimestamp;

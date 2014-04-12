@@ -2,6 +2,7 @@
 using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.Services;
+using PsISEProjectExplorer.UI.Helpers;
 using PsISEProjectExplorer.UI.IseIntegration;
 using System;
 using System.Collections.Generic;
@@ -24,25 +25,26 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-
         public IseIntegrator IseIntegrator { private get; set; }
 
         private TreeViewEntryItemModel RootTreeViewEntryItem { get; set; }
+
+        private string PathOfItemToSelectOnRefresh { get; set; }
         
-        public void RefreshFromRoot(INode newDocumentHierarchyRoot, bool expandAllNodes)
+        public void RefreshFromRoot(INode newDocumentHierarchyRoot, bool expandAllNodes, bool includeAllFiles)
         {
             if (newDocumentHierarchyRoot == null)
             {
                 this.SetNewRootItem(null);
-                FileSystemChangeNotifier.Watch(null);
+                FileSystemChangeNotifier.Watch(null, false);
                 return;
             }
 
             if (this.RootTreeViewEntryItem == null || !this.RootTreeViewEntryItem.Node.Equals(newDocumentHierarchyRoot))
             {
-                var newRootItem = new TreeViewEntryItemModel(newDocumentHierarchyRoot, null);
+                var newRootItem = new TreeViewEntryItemModel(newDocumentHierarchyRoot, null, false);
                 this.SetNewRootItem(newRootItem);
-                FileSystemChangeNotifier.Watch(newRootItem.Node.Path);
+                FileSystemChangeNotifier.Watch(newRootItem.Node.Path, includeAllFiles);
             }
             lock (newDocumentHierarchyRoot)
             {
@@ -96,7 +98,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     .FirstOrDefault(treeViewChild => treeViewChild.Node.Equals(docHierarchyChild));
                 if (newTreeViewItem == null)
                 {
-                    newTreeViewItem = new TreeViewEntryItemModel(docHierarchyChild, treeViewEntryItem);
+                    bool isSelected = docHierarchyChild.Path == PathOfItemToSelectOnRefresh;
+                    newTreeViewItem = new TreeViewEntryItemModel(docHierarchyChild, treeViewEntryItem, isSelected);
                 }
                 else
                 {
@@ -108,10 +111,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 }
                 this.RefreshFromIntermediateNode(docHierarchyChild, newTreeViewItem, expandAllNodes);
             }
-
         }
 
-        public void SelectItem(TreeViewEntryItemModel item, string searchText)
+        public void OpenItem(TreeViewEntryItemModel item, string searchText)
         {
             if (this.IseIntegrator == null)
             {
@@ -157,7 +159,113 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.IseIntegrator.GoToFile(node.FilePath);
                 this.IseIntegrator.SelectText(node.PowershellFunction.StartLine, node.PowershellFunction.StartColumn, node.Name.Length);
             }
+        }
+
+        public void EndEdit(string newValue, bool save, TreeViewEntryItemModel selectedItem)
+        {
+            if (selectedItem == null)
+            {
+                return;
+            }
+            selectedItem.IsBeingEdited = false;
+            if (selectedItem.IsBeingAdded)
+            {
+                selectedItem.IsBeingAdded = false;
+                this.EndAddingItem(newValue, save, selectedItem);
+            }
+            else
+            {
+                this.EndRenamingItem(newValue, save, selectedItem);
+            }
+        }
+
+        private void EndRenamingItem(string newValue, bool save, TreeViewEntryItemModel selectedItem)
+        {
+            if (!save || String.IsNullOrEmpty(newValue))
+            {
+                return;
+            }
+            try
+            {
+                var newPath = this.GenerateNewPath(selectedItem.Path, newValue);
+                FileSystemOperationsService.RenameFileOrDirectory(selectedItem.Path, newPath);
+            }
+            catch (Exception e)
+            {
+                MessageBoxHelper.ShowMessage("Failed to rename: " + e.Message);
+            }            
+        }
+
+        private void EndAddingItem(string newValue, bool save, TreeViewEntryItemModel selectedItem)
+        {
+            if (!save || String.IsNullOrEmpty(newValue))
+            {
+                selectedItem.Delete();
+                return;
+            }
             
+            var newPath = this.GenerateNewPath(selectedItem.Path, newValue);
+            selectedItem.UpdateNewItem(newPath, newValue);
+            if (selectedItem.NodeType == NodeType.Directory) 
+            {
+                try
+                {
+                    FileSystemOperationsService.CreateDirectory(newPath);
+                }
+                catch (Exception e)
+                {
+                    MessageBoxHelper.ShowMessage("Failed to create directory: " + e.Message);
+                }
+            } 
+            else if (selectedItem.NodeType == NodeType.File)
+            {
+                try
+                {
+                    FileSystemOperationsService.CreateFile(newPath);
+                }
+                catch (Exception e)
+                {
+                    MessageBoxHelper.ShowMessage("Failed to create file: " + e.Message);
+                }
+            }
+        }
+
+        private string GenerateNewPath(string currentPath, string newValue)
+        {
+            var newPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(currentPath), newValue);
+            this.PathOfItemToSelectOnRefresh = newPath;
+            return newPath;
+        }
+
+        public void DeleteItem(TreeViewEntryItemModel selectedItem)
+        {
+            if (selectedItem == null)
+            {
+                return;
+            }
+            if (MessageBoxHelper.ShowConfirmMessage(String.Format("'{0}' will be deleted permanently.", selectedItem.Path)))
+            {
+                try
+                {
+                    FileSystemOperationsService.DeleteFileOrDirectory(selectedItem.Path);
+                }
+                catch (Exception e)
+                {
+                    MessageBoxHelper.ShowMessage("Failed to delete: " + e.Message);
+                }
+            }
+        }
+
+        public void AddNewItem(TreeViewEntryItemModel selectedItem, NodeType nodeType)
+        {
+            if (selectedItem == null)
+            {
+                return;
+            }
+            selectedItem.IsExpanded = true;
+            var newItem = new TreeViewEntryItemModel(selectedItem, selectedItem.Path + @"\", nodeType);
+            newItem.IsBeingEdited = true;
+            newItem.IsBeingAdded = true;
         }
     }
 }

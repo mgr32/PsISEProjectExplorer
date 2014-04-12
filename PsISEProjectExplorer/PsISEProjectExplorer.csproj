@@ -79,6 +79,7 @@
     <Compile Include="Services\DocumentHierarchyIndexer.cs" />
     <Compile Include="Services\FileReader.cs" />
     <Compile Include="Services\FileSystemChangeNotifier.cs" />
+    <Compile Include="Services\FileSystemOperationsService.cs" />
     <Compile Include="Services\PowershellFileParser.cs" />
     <Compile Include="Enums\FullTextFieldType.cs" />
     <Compile Include="FullText\CustomAnalyzer.cs" />
@@ -94,6 +95,8 @@
     <Compile Include="Enums\NodeType.cs" />
     <Compile Include="Services\PowershellTokenizer.cs" />
     <Compile Include="Services\TokenLocator.cs" />
+    <Compile Include="UI\Helpers\FocusExtensions.cs" />
+    <Compile Include="UI\Helpers\MessageBoxHelper.cs" />
     <Compile Include="UI\IseIntegration\IseEventArgs.cs" />
     <Compile Include="UI\IseIntegration\IseIntegrator.cs" />
     <Compile Include="UI\Ookii.Dialogs.Wpf\Interop\COMGuids.cs" />
@@ -107,7 +110,7 @@
     <Compile Include="UI\ViewModel\DefaultTreeViewEntryItemComparer.cs" />
     <Compile Include="UI\ViewModel\MainViewModel.cs" />
     <Compile Include="UI\ViewModel\TreeViewEntryItemObservableSet.cs" />
-    <Compile Include="UI\TreeViewHelper.cs" />
+    <Compile Include="UI\Helpers\TreeViewHelper.cs" />
     <Compile Include="UI\ViewModel\TreeViewModel.cs" />
     <Compile Include="UI\Workers\BackgroundIndexer.cs">
       <SubType>Component</SubType>

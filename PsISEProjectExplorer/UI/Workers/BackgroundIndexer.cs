@@ -25,18 +25,18 @@ namespace PsISEProjectExplorer.UI.Workers
             Logger.Info("Indexing started");
             if (indexerParams.PathsChanged == null)
             {
-                newSearcher = this.CreateNewDocHierarchy(indexerParams.DocumentHierarchyFactory, indexerParams.RootDirectory);
+                newSearcher = this.CreateNewDocHierarchy(indexerParams.DocumentHierarchyFactory, indexerParams.RootDirectory, indexerParams.IncludeAllFiles);
             }
             else
             {
                 DocumentHierarchy docHierarchy = indexerParams.DocumentHierarchyFactory.GetDocumentHierarchy(indexerParams.RootDirectory);
                 if (docHierarchy == null)
                 {
-                    newSearcher = this.CreateNewDocHierarchy(indexerParams.DocumentHierarchyFactory, indexerParams.RootDirectory);
+                    newSearcher = this.CreateNewDocHierarchy(indexerParams.DocumentHierarchyFactory, indexerParams.RootDirectory, indexerParams.IncludeAllFiles);
                 }
                 else
                 {
-                    bool changed = indexerParams.DocumentHierarchyFactory.UpdateDocumentHierarchy(docHierarchy, indexerParams.PathsChanged);
+                    bool changed = indexerParams.DocumentHierarchyFactory.UpdateDocumentHierarchy(docHierarchy, indexerParams.PathsChanged, indexerParams.IncludeAllFiles);
                     if (changed)
                     {
                         newSearcher = new DocumentHierarchySearcher(docHierarchy);
@@ -46,9 +46,9 @@ namespace PsISEProjectExplorer.UI.Workers
             e.Result = new WorkerResult(this.StartTimestamp, newSearcher);
         }
 
-        private DocumentHierarchySearcher CreateNewDocHierarchy(DocumentHierarchyFactory factory, string rootDirectory)
+        private DocumentHierarchySearcher CreateNewDocHierarchy(DocumentHierarchyFactory factory, string rootDirectory, bool includeAllFiles)
         {
-            var docHierarchy = factory.CreateDocumentHierarchy(rootDirectory);
+            var docHierarchy = factory.CreateDocumentHierarchy(rootDirectory, includeAllFiles);
             return new DocumentHierarchySearcher(docHierarchy);
         }
 
