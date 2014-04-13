@@ -24,7 +24,9 @@ namespace PsISEProjectExplorer
 
         private MainViewModel MainViewModel { get; set; }
 
-        private ObjectModelRoot hostObject;
+        private Point DragStartPoint;
+
+        private ObjectModelRoot hostObject { get; set; }
 
          // Entry point to the ISE object model.
         public ObjectModelRoot HostObject
@@ -117,6 +119,7 @@ namespace PsISEProjectExplorer
 
         private void SearchResults_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            this.DragStartPoint = e.GetPosition(null);
             if (e.ClickCount > 1)
             {
                 this.MainViewModel.TreeViewModel.OpenItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.MainViewModel.SearchText);
@@ -236,6 +239,67 @@ namespace PsISEProjectExplorer
             else
             {
                 this.SearchResults.ContextMenu = null;
+            }
+        }
+
+        private void SearchResults_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                var mousePos = e.GetPosition(null);
+                var diff = this.DragStartPoint - mousePos;
+
+                if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance
+                    || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
+                {
+                    var treeView = sender as TreeView;
+                    if (treeView == null)
+                    {
+                        return;
+                    }
+                    var treeViewItem = treeView.FindItemFromSource((DependencyObject)e.OriginalSource);
+                    if (treeViewItem == null)
+                    {
+                        return;
+                    }
+
+                    var item = treeView.SelectedItem as TreeViewEntryItemModel;
+                    if (item == null)
+                    {
+                        return;
+                    }
+                    
+                    var dragData = new DataObject(item);
+                    DragDrop.DoDragDrop(treeViewItem, dragData, DragDropEffects.Move);
+                }
+            }
+        }
+
+        private void SearchResults_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(typeof(TreeViewEntryItemModel)))
+            {
+                var item = e.Data.GetData(typeof(TreeViewEntryItemModel)) as TreeViewEntryItemModel;
+                var treeView = sender as TreeView;
+                if (treeView == null)
+                {
+                    return;
+                }
+                var treeViewItem = treeView.FindItemFromSource((DependencyObject)e.OriginalSource);
+                var dropTarget = treeViewItem.Header as TreeViewEntryItemModel;
+
+                if (dropTarget == null || item == null)
+                    return;
+
+                this.MainViewModel.MoveTreeItem(item, dropTarget);
+            }
+        }
+
+        private void SearchResults_DragEnter(object sender, DragEventArgs e)
+        {
+            if (!e.Data.GetDataPresent(typeof(TreeViewEntryItemModel)))
+            {
+                e.Effects = DragDropEffects.None;
             }
         }
    }

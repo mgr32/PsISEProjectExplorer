@@ -17,6 +17,10 @@ namespace PsISEProjectExplorer.Services
             }
             if (Directory.Exists(filePath)) 
             {
+                if (newFilePath.StartsWith(filePath))
+                {
+                    throw new InvalidOperationException("Cannot move folder - the destination folder cannot be a subfolder of the source folder.");
+                }
                 Directory.Move(filePath, newFilePath);
             } 
             else if (File.Exists(filePath)) 

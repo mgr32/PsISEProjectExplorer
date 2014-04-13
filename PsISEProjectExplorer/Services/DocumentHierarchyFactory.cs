@@ -71,7 +71,6 @@ namespace PsISEProjectExplorer.Services
             }
             return null;
         }
-           
 
         public DocumentHierarchySearcher UpdateDocumentHierarchy(IEnumerable<string> pathsToUpdate, FilesPatternProvider filesPatternProvider)
         {
@@ -125,7 +124,7 @@ namespace PsISEProjectExplorer.Services
             foreach (string dir in Directory.EnumerateDirectories(path))
             {
                 var anyMatchingFilesInDir = this.FillFileListRecursively(dir, result, filesPatternProvider);
-                if (filesPatternProvider.IncludeAllFiles || anyMatchingFilesInDir || filesPatternProvider.IsInAdditonalPaths(path))
+                if (filesPatternProvider.IncludeAllFiles || anyMatchingFilesInDir || filesPatternProvider.IsInAdditonalPaths(dir))
                 {
                     result.Add(new PowershellFileParser(dir, true));
                 }

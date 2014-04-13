@@ -40,6 +40,11 @@ namespace PsISEProjectExplorer.Services
             this.AdditionalPaths.Add(path);
         }
 
+        public void RemoveAdditionalPath(string path)
+        {
+            this.AdditionalPaths.Remove(path);
+        }
+
         public bool IsInAdditonalPaths(string path)
         {
             return this.AdditionalPaths.Contains(path);

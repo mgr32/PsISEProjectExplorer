@@ -97,6 +97,8 @@
     <Compile Include="Services\TokenLocator.cs" />
     <Compile Include="UI\Helpers\FocusExtensions.cs" />
     <Compile Include="UI\Helpers\MessageBoxHelper.cs" />
+    <Compile Include="UI\Helpers\StretchingTreeView.cs" />
+    <Compile Include="UI\Helpers\TreeViewMouseHelper.cs" />
     <Compile Include="UI\IseIntegration\IseEventArgs.cs" />
     <Compile Include="UI\IseIntegration\IseIntegrator.cs" />
     <Compile Include="UI\Ookii.Dialogs.Wpf\Interop\COMGuids.cs" />

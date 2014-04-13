@@ -68,6 +68,21 @@ namespace PsISEProjectExplorer.UI.Helpers
         }
 
         /// <summary>
+        /// Searches a TreeView basing on source.
+        /// </summary>
+        /// <param name="treeView">treeView</param>
+        /// <param name="source">Source of event</param>
+        /// <returns>Found TreeViewItem or null</returns>
+        public static TreeViewItem FindItemFromSource(this TreeView treeView, DependencyObject source)
+        {
+            while (source != null && source.GetType() != typeof(TreeViewItem))
+            {
+                source = VisualTreeHelper.GetParent(source);
+            }
+            return source as TreeViewItem;
+        }
+
+        /// <summary>
         /// Searches a TreeView and selectes it if found.
         /// </summary>
         /// <param name="treeView">treeView</param>
@@ -75,13 +90,10 @@ namespace PsISEProjectExplorer.UI.Helpers
         /// <returns>True if item has been selected</returns>
         public static bool SelectItemFromSource(this TreeView treeView, DependencyObject source)
         {
-            while (source != null && source.GetType() != typeof(TreeViewItem))
+            TreeViewItem item = FindItemFromSource(treeView, source);
+            if (item != null)
             {
-                source = VisualTreeHelper.GetParent(source);
-            }
-            if (source != null)
-            {
-                ((TreeViewItem)source).IsSelected = true;
+                item.IsSelected = true;
                 return true;
             }
             return false;

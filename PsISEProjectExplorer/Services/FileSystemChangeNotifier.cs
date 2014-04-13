@@ -47,10 +47,6 @@ namespace PsISEProjectExplorer.Services
         private static void OnFileChanged(object source, FileSystemEventArgs e)
         {
             bool isDir = Directory.Exists(e.FullPath);
-            if (isDir && e.ChangeType == WatcherChangeTypes.Changed)
-            {
-                return;
-            }
             if (!isDir && !FilesPatternProvider.DoesFileMatch(e.FullPath))
             {
                 return;

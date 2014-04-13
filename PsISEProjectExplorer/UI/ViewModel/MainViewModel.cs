@@ -360,6 +360,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
             catch (Exception e)
             {
+                this.TreeViewModel.PathOfItemToSelectOnRefresh = null;
                 MessageBoxHelper.ShowError("Failed to rename: " + e.Message);
             }
             
@@ -405,6 +406,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     {
                         selectedItem.Delete();
                     }
+                    this.TreeViewModel.PathOfItemToSelectOnRefresh = null;
                     MessageBoxHelper.ShowError("Failed to create directory '" + newPath + "': " + e.Message);
                 }
             }
@@ -430,6 +432,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     {
                         selectedItem.Delete();
                     }
+                    this.TreeViewModel.PathOfItemToSelectOnRefresh = null;
                     MessageBoxHelper.ShowError("Failed to create file '" + newPath + "': " + e.Message);
                 }
             }
@@ -438,6 +441,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private string GenerateNewPath(string currentPath, string newValue)
         {
             var newPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(currentPath), newValue);
+            this.TreeViewModel.PathOfItemToSelectOnRefresh = newPath;
+            return newPath;
+        }
+
+        private string GenerateNewPathForDir(string currentPath, string newValue)
+        {
+            var newPath = System.IO.Path.Combine(currentPath, newValue);
             this.TreeViewModel.PathOfItemToSelectOnRefresh = newPath;
             return newPath;
         }
@@ -464,6 +474,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 try
                 {
+                    this.FilesPatternProvider.RemoveAdditionalPath(selectedItem.Path);
                     FileSystemOperationsService.DeleteFileOrDirectory(selectedItem.Path);
                 }
                 catch (Exception e)
@@ -490,5 +501,36 @@ namespace PsISEProjectExplorer.UI.ViewModel
             newItem.IsBeingAdded = true;
         }
 
+        public void MoveTreeItem(TreeViewEntryItemModel movedItem, TreeViewEntryItemModel destinationItem)
+        {
+            if (movedItem == destinationItem)
+            {
+                return;
+            }
+            try
+            {
+                string newPath;
+                if (destinationItem.NodeType == NodeType.File)
+                {
+                    newPath = this.GenerateNewPath(destinationItem.Path, movedItem.Name);
+                }
+                else if (destinationItem.NodeType == NodeType.Directory)
+                {
+                    newPath = this.GenerateNewPathForDir(destinationItem.Path, movedItem.Name);
+                }
+                else
+                {
+                    return;
+                }
+                this.FilesPatternProvider.RemoveAdditionalPath(movedItem.Path);
+                this.FilesPatternProvider.AddAdditionalPath(newPath);
+                FileSystemOperationsService.RenameFileOrDirectory(movedItem.Path, newPath);
+            }
+            catch (Exception e)
+            {
+                this.TreeViewModel.PathOfItemToSelectOnRefresh = null;
+                MessageBoxHelper.ShowError("Failed to move: " + e.Message);
+            }
+        }
     }
 }
