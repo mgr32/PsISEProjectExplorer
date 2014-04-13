@@ -6,7 +6,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 {
     public class ViewNode : INode
     {
-        public NodeType NodeType { get { return NodeType.Intermediate; } }
+        public NodeType NodeType { get { return this.Node.NodeType; } }
 
         public INode Node { get; private set; }
 
@@ -23,14 +23,6 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             get
             {
                 return this.Node.Name;
-            }
-        }
-
-        public int OrderValue
-        {
-            get
-            {
-                return this.Node.OrderValue;
             }
         }
 
@@ -75,6 +67,5 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
                 this.Parent.Children.Remove(this);
             }
         }
-
     }
 }

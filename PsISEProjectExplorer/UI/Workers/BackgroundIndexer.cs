@@ -1,7 +1,9 @@
 ﻿using NLog;
+using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Services;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace PsISEProjectExplorer.UI.Workers
@@ -21,36 +23,20 @@ namespace PsISEProjectExplorer.UI.Workers
         private void RunIndexing(object sender, DoWorkEventArgs e)
         {
             var indexerParams = (BackgroundIndexerParams)e.Argument;
-            DocumentHierarchySearcher newSearcher = null;
             Logger.Info("Indexing started");
-            if (indexerParams.PathsChanged == null)
+
+            DocumentHierarchySearcher newSearcher;
+            if (indexerParams.PathsChanged == null || indexerParams.RootDirectory != indexerParams.DocumentHierarchyFactory.CurrentDocumentHierarchyPath)
             {
-                newSearcher = this.CreateNewDocHierarchy(indexerParams.DocumentHierarchyFactory, indexerParams.RootDirectory, indexerParams.IncludeAllFiles);
+                newSearcher = indexerParams.DocumentHierarchyFactory.CreateDocumentHierarchy(indexerParams.RootDirectory, indexerParams.FilesPatternProvider);
             }
             else
             {
-                DocumentHierarchy docHierarchy = indexerParams.DocumentHierarchyFactory.GetDocumentHierarchy(indexerParams.RootDirectory);
-                if (docHierarchy == null)
-                {
-                    newSearcher = this.CreateNewDocHierarchy(indexerParams.DocumentHierarchyFactory, indexerParams.RootDirectory, indexerParams.IncludeAllFiles);
-                }
-                else
-                {
-                    bool changed = indexerParams.DocumentHierarchyFactory.UpdateDocumentHierarchy(docHierarchy, indexerParams.PathsChanged, indexerParams.IncludeAllFiles);
-                    if (changed)
-                    {
-                        newSearcher = new DocumentHierarchySearcher(docHierarchy);
-                    }
-                }
+                newSearcher = indexerParams.DocumentHierarchyFactory.UpdateDocumentHierarchy(indexerParams.PathsChanged, indexerParams.FilesPatternProvider);
             }
             e.Result = new WorkerResult(this.StartTimestamp, newSearcher);
         }
 
-        private DocumentHierarchySearcher CreateNewDocHierarchy(DocumentHierarchyFactory factory, string rootDirectory, bool includeAllFiles)
-        {
-            var docHierarchy = factory.CreateDocumentHierarchy(rootDirectory, includeAllFiles);
-            return new DocumentHierarchySearcher(docHierarchy);
-        }
-
+       
     }
 }

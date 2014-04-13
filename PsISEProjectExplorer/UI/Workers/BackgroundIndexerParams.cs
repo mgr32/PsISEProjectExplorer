@@ -1,4 +1,5 @@
-﻿using PsISEProjectExplorer.Services;
+﻿using PsISEProjectExplorer.Model;
+using PsISEProjectExplorer.Services;
 using System.Collections.Generic;
 
 namespace PsISEProjectExplorer.UI.Workers
@@ -8,14 +9,14 @@ namespace PsISEProjectExplorer.UI.Workers
         public DocumentHierarchyFactory DocumentHierarchyFactory { get; private set; }
         public string RootDirectory { get; private set; }
         public IEnumerable<string> PathsChanged { get; private set; }
-        public bool IncludeAllFiles { get; private set; }
+        public FilesPatternProvider FilesPatternProvider { get; private set; }
 
-        public BackgroundIndexerParams(DocumentHierarchyFactory documentHierarchyFactory, string rootDirectory, IEnumerable<string> pathsChanged, bool includeAllFiles)
+        public BackgroundIndexerParams(DocumentHierarchyFactory documentHierarchyFactory, string rootDirectory, IEnumerable<string> pathsChanged, FilesPatternProvider filesPatternProvider)
         {
             this.DocumentHierarchyFactory = documentHierarchyFactory;
             this.RootDirectory = rootDirectory;
             this.PathsChanged = pathsChanged;
-            this.IncludeAllFiles = includeAllFiles;
+            this.FilesPatternProvider = filesPatternProvider;
         }
         
     }

@@ -18,21 +18,21 @@ namespace PsISEProjectExplorer.Services
 
         private static readonly FileSystemWatcher Watcher = new FileSystemWatcher();
 
-        private static bool IncludeAllFiles { get; set; }
+        private static FilesPatternProvider FilesPatternProvider { get; set; }
 
         static FileSystemChangeNotifier()
         {
             Task.Factory.StartNew(ChangeNotifier);
         }
 
-        public static void Watch(string path, bool includeAllFiles)
+        public static void Watch(string path, FilesPatternProvider filesPatternProvider)
         {
             Watcher.EnableRaisingEvents = false;
             if (String.IsNullOrEmpty(path) || !Directory.Exists(path))
             {
                 return;
             }
-            IncludeAllFiles = includeAllFiles;
+            FilesPatternProvider = filesPatternProvider;
             Watcher.Path = path;
             Watcher.NotifyFilter = NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Security;
             Watcher.IncludeSubdirectories = true;
@@ -51,7 +51,7 @@ namespace PsISEProjectExplorer.Services
             {
                 return;
             }
-            if (!isDir && !FilesPatternProvider.DoesFileMatch(e.FullPath, IncludeAllFiles))
+            if (!isDir && !FilesPatternProvider.DoesFileMatch(e.FullPath))
             {
                 return;
             }
@@ -67,11 +67,11 @@ namespace PsISEProjectExplorer.Services
             bool isDir = Directory.Exists(e.FullPath) || Directory.Exists(e.OldFullPath);
             lock (ChangePool)
             {
-                if (isDir || FilesPatternProvider.DoesFileMatch(e.OldFullPath, IncludeAllFiles))
+                if (isDir || FilesPatternProvider.DoesFileMatch(e.OldFullPath))
                 {
                     ChangePool.Add(e.OldFullPath);
                 }
-                if ((isDir || FilesPatternProvider.DoesFileMatch(e.FullPath, IncludeAllFiles)) &&
+                if ((isDir || FilesPatternProvider.DoesFileMatch(e.FullPath)) &&
                     e.FullPath.ToLowerInvariant() != e.OldFullPath.ToLowerInvariant())
                 {
                     ChangePool.Add(e.FullPath);

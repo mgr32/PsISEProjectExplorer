@@ -20,6 +20,7 @@ namespace PsISEProjectExplorer.Services
             {
                 return null;
             }
+            var filesPatternProvider = new FilesPatternProvider(false);
             string currentDir = rootDir;
             while (true)
             {
@@ -40,7 +41,7 @@ namespace PsISEProjectExplorer.Services
                 }
                 foreach (string file in allFilesInCurrentDir)
                 {
-                    if (FilesPatternProvider.DoesFileMatch(file, false))
+                    if (filesPatternProvider.DoesFileMatch(file))
                     {
                         rootDir = currentDir;
                     }

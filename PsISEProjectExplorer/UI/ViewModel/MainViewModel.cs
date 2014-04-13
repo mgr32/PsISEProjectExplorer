@@ -2,8 +2,10 @@
 using PsISEProjectExplorer.Config;
 using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
+using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.Services;
+using PsISEProjectExplorer.UI.Helpers;
 using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.Workers;
 using System;
@@ -92,6 +94,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.OnPropertyChanged();
                 if (!this.autoUpdateRootDirectory)
                 {
+                    this.DocumentHierarchySearcher = null;
                     this.RecalculateRootDirectory(false);
                 }
                 ConfigHandler.SaveConfigValue("AutoUpdateRootDirectory", value.ToString());
@@ -106,8 +109,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
             set
             {
                 this.showAllFiles = value;
+                this.FilesPatternProvider.IncludeAllFiles = value;
                 this.OnPropertyChanged();
                 ConfigHandler.SaveConfigValue("ShowAllFiles", value.ToString());
+                this.ReindexSearchTree(null);
             }
         }
 
@@ -126,7 +131,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private DocumentHierarchySearcher DocumentHierarchySearcher { get; set; }
 
-        private DocumentHierarchyFactory DocumentHierarchyIndexer { get; set; }
+        private DocumentHierarchyFactory DocumentHierarchyFactory { get; set; }
 
         private DateTime LastSearchStartTime { get; set; }
 
@@ -147,14 +152,16 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.iseIntegrator.FileTabChanged += OnFileTabChanged;
                 this.RecalculateRootDirectory(true);
             }
-
         }
+
+        private FilesPatternProvider FilesPatternProvider { get; set; }
 
         public MainViewModel()
         {
             this.autoUpdateRootDirectory = ConfigHandler.ReadConfigBoolValue("AutoUpdateRootDirectory", true);
             this.searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles", false);
             this.showAllFiles = ConfigHandler.ReadConfigBoolValue("ShowAllFiles", false);
+            this.FilesPatternProvider = new FilesPatternProvider(this.showAllFiles);
             var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
             this.rootDirectoryToSearch = ConfigHandler.ReadConfigStringValue("RootDirectory");
             if (this.rootDirectoryToSearch == string.Empty || !Directory.Exists(this.rootDirectoryToSearch))
@@ -163,7 +170,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
             this.TreeViewModel = new TreeViewModel();
             this.SearchOptions = new SearchOptions { IncludeAllParents = true, SearchField = searchField };
-            this.DocumentHierarchyIndexer = new DocumentHierarchyFactory();
+            this.DocumentHierarchyFactory = new DocumentHierarchyFactory();
             FileSystemChangeNotifier.FileSystemChanged += OnFileSystemChanged;
         }
 
@@ -248,7 +255,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             Logger.Debug("Searching ended");
             var rootNode = (INode)result.Result;
             bool expandNewNodes = !String.IsNullOrWhiteSpace(this.SearchText);
-            this.TreeViewModel.RefreshFromRoot(rootNode, expandNewNodes, this.ShowAllFiles);
+            this.TreeViewModel.RefreshFromRoot(rootNode, expandNewNodes, this.FilesPatternProvider);
         }
 
         private void OnFileSystemChanged(object sender, FileSystemChangedInfo changedInfo)
@@ -294,7 +301,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private void ReindexSearchTree(IEnumerable<string> pathsChanged)
         {
             this.SearchTreeInitialized = false;
-            var indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyIndexer, this.rootDirectoryToSearch, pathsChanged, this.ShowAllFiles);
+            var indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyFactory, this.rootDirectoryToSearch, pathsChanged, this.FilesPatternProvider);
             this.IndexingInProgress = true;
             this.BackgroundIndexer = new BackgroundIndexer();
             this.LastIndexStartTime = this.BackgroundIndexer.StartTimestamp;
@@ -317,7 +324,171 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.RecalculateRootDirectory(false);
             }
-        }      
+        }
+
+        public void EndTreeEdit(string newValue, bool save, TreeViewEntryItemModel selectedItem)
+        {
+            if (selectedItem == null)
+            {
+                return;
+            }
+            selectedItem.IsBeingEdited = false;
+            if (selectedItem.IsBeingAdded)
+            {
+                selectedItem.IsBeingAdded = false;
+                this.EndAddingTreeItem(newValue, save, selectedItem);
+            }
+            else
+            {
+                this.EndRenamingTreeItem(newValue, save, selectedItem);
+            }
+        }
+
+        private void EndRenamingTreeItem(string newValue, bool save, TreeViewEntryItemModel selectedItem)
+        {
+            if (!save || String.IsNullOrEmpty(newValue))
+            {
+                return;
+            }
+            
+            try
+            {
+                string oldPath = selectedItem.Path;
+                string newPath = this.GenerateNewPath(selectedItem.Path, newValue);
+                FileSystemOperationsService.RenameFileOrDirectory(oldPath, newPath);
+                this.IseIntegrator.ReopenFileAfterRename(oldPath, newPath);
+            }
+            catch (Exception e)
+            {
+                MessageBoxHelper.ShowError("Failed to rename: " + e.Message);
+            }
+            
+        }
+
+        private void EndAddingTreeItem(string newValue, bool save, TreeViewEntryItemModel selectedItem)
+        {
+            if (!save || String.IsNullOrEmpty(newValue))
+            {
+                selectedItem.Delete();
+                return;
+            }
+            if (selectedItem.NodeType == NodeType.File && !this.ShowAllFiles && !this.FilesPatternProvider.DoesFileMatch(newValue))
+            {
+                newValue += ".ps1";
+            }
+            var newPath = this.GenerateNewPath(selectedItem.Path, newValue);
+            INode newNode = null;
+            if (this.TreeViewModel.FindTreeViewEntryItemByPath(newPath) != null)
+            {
+                selectedItem.Delete();
+                MessageBoxHelper.ShowError("Item '" + newPath + "' already exists.");
+                return;
+            }
+            if (selectedItem.NodeType == NodeType.Directory)
+            {
+                try
+                {
+                    newNode = this.DocumentHierarchyFactory.UpdateTemporaryNode(selectedItem.Node, newPath);
+                    var parent = selectedItem.Parent;
+                    selectedItem.Delete();
+                    selectedItem = new TreeViewEntryItemModel(newNode, parent, true);
+                    this.FilesPatternProvider.AddAdditionalPath(newPath);
+                    FileSystemOperationsService.CreateDirectory(newPath);
+                }
+                catch (Exception e)
+                {
+                    if (newNode != null)
+                    {
+                        newNode.Remove();
+                    }
+                    if (selectedItem != null)
+                    {
+                        selectedItem.Delete();
+                    }
+                    MessageBoxHelper.ShowError("Failed to create directory '" + newPath + "': " + e.Message);
+                }
+            }
+            else if (selectedItem.NodeType == NodeType.File)
+            {
+                try
+                {
+                    newNode = this.DocumentHierarchyFactory.UpdateTemporaryNode(selectedItem.Node, newPath);
+                    var parent = selectedItem.Parent;
+                    selectedItem.Delete();
+                    selectedItem = new TreeViewEntryItemModel(newNode, parent, true);
+                    this.FilesPatternProvider.AddAdditionalPath(newPath);
+                    FileSystemOperationsService.CreateFile(newPath);
+                    this.IseIntegrator.GoToFile(newPath);
+                }
+                catch (Exception e)
+                {
+                    if (newNode != null)
+                    {
+                        newNode.Remove();
+                    }
+                    if (selectedItem != null)
+                    {
+                        selectedItem.Delete();
+                    }
+                    MessageBoxHelper.ShowError("Failed to create file '" + newPath + "': " + e.Message);
+                }
+            }
+        }
+
+        private string GenerateNewPath(string currentPath, string newValue)
+        {
+            var newPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(currentPath), newValue);
+            this.TreeViewModel.PathOfItemToSelectOnRefresh = newPath;
+            return newPath;
+        }
+
+        public void DeleteTreeItem(TreeViewEntryItemModel selectedItem)
+        {
+            if (selectedItem == null)
+            {
+                return;
+            }
+            int numFilesInside = 0;
+            try
+            {
+                numFilesInside = Directory.GetFileSystemEntries(selectedItem.Path).Count();
+            }
+            catch (Exception)
+            {
+                // ignore - this only has impact on message
+            }
+            string message = numFilesInside == 0 ?
+                String.Format("'{0}' will be deleted permanently.", selectedItem.Path) :
+                String.Format("'{0}' will be deleted permanently (together with {1} items inside).", selectedItem.Path, numFilesInside);
+            if (MessageBoxHelper.ShowConfirmMessage(message))
+            {
+                try
+                {
+                    FileSystemOperationsService.DeleteFileOrDirectory(selectedItem.Path);
+                }
+                catch (Exception e)
+                {
+                    MessageBoxHelper.ShowError("Failed to delete: " + e.Message);
+                }
+            }
+        }
+
+        public void AddNewTreeItem(TreeViewEntryItemModel selectedItem, NodeType nodeType)
+        {
+            if (selectedItem == null || this.DocumentHierarchyFactory == null)
+            {
+                return;
+            }
+            selectedItem.IsExpanded = true;
+            INode newNode = this.DocumentHierarchyFactory.CreateTemporaryNode(selectedItem.Node, nodeType);
+            if (newNode == null)
+            {
+                return;
+            }
+            var newItem = new TreeViewEntryItemModel(newNode, selectedItem, true);
+            newItem.IsBeingEdited = true;
+            newItem.IsBeingAdded = true;
+        }
 
     }
 }

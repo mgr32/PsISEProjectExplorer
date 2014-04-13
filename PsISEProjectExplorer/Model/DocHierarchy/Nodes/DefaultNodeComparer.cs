@@ -21,9 +21,9 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             {
                 return 1;
             }
-            if (x.OrderValue != y.OrderValue)
+            if (x.NodeType != y.NodeType)
             {
-                return x.OrderValue.CompareTo(y.OrderValue);
+                return x.NodeType.CompareTo(y.NodeType);
             }
             int nameCompare = string.Compare(x.Name, y.Name, StringComparison.InvariantCulture);
             if (nameCompare != 0)

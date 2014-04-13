@@ -43,24 +43,23 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        private string name;
-
         public string Name
         {
             get
             {
-                return this.name;
-            }
-            set
-            {
-                this.name = value;
-                this.OnPropertyChanged();
+                return this.Node.Name;
             }
         }
 
-        public string Path { get; private set; }
+        public string Path
+        {
+            get
+            {
+                return this.Node.Path;
+            }
+        }
         
-        private TreeViewEntryItemModel Parent { get; set; }
+        public TreeViewEntryItemModel Parent { get; private set; }
 
         private bool isExpanded;
 
@@ -122,7 +121,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        public NodeType NodeType { get; private set; }
+        public NodeType NodeType
+        {
+            get
+            {
+                return this.Node.NodeType;
+            }
+        }
 
         public TreeViewEntryItemObservableSet Children { get; private set; }
 
@@ -147,11 +152,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 throw new ArgumentNullException("node");
             }
             this.DocumentHierarchyNode = node;
-            this.Path = node.Path;
             this.Parent = parent;
             this.Children = new TreeViewEntryItemObservableSet();
-            this.Name = this.DocumentHierarchyNode.Name;
-            this.NodeType = node.NodeType;
             if (this.Parent != null)
             {
                 this.Parent.Children.Add(this);

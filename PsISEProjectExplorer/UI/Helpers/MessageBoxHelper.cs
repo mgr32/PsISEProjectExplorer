@@ -9,9 +9,9 @@ namespace PsISEProjectExplorer.UI.Helpers
 {
     public static class MessageBoxHelper
     {
-        public static void ShowMessage(string message)
+        public static void ShowError(string message)
         {
-            MessageBox.Show(message);
+            MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         public static bool ShowConfirmMessage(string message)

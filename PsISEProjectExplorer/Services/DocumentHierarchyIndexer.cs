@@ -26,14 +26,14 @@ namespace PsISEProjectExplorer.Services
 
         public bool AddFileSystemNode(PowershellFileParser parser)
         {
-            if (this.DocumentHierarchy.GetNode(parser.Path) != null)
+            if (this.DocumentHierarchy.GetNode(parser.Path) != null || parser.Path == this.DocumentHierarchy.RootNode.Path)
             {
                 return false;
             }
             INode lastDirNode = this.FillHierarchyWithIntermediateDirectories(parser.Path, parser.IsDirectory);
             if (!parser.IsDirectory)
             {
-                INode fileNode = this.DocumentHierarchy.CreateNewFileNode(parser.Path, parser.FileName, parser.FileContents, lastDirNode);
+                INode fileNode = this.DocumentHierarchy.CreateNewFileNode(parser.Path, parser.FileContents, lastDirNode);
                 foreach (PowershellFunction func in parser.PowershellFunctions)
                 {
                     this.DocumentHierarchy.CreateNewFunctionNode(parser.Path, func, fileNode);
@@ -59,7 +59,7 @@ namespace PsISEProjectExplorer.Services
             {
                 currentAbsolutePath = Path.Combine(currentAbsolutePath, segment);
                 currentNode = this.DocumentHierarchy.GetNode(currentAbsolutePath) ??
-                             this.DocumentHierarchy.CreateNewIntermediateDirectoryNode(currentAbsolutePath, segment, currentNode);
+                             this.DocumentHierarchy.CreateNewDirectoryNode(currentAbsolutePath, currentNode);
             }
             return currentNode;
         }

@@ -3,9 +3,10 @@ namespace PsISEProjectExplorer.Enums
 {
     public enum NodeType
     {
-        Directory,
+        Directory = 1,
         File,
         Function,
         Intermediate
     }
+
 }

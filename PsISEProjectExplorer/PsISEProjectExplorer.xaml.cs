@@ -136,10 +136,6 @@ namespace PsISEProjectExplorer
             {
                 this.MainViewModel.TreeViewModel.OpenItem(selectedItem, this.MainViewModel.SearchText);
             }
-            else if (e.Key == Key.Up)
-            {
-                // TODO + prefix search
-            }
         }
 
         private void TextBoxSearchClear_Click(object sender, RoutedEventArgs e)
@@ -155,7 +151,7 @@ namespace PsISEProjectExplorer
             {
                 return;
             }
-            this.MainViewModel.TreeViewModel.AddNewItem(item, NodeType.Directory);
+            this.MainViewModel.AddNewTreeItem(item, NodeType.Directory);
         }
 
         private void SearchResults_AddFile(object sender, RoutedEventArgs e)
@@ -165,7 +161,7 @@ namespace PsISEProjectExplorer
             {
                 return;
             }
-            this.MainViewModel.TreeViewModel.AddNewItem(item, NodeType.File);
+            this.MainViewModel.AddNewTreeItem(item, NodeType.File);
         }
 
         private void SearchResults_Rename(object sender, RoutedEventArgs e)
@@ -185,7 +181,7 @@ namespace PsISEProjectExplorer
             {
                 return;
             }
-            this.MainViewModel.TreeViewModel.DeleteItem(item);
+            this.MainViewModel.DeleteTreeItem(item);
         }
 
         private void SearchResults_EditKeyDown(object sender, KeyEventArgs e)
@@ -198,13 +194,13 @@ namespace PsISEProjectExplorer
             var newValue = ((TextBox)sender).Text;
             if (e.Key == Key.Escape)
             {
-                this.MainViewModel.TreeViewModel.EndEdit(newValue, false, item);
+                this.MainViewModel.EndTreeEdit(newValue, false, item);
                 e.Handled = true;
                 return;
             }
             if (e.Key == Key.Enter)
             {
-                this.MainViewModel.TreeViewModel.EndEdit(newValue, true, item);
+                this.MainViewModel.EndTreeEdit(newValue, true, item);
                 e.Handled = true;
                 return;
             }
@@ -218,7 +214,7 @@ namespace PsISEProjectExplorer
                 return;
             }
             var newValue = ((TextBox)sender).Text;
-            this.MainViewModel.TreeViewModel.EndEdit(newValue, true, item);
+            this.MainViewModel.EndTreeEdit(newValue, true, item);
         }
 
         private void SearchResults_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -241,10 +237,6 @@ namespace PsISEProjectExplorer
             {
                 this.SearchResults.ContextMenu = null;
             }
-
         }
-
-        
-
    }
 }

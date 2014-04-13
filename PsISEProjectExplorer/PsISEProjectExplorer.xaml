@@ -19,7 +19,7 @@
             <DataTemplate x:Key="EditTemplate">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{Binding Path=Image}" />
-                    <TextBox Name="EditItemTextBox" Text="{Binding Path=Name, UpdateSourceTrigger=Explicit}" Margin="5,0,0,0" LostFocus="SearchResults_EndEdit" 
+                    <TextBox Name="EditItemTextBox" Text="{Binding Path=Name, UpdateSourceTrigger=Explicit, Mode=OneWay}" Margin="5,0,0,0" LostFocus="SearchResults_EndEdit" 
                              uiHelpers:FocusExtensions.IsDefaultFocusElement="True" KeyDown="SearchResults_EditKeyDown"/>
                 </StackPanel>
             </DataTemplate>
@@ -28,28 +28,65 @@
     </UserControl.Resources>
     <Grid d:DataContext="{d:DesignInstance viewModel:MainViewModel}">
         <TextBlock HorizontalAlignment="Stretch" Margin="10,5,66,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Text="{Binding Path=RootDirectoryLabel}" VerticalAlignment="Top" />
+        <Button Content="Change" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Top" Width="51" Click="ChangeWorkspace_Click"/>
         <TextBox Name="TextBoxSearchText" HorizontalAlignment="Stretch" Height="21" Margin="10,25,36,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged, Delay=150}" MaxLength="100"
                  x:FieldModifier="private" />
         <Button VerticalAlignment="Top" Height="21" Margin="10,25,10,0" HorizontalAlignment="Right" Click="TextBoxSearchClear_Click">
-            <Image Source="Resources/cancel.png" />
+            <Image Source="Resources/cancel.png" ToolTip="Clear search text" />
         </Button>
-        <CheckBox HorizontalAlignment="Right" Margin="10,54,105,5" Content="Auto-update root dir" VerticalAlignment="Top" Width="128" IsChecked="{Binding Path=AutoUpdateRootDirectory}" />
-        <CheckBox HorizontalAlignment="Right" Margin="10,54,0,5" Content="Search in files" VerticalAlignment="Top" Width="100" IsChecked="{Binding Path=SearchInFiles}" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,50,10,0" VerticalAlignment="Top" Height="22">
+            <ToggleButton IsChecked="{Binding Path=SearchInFiles}" Margin="0,0,4,0">
+                <Image Source="Resources\toolbar_searchInFiles.png" ToolTip="Search in files" />
+            </ToggleButton>
+            <ToggleButton IsChecked="{Binding Path=ShowAllFiles}" Margin="0,0,4,0">
+                <Image Source="Resources\toolbar_showAllFiles.png" ToolTip="Show all files" />
+            </ToggleButton>
+            <ToggleButton IsChecked="{Binding Path=AutoUpdateRootDirectory}">
+                <Image Source="Resources\toolbar_autoUpdateProjectDir.png" ToolTip="Auto-update project directory"/>
+            </ToggleButton>
+        </StackPanel>
         <TextBlock HorizontalAlignment="Left" Margin="10,54,0,5" TextWrapping="Wrap" Text="Indexing..." VerticalAlignment="Top" Width="70" Visibility="{Binding Path=IndexingInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <TreeView Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewModel.TreeViewItems}" PreviewMouseLeftButtonDown="SearchResults_PreviewMouseLeftButtonDown" PreviewMouseRightButtonDown="SearchResults_PreviewMouseRightButtonDown"
                   x:FieldModifier="private" SelectedItemChanged="SearchResults_SelectedItemChanged">
             <TreeView.Resources>
                 <ContextMenu x:Key="DirectoryContext">
                     <MenuItem Header="Add">
-                        <MenuItem Header="Directory" Click="SearchResults_AddDirectory" />
-                        <MenuItem Header="File" Click="SearchResults_AddFile" />
+                        <MenuItem.Icon>
+                            <Image Source="Resources/add.png" />
+                        </MenuItem.Icon>
+                        <MenuItem Header="Directory" Click="SearchResults_AddDirectory">
+                            <MenuItem.Icon>
+                                <Image Source="Resources/directory.png" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="File" Click="SearchResults_AddFile">
+                            <MenuItem.Icon>
+                                <Image Source="Resources/file.png" />
+                            </MenuItem.Icon>
+                        </MenuItem>
                     </MenuItem>
-                    <MenuItem Header="Rename" Click="SearchResults_Rename" />
-                    <MenuItem Header="Delete" Click="SearchResults_Delete" />
+                    <MenuItem Header="Rename" Click="SearchResults_Rename">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/textfield_rename.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Delete" Click="SearchResults_Delete">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/cross.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </ContextMenu>
                 <ContextMenu x:Key="FileContext">
-                    <MenuItem Header="Rename" Click="SearchResults_Rename" />
-                    <MenuItem Header="Delete" Click="SearchResults_Delete" />
+                    <MenuItem Header="Rename" Click="SearchResults_Rename">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/textfield_rename.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Delete" Click="SearchResults_Delete">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/cross.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </ContextMenu>
             </TreeView.Resources>
 
@@ -86,7 +123,5 @@
                 </Style>
             </TreeView.ItemContainerStyle>
         </TreeView>
-        <Button Content="Change" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Top" Width="51" Click="ChangeWorkspace_Click"/>
-
     </Grid>
 </UserControl>

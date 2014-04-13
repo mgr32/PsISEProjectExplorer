@@ -2,6 +2,7 @@
 using PsISEProjectExplorer.FullText;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using System.Collections.Generic;
+using System.IO;
 
 namespace PsISEProjectExplorer.Model.DocHierarchy
 {
@@ -40,16 +41,18 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
         }
 
 
-        public INode CreateNewIntermediateDirectoryNode(string absolutePath, string segment, INode parent)
+        public INode CreateNewDirectoryNode(string absolutePath, INode parent)
         {
-            INode node = new DirectoryNode(absolutePath, segment, parent);
+            string name = absolutePath.Substring(absolutePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
+            INode node = new DirectoryNode(absolutePath, name, parent);
             this.NodeMap.Add(absolutePath, node);
-            this.FullTextDirectory.DocumentCreator.AddDirectoryEntry(absolutePath, segment);
+            this.FullTextDirectory.DocumentCreator.AddDirectoryEntry(absolutePath, name);
             return node;
         }
 
-        public INode CreateNewFileNode(string absolutePath, string fileName, string fileContents, INode parent)
+        public INode CreateNewFileNode(string absolutePath, string fileContents, INode parent)
         {
+            string fileName = Path.GetFileName(absolutePath);
             INode fileNode = new FileNode(absolutePath, fileName, parent);
             this.NodeMap.Add(absolutePath, fileNode);
             this.FullTextDirectory.DocumentCreator.AddFileEntry(absolutePath, fileName, fileContents);
@@ -62,6 +65,18 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             this.NodeMap.Add(functionNode.Path, functionNode);
             this.FullTextDirectory.DocumentCreator.AddFunctionEntry(functionNode.Path, func.Name);
             return functionNode;
+        }
+
+        public INode UpdateDirectoryNodePath(INode node, string newPath)
+        {
+            this.RemoveNode(node);
+            return this.CreateNewDirectoryNode(newPath, node.Parent);
+        }
+
+        public INode UpdateFileNodePath(INode node, string newPath)
+        {
+            this.RemoveNode(node);
+            return this.CreateNewFileNode(newPath, string.Empty, node.Parent);
         }
 
         public IEnumerable<SearchResult> SearchNodesFullText(string filter, FullTextFieldType fieldType)

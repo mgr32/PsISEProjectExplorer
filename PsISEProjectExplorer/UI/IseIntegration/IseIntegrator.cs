@@ -46,6 +46,15 @@ namespace PsISEProjectExplorer.UI.IseIntegration
              this.HostObject.CurrentPowerShellTab.Files.Add(filePath);
         }
 
+        public void ReopenFileAfterRename(string oldPath, string newPath)
+        {
+            ISEFile file = this.FindFile(oldPath);
+            if (file != null) 
+            {
+                file.SaveAs(newPath);
+            }
+        }
+
         public void SetCursor(int line, int column)
         {
             if (this.HostObject.CurrentPowerShellTab.Files.SelectedFile != null)
@@ -92,6 +101,18 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                 }
                 
             }
+        }
+
+        private ISEFile FindFile(string path)
+        {
+            foreach (ISEFile file in this.HostObject.CurrentPowerShellTab.Files)
+            {
+                if (file.FullPath.Equals(path, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return file;
+                }
+            }
+            return null;
         }
     }
 }

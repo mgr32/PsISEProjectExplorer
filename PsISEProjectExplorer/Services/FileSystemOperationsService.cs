@@ -33,7 +33,7 @@ namespace PsISEProjectExplorer.Services
         {
             if (Directory.Exists(filePath))
             {
-                Directory.Delete(filePath);
+                Directory.Delete(filePath, true);
             }
             else if (File.Exists(filePath))
             {
@@ -43,11 +43,19 @@ namespace PsISEProjectExplorer.Services
 
         public static void CreateFile(string filePath)
         {
+            if (File.Exists(filePath))
+            {
+                throw new InvalidOperationException("File already exists. You should be able to see it when you enable 'Show all files' option.");
+            }
             File.Create(filePath).Dispose();
         }
 
         public static void CreateDirectory(string filePath)
         {
+            if (Directory.Exists(filePath))
+            {
+                throw new InvalidOperationException("Directory already exists. You should be able to see it when you enable 'Show all files' option.");
+            }
             Directory.CreateDirectory(filePath);
         }
     }

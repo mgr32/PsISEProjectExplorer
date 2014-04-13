@@ -12,9 +12,6 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         public INode Parent { get; private set; }
         public ISet<INode> Children { get; private set; }
 
-        // less = will be before other nodes
-        public virtual int OrderValue { get { return 0; } }
-
         protected AbstractNode(string path, string name, INode parent)
         {
             if (path == null) {
@@ -55,6 +52,5 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
                 this.Parent.Children.Remove(this);
             }
         }
-
     }
 }
