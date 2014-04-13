@@ -17,7 +17,7 @@ namespace PsISEProjectExplorer.Services
             }
             if (Directory.Exists(filePath)) 
             {
-                if (newFilePath.StartsWith(filePath))
+                if (IsSubdirectory(filePath, newFilePath))
                 {
                     throw new InvalidOperationException("Cannot move folder - the destination folder cannot be a subfolder of the source folder.");
                 }
@@ -61,6 +61,21 @@ namespace PsISEProjectExplorer.Services
                 throw new InvalidOperationException("Directory already exists. You should be able to see it when you enable 'Show all files' option.");
             }
             Directory.CreateDirectory(filePath);
+        }
+
+        private static bool IsSubdirectory(string rootDir, string potentialSubDir)
+        {
+            DirectoryInfo root = new DirectoryInfo(rootDir);
+            DirectoryInfo sub = new DirectoryInfo(potentialSubDir);
+            while (sub.Parent != null)
+            {
+                if (sub.Parent.FullName == root.FullName)
+                {
+                    return true;
+                }
+                sub = sub.Parent;
+            }
+            return false;
         }
     }
 }

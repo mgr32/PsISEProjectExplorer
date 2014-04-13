@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,9 +13,13 @@ namespace PsISEProjectExplorer.UI.Helpers
     /// Implements an attached property used for styling TreeViewItems when
     /// they're a possible drop target.
     /// </summary>
+    /// http://stackoverflow.com/questions/639884/highlight-treeview-item-being-dragged-over
     public static class TreeViewDropHighlighter
     {
         #region private variables
+
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// the TreeViewItem that is the current drop target
         /// </summary>
@@ -82,6 +87,9 @@ namespace PsISEProjectExplorer.UI.Helpers
             EventManager.RegisterClassHandler(typeof(TreeViewItem),
                                       TreeViewItem.PreviewDragOverEvent,
                                       new DragEventHandler(OnDragEvent), true);
+            EventManager.RegisterClassHandler(typeof(TreeViewItem),
+                                      TreeViewItem.PreviewDropEvent,
+                                      new DragEventHandler(OnDragLeave), true);
         }
 
         #region event handlers
