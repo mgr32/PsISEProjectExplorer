@@ -49,7 +49,7 @@
         <uiHelpers:StretchingTreeView x:Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewModel.TreeViewItems}" PreviewMouseLeftButtonDown="SearchResults_PreviewMouseLeftButtonDown" PreviewMouseRightButtonDown="SearchResults_PreviewMouseRightButtonDown"
                    x:FieldModifier="private" SelectedItemChanged="SearchResults_SelectedItemChanged" PreviewMouseMove="SearchResults_PreviewMouseMove" Drop="SearchResults_Drop" DragEnter="SearchResults_DragEnter" AllowDrop="True">
             <TreeView.Resources>
-                <ContextMenu x:Key="DirectoryContext">
+                <ContextMenu x:Key="DirectoryContext" Opened="SearchResults_ContextMenuOpened" Closed="SearchResults_ContextMenuClosed">
                     <MenuItem Header="Add">
                         <MenuItem.Icon>
                             <Image Source="Resources/add.png" />
@@ -76,7 +76,7 @@
                         </MenuItem.Icon>
                     </MenuItem>
                 </ContextMenu>
-                <ContextMenu x:Key="FileContext">
+                <ContextMenu x:Key="FileContext" Opened="SearchResults_ContextMenuOpened" Closed="SearchResults_ContextMenuClosed">
                     <MenuItem Header="Rename" Click="SearchResults_Rename">
                         <MenuItem.Icon>
                             <Image Source="Resources/textfield_rename.png" />

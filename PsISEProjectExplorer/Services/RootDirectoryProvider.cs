@@ -30,6 +30,10 @@ namespace PsISEProjectExplorer.Services
                     return (rootDir.ToLowerInvariant() == driveRoot ? null : rootDir);
                 }
                 currentDir = currentDirInfo.FullName;
+                if (!filesPatternProvider.DoesDirectoryMatch(currentDir))
+                {
+                    continue;
+                }
                 IList<string> allFilesInCurrentDir;
                 try
                 {

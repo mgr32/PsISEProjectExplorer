@@ -63,7 +63,7 @@ namespace PsISEProjectExplorer.Services
             Directory.CreateDirectory(filePath);
         }
 
-        private static bool IsSubdirectory(string rootDir, string potentialSubDir)
+        public static bool IsSubdirectory(string rootDir, string potentialSubDir)
         {
             DirectoryInfo root = new DirectoryInfo(rootDir);
             DirectoryInfo sub = new DirectoryInfo(potentialSubDir);
@@ -77,5 +77,6 @@ namespace PsISEProjectExplorer.Services
             }
             return false;
         }
+
     }
 }

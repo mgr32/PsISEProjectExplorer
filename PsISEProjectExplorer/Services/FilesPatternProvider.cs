@@ -11,6 +11,8 @@ namespace PsISEProjectExplorer.Services
 
         private static readonly Regex PowershellFilesRegex = new Regex(@".*\.ps.*1$", RegexOptions.Compiled);
 
+        private static readonly Regex ExcludeRegex = new Regex(@"(\.git|\.svn)$");
+
         public bool IncludeAllFiles { get; set; }
 
         private ISet<string> AdditionalPaths { get; set; }
@@ -21,13 +23,19 @@ namespace PsISEProjectExplorer.Services
             this.AdditionalPaths = new HashSet<string>();
         }
 
+        public static bool IsPowershellFile(string fileName)
+        {
+            return PowershellFilesRegex.IsMatch(fileName);
+        }
+
         public bool DoesFileMatch(string fileName)
         {
-            if (this.IncludeAllFiles)
-            {
-                return true;
-            }
-            return PowershellFilesRegex.IsMatch(fileName);
+            return (this.IncludeAllFiles || PowershellFilesRegex.IsMatch(fileName)) && !ExcludeRegex.IsMatch(fileName);
+        }
+
+        public bool DoesDirectoryMatch(string dirName)
+        {
+            return !ExcludeRegex.IsMatch(dirName);
         }
 
         public string GetFilesPattern()

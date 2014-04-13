@@ -27,7 +27,7 @@ namespace PsISEProjectExplorer.Services
             this.Path = path;
             this.IsDirectory = isDirectory;
             this.PowershellFunctions = new List<PowershellFunction>();
-            if (!this.IsDirectory)
+            if (!this.IsDirectory && FilesPatternProvider.IsPowershellFile(path))
             {
                 this.ParseFile();
             }

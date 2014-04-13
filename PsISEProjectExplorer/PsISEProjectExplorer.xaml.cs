@@ -21,12 +21,13 @@ namespace PsISEProjectExplorer
     /// </summary>
     public partial class ProjectExplorerWindow : IAddOnToolHostObject
     {
-
         private MainViewModel MainViewModel { get; set; }
 
         private Point DragStartPoint;
 
         private ObjectModelRoot hostObject { get; set; }
+
+        private bool IsContextMenuOpened { get; set; }
 
          // Entry point to the ISE object model.
         public ObjectModelRoot HostObject
@@ -244,7 +245,7 @@ namespace PsISEProjectExplorer
 
         private void SearchResults_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            if (e.LeftButton == MouseButtonState.Pressed && !this.IsContextMenuOpened)
             {
                 var mousePos = e.GetPosition(null);
                 var diff = this.DragStartPoint - mousePos;
@@ -302,5 +303,16 @@ namespace PsISEProjectExplorer
                 e.Effects = DragDropEffects.None;
             }
         }
+
+        private void SearchResults_ContextMenuClosed(object sender, RoutedEventArgs e)
+        {
+            this.IsContextMenuOpened = false;
+        }
+
+        private void SearchResults_ContextMenuOpened(object sender, RoutedEventArgs e)
+        {
+            this.IsContextMenuOpened = true;
+        }
+
    }
 }

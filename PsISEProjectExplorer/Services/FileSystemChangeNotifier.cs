@@ -47,6 +47,10 @@ namespace PsISEProjectExplorer.Services
         private static void OnFileChanged(object source, FileSystemEventArgs e)
         {
             bool isDir = Directory.Exists(e.FullPath);
+            if (isDir && !FilesPatternProvider.DoesDirectoryMatch(e.FullPath))
+            {
+                return;
+            }
             if (!isDir && !FilesPatternProvider.DoesFileMatch(e.FullPath))
             {
                 return;
@@ -89,13 +93,26 @@ namespace PsISEProjectExplorer.Services
                 {
                     if (ChangePool.Any())
                     {
-                        IList<string> pathsChanged = new List<string>(ChangePool);
+                        IList<string> pathsChanged = RemoveSubdirectories(ChangePool);
                         var changedInfo = new FileSystemChangedInfo(pathsChanged);
                         FileSystemChanged(null, changedInfo);
                         ChangePool.Clear();
                     }
                 }
             }
+        }
+
+        private static IList<string> RemoveSubdirectories(ISet<string> dirList)
+        {
+            IList<string> result = new List<string>();
+            foreach (string dir in dirList)
+            {
+                if (dirList.Where(d => d != dir).All(d => !FileSystemOperationsService.IsSubdirectory(d, dir)))
+                {
+                    result.Add(dir);
+                }
+            }
+            return result;
         }
     }
 }

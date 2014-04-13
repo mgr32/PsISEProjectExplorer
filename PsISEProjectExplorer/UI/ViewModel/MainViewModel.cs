@@ -120,7 +120,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get { return "Project root: " + this.RootDirectoryToSearch; }
         }
-       
+
         private bool SearchTreeInitialized { get; set; }
 
         private SearchOptions SearchOptions { get; set; }
@@ -525,6 +525,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.FilesPatternProvider.RemoveAdditionalPath(movedItem.Path);
                 this.FilesPatternProvider.AddAdditionalPath(newPath);
                 FileSystemOperationsService.RenameFileOrDirectory(movedItem.Path, newPath);
+                destinationItem.IsExpanded = true;
             }
             catch (Exception e)
             {

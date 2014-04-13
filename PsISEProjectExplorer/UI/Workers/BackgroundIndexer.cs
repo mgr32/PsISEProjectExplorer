@@ -23,7 +23,7 @@ namespace PsISEProjectExplorer.UI.Workers
         private void RunIndexing(object sender, DoWorkEventArgs e)
         {
             var indexerParams = (BackgroundIndexerParams)e.Argument;
-            Logger.Info("Indexing started");
+            Logger.Info("Indexing started, pathsChanged: " + (indexerParams.PathsChanged == null ? "null" : String.Join(", ", indexerParams.PathsChanged)));
 
             DocumentHierarchySearcher newSearcher;
             if (indexerParams.PathsChanged == null || indexerParams.RootDirectory != indexerParams.DocumentHierarchyFactory.CurrentDocumentHierarchyPath)

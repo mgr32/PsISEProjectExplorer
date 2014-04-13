@@ -112,6 +112,10 @@ namespace PsISEProjectExplorer.Services
 
         private void FillFileListRecursivelyRoot(string path, IList<PowershellFileParser> result, FilesPatternProvider filesPatternProvider)
         {
+            if (!filesPatternProvider.DoesDirectoryMatch(path))
+            {
+                return;
+            }
             bool anyMatchingFilesInDir = this.FillFileListRecursively(path, result, filesPatternProvider);
             if (filesPatternProvider.IncludeAllFiles || anyMatchingFilesInDir || filesPatternProvider.IsInAdditonalPaths(path))
             {
@@ -123,6 +127,10 @@ namespace PsISEProjectExplorer.Services
         {
             foreach (string dir in Directory.EnumerateDirectories(path))
             {
+                if (!filesPatternProvider.DoesDirectoryMatch(dir))
+                {
+                    continue;
+                }
                 var anyMatchingFilesInDir = this.FillFileListRecursively(dir, result, filesPatternProvider);
                 if (filesPatternProvider.IncludeAllFiles || anyMatchingFilesInDir || filesPatternProvider.IsInAdditonalPaths(dir))
                 {
