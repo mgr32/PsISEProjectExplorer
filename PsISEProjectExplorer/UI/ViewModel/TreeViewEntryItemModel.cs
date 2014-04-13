@@ -131,20 +131,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public TreeViewEntryItemObservableSet Children { get; private set; }
 
-        public TreeViewEntryItemModel(TreeViewEntryItemModel parent, string nodePath, NodeType nodeType)
-        {
-            this.Parent = parent;
-            this.Children = new TreeViewEntryItemObservableSet();
-            this.Name = string.Empty;
-            this.Path = nodePath;
-            if (this.Parent != null)
-            {
-                this.Parent.Children.Add(this);
-            }
-            this.IsSelected = true;
-            this.NodeType = nodeType;
-        }
-
         public TreeViewEntryItemModel(INode node, TreeViewEntryItemModel parent, bool isSelected)
         {
             if (node == null) 
@@ -176,16 +162,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
         public void UpdateNode(INode node)
         {
             this.DocumentHierarchyNode = node;
-        }
-
-        public void UpdateNewItem(string newPath, string newName)
-        {
-            if (this.Node != null)
-            {
-                throw new InvalidOperationException("Path/name can be updated only for new items");
-            }
-            this.Path = newPath;
-            this.Name = newName;
         }
 
         public override bool Equals(object obj)
