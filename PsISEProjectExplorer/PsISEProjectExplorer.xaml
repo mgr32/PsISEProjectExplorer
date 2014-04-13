@@ -46,7 +46,7 @@
             </ToggleButton>
         </StackPanel>
         <TextBlock HorizontalAlignment="Left" Margin="10,54,0,5" TextWrapping="Wrap" Text="Indexing..." VerticalAlignment="Top" Width="70" Visibility="{Binding Path=IndexingInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <TreeView Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewModel.TreeViewItems}" PreviewMouseLeftButtonDown="SearchResults_PreviewMouseLeftButtonDown" PreviewMouseRightButtonDown="SearchResults_PreviewMouseRightButtonDown"
+        <uiHelpers:StretchingTreeView x:Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewModel.TreeViewItems}" PreviewMouseLeftButtonDown="SearchResults_PreviewMouseLeftButtonDown" PreviewMouseRightButtonDown="SearchResults_PreviewMouseRightButtonDown"
                    x:FieldModifier="private" SelectedItemChanged="SearchResults_SelectedItemChanged" PreviewMouseMove="SearchResults_PreviewMouseMove" Drop="SearchResults_Drop" DragEnter="SearchResults_DragEnter" AllowDrop="True">
             <TreeView.Resources>
                 <ContextMenu x:Key="DirectoryContext">
@@ -120,11 +120,15 @@
                             <Setter Property="FontWeight" Value="Bold" />
                         </MultiTrigger>
                         <Trigger Property="uiHelpers:TreeViewMouseHelper.IsMouseDirectlyOverItem" Value="True">
-                            <Setter Property="Background" Value="WhiteSmoke" />
+                            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.MenuBrushKey}}" />
+                        </Trigger>
+                        <Trigger Property="uiHelpers:TreeViewDropHighlighter.IsPossibleDropTarget" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" />
+                            <Setter Property="FontWeight" Value="Bold" />
                         </Trigger>
                     </Style.Triggers>
                 </Style>
             </TreeView.ItemContainerStyle>
-        </TreeView>
+        </uiHelpers:StretchingTreeView>
     </Grid>
 </UserControl>

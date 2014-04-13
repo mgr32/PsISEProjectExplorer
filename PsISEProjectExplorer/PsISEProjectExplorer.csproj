@@ -98,6 +98,7 @@
     <Compile Include="UI\Helpers\FocusExtensions.cs" />
     <Compile Include="UI\Helpers\MessageBoxHelper.cs" />
     <Compile Include="UI\Helpers\StretchingTreeView.cs" />
+    <Compile Include="UI\Helpers\TreeViewDropHighlighter.cs" />
     <Compile Include="UI\Helpers\TreeViewMouseHelper.cs" />
     <Compile Include="UI\IseIntegration\IseEventArgs.cs" />
     <Compile Include="UI\IseIntegration\IseIntegrator.cs" />

@@ -75,7 +75,7 @@ namespace PsISEProjectExplorer.UI.Helpers
         /// <returns>Found TreeViewItem or null</returns>
         public static TreeViewItem FindItemFromSource(this TreeView treeView, DependencyObject source)
         {
-            while (source != null && source.GetType() != typeof(TreeViewItem))
+            while (source != null && !(source is TreeViewItem))
             {
                 source = VisualTreeHelper.GetParent(source);
             }

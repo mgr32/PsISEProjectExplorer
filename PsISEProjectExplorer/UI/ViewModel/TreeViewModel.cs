@@ -160,6 +160,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.IseIntegrator.GoToFile(node.FilePath);
                 this.IseIntegrator.SelectText(node.PowershellFunction.StartLine, node.PowershellFunction.StartColumn, node.Name.Length);
             }
+            else if (item.Node.NodeType == NodeType.Directory)
+            {
+                item.IsExpanded = !item.IsExpanded;
+            }
         }
     }
 }
