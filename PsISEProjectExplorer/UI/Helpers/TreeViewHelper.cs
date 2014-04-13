@@ -64,7 +64,7 @@ namespace PsISEProjectExplorer.UI.Helpers
         /// <param name="item">The item to search and select</param>
         public static void ExpandAndSelectItem(this TreeView treeView, object item)
         {
-            ExpandAndSelectItem(treeView, item);
+            ExpandAndSelectItemContainer(treeView, item);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace PsISEProjectExplorer.UI.Helpers
         /// <param name="parentContainer">The parent container whose children will be searched for the selected item</param>
         /// <param name="itemToSelect">The item to select</param>
         /// <returns>True if the item is found and selected, false otherwise</returns>
-        private static bool ExpandAndSelectItem(ItemsControl parentContainer, object itemToSelect)
+        private static bool ExpandAndSelectItemContainer(ItemsControl parentContainer, object itemToSelect)
         {
             //check all items at the current level
             foreach (Object item in parentContainer.Items)
@@ -167,7 +167,7 @@ namespace PsISEProjectExplorer.UI.Helpers
                         {
                             if (currentContainer.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
                             {
-                                if (ExpandAndSelectItem(currentContainer, itemToSelect) == false)
+                                if (ExpandAndSelectItemContainer(currentContainer, itemToSelect) == false)
                                 {
                                     //The assumption is that code executing in this EventHandler is the result of the parent not
                                     //being expanded since the containers were not generated.
@@ -183,7 +183,7 @@ namespace PsISEProjectExplorer.UI.Helpers
                     }
                     else //otherwise the containers have been generated, so look for item to select in the children
                     {
-                        if (ExpandAndSelectItem(currentContainer, itemToSelect) == false)
+                        if (ExpandAndSelectItemContainer(currentContainer, itemToSelect) == false)
                         {
                             //restore the current TreeViewItem's expanded state
                             currentContainer.IsExpanded = wasExpanded;

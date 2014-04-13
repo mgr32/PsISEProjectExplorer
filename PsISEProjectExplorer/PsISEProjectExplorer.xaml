@@ -36,13 +36,16 @@
         </Button>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,50,10,0" VerticalAlignment="Top" Height="22">
             <ToggleButton IsChecked="{Binding Path=SearchInFiles}" Margin="0,0,4,0">
-                <Image Source="Resources\toolbar_searchInFiles.png" ToolTip="Search in files" />
+                <Image Source="Resources\toolbar_searchInFiles.png" ToolTip="Search in Files" />
             </ToggleButton>
             <ToggleButton IsChecked="{Binding Path=ShowAllFiles}" Margin="0,0,4,0">
-                <Image Source="Resources\toolbar_showAllFiles.png" ToolTip="Show all files" />
+                <Image Source="Resources\toolbar_showAllFiles.png" ToolTip="Show All Files" />
+            </ToggleButton>
+            <ToggleButton IsChecked="{Binding Path=SyncWithActiveDocument}" Margin="0,0,4,0">
+                <Image Source="Resources\toolbar_sync.png" ToolTip="Sync with Active Document" />
             </ToggleButton>
             <ToggleButton IsChecked="{Binding Path=AutoUpdateRootDirectory}">
-                <Image Source="Resources\toolbar_autoUpdateProjectDir.png" ToolTip="Auto-update project directory"/>
+                <Image Source="Resources\toolbar_autoUpdateProjectDir.png" ToolTip="Auto-update Project Root"/>
             </ToggleButton>
         </StackPanel>
         <TextBlock HorizontalAlignment="Left" Margin="10,54,0,5" TextWrapping="Wrap" Text="Indexing..." VerticalAlignment="Top" Width="70" Visibility="{Binding Path=IndexingInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>

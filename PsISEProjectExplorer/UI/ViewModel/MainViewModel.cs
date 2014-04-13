@@ -25,6 +25,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public TreeViewModel TreeViewModel { get; private set; }
 
+        public event EventHandler<IseEventArgs> ActiveDocumentSyncEvent;
+
         private string rootDirectoryToSearch;
 
         public string RootDirectoryToSearch
@@ -118,6 +120,20 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        private bool syncWithActiveDocument;
+
+        public bool SyncWithActiveDocument
+        {
+            get { return this.syncWithActiveDocument; }
+            set
+            {
+                this.syncWithActiveDocument = value;
+                this.OnPropertyChanged();
+                this.ActiveDocumentPotentiallyChanged();
+                ConfigHandler.SaveConfigValue("SyncWithActiveDocument", value.ToString());
+            }
+        }
+
         public string RootDirectoryLabel
         {
             get { return "Project root: " + (String.IsNullOrEmpty(this.RootDirectoryToSearch) ? EmptyRootDir : this.RootDirectoryToSearch); }
@@ -164,6 +180,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles", false);
             this.showAllFiles = ConfigHandler.ReadConfigBoolValue("ShowAllFiles", false);
             this.FilesPatternProvider = new FilesPatternProvider(this.showAllFiles);
+            this.syncWithActiveDocument = ConfigHandler.ReadConfigBoolValue("SyncWithActiveDocument", false);
             var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
             this.rootDirectoryToSearch = ConfigHandler.ReadConfigStringValue("RootDirectory");
             if (this.rootDirectoryToSearch == string.Empty || !Directory.Exists(this.rootDirectoryToSearch))
@@ -258,6 +275,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             var rootNode = (INode)result.Result;
             bool expandNewNodes = !String.IsNullOrWhiteSpace(this.SearchText);
             this.TreeViewModel.RefreshFromRoot(rootNode, expandNewNodes, this.FilesPatternProvider);
+            this.ActiveDocumentPotentiallyChanged();
         }
 
         private void OnFileSystemChanged(object sender, FileSystemChangedInfo changedInfo)
@@ -321,10 +339,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void OnFileTabChanged(object sender, IseEventArgs args)
         {
-            if (this.AutoUpdateRootDirectory)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                this.RecalculateRootDirectory(false);
-            }
+                if (this.AutoUpdateRootDirectory)
+                {
+                    this.RecalculateRootDirectory(false);
+                }
+            });
+            this.ActiveDocumentPotentiallyChanged();
         }
 
         public void EndTreeEdit(string newValue, bool save, TreeViewEntryItemModel selectedItem)
@@ -532,6 +554,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.TreeViewModel.PathOfItemToSelectOnRefresh = null;
                 MessageBoxHelper.ShowError("Failed to move: " + e.Message);
+            }
+        }
+
+        private void ActiveDocumentPotentiallyChanged()
+        {
+            if (this.ActiveDocumentSyncEvent != null)
+            {
+                this.ActiveDocumentSyncEvent(this, new IseEventArgs());
             }
         }
     }

@@ -46,8 +46,20 @@ namespace PsISEProjectExplorer
         {
             this.ConfigureLogging();
             this.MainViewModel = new MainViewModel();
+            this.MainViewModel.ActiveDocumentSyncEvent += OnActiveDocumentSyncEvent;
             this.DataContext = this.MainViewModel;
             InitializeComponent();
+        }
+
+        private void OnActiveDocumentSyncEvent(object sender, IseEventArgs args)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (this.MainViewModel.SyncWithActiveDocument)
+                {
+                    this.LocateFileInTree();
+                }
+            });
         }
 
         public void GoToDefinition()
