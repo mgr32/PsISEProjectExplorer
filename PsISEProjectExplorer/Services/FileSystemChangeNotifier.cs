@@ -20,6 +20,8 @@ namespace PsISEProjectExplorer.Services
 
         private static FilesPatternProvider FilesPatternProvider { get; set; }
 
+        private static string RootPath { get; set; }
+
         static FileSystemChangeNotifier()
         {
             Task.Factory.StartNew(ChangeNotifier);
@@ -27,20 +29,28 @@ namespace PsISEProjectExplorer.Services
 
         public static void Watch(string path, FilesPatternProvider filesPatternProvider)
         {
-            Watcher.EnableRaisingEvents = false;
-            if (String.IsNullOrEmpty(path) || !Directory.Exists(path))
+            lock (ChangePool)
             {
-                return;
+                Watcher.EnableRaisingEvents = false;
+                if (path != RootPath)
+                {
+                    ChangePool.Clear();
+                }
+                RootPath = path;
+                if (String.IsNullOrEmpty(path) || !Directory.Exists(path))
+                {
+                    return;
+                }
+                FilesPatternProvider = filesPatternProvider;
+                Watcher.Path = path;
+                Watcher.NotifyFilter = NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Security;
+                Watcher.IncludeSubdirectories = true;
+                Watcher.Changed += OnFileChanged;
+                Watcher.Created += OnFileChanged;
+                Watcher.Deleted += OnFileChanged;
+                Watcher.Renamed += OnFileRenamed;
+                Watcher.EnableRaisingEvents = true;
             }
-            FilesPatternProvider = filesPatternProvider;
-            Watcher.Path = path;
-            Watcher.NotifyFilter = NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Security;
-            Watcher.IncludeSubdirectories = true;
-            Watcher.Changed += OnFileChanged;
-            Watcher.Created += OnFileChanged;
-            Watcher.Deleted += OnFileChanged;
-            Watcher.Renamed += OnFileRenamed;
-            Watcher.EnableRaisingEvents = true;
         }
 
         // runs on a separate thread (from system)
@@ -51,7 +61,11 @@ namespace PsISEProjectExplorer.Services
             {
                 return;
             }
-            if (!isDir && !FilesPatternProvider.DoesFileMatch(e.FullPath))
+            if (isDir && e.ChangeType == WatcherChangeTypes.Changed)
+            {
+                return;
+            }
+            if (!isDir && e.ChangeType != WatcherChangeTypes.Deleted && !FilesPatternProvider.DoesFileMatch(e.FullPath))
             {
                 return;
             }

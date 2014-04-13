@@ -10,6 +10,7 @@ using PsISEProjectExplorer.UI.Helpers;
 using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.ViewModel;
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -99,7 +100,14 @@ namespace PsISEProjectExplorer
             bool? dialogResult = dialog.ShowDialog();
             if (dialogResult != null && dialogResult.Value)
             {
-                this.MainViewModel.ChangeRootDirectory(dialog.SelectedPath);
+                if (dialog.SelectedPath == Path.GetPathRoot(dialog.SelectedPath))
+                {
+                    MessageBoxHelper.ShowError("Cannot use root directory ('" + dialog.SelectedPath + "'). Please select another path.");
+                }
+                else
+                {
+                    this.MainViewModel.ChangeRootDirectory(dialog.SelectedPath);
+                }
             }
         }
 

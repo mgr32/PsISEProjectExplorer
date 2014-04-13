@@ -23,18 +23,21 @@ namespace PsISEProjectExplorer.UI.Workers
         private void RunIndexing(object sender, DoWorkEventArgs e)
         {
             var indexerParams = (BackgroundIndexerParams)e.Argument;
-            Logger.Info("Indexing started, pathsChanged: " + (indexerParams.PathsChanged == null ? "null" : String.Join(", ", indexerParams.PathsChanged)));
+            Logger.Info("Indexing started, rootDir: " + indexerParams.RootDirectory + ", pathsChanged: " + (indexerParams.PathsChanged == null ? "null" : String.Join(", ", indexerParams.PathsChanged)));
 
             DocumentHierarchySearcher newSearcher;
-            if (indexerParams.PathsChanged == null || indexerParams.RootDirectory != indexerParams.DocumentHierarchyFactory.CurrentDocumentHierarchyPath)
+            lock (this)
             {
-                newSearcher = indexerParams.DocumentHierarchyFactory.CreateDocumentHierarchy(indexerParams.RootDirectory, indexerParams.FilesPatternProvider);
+                if (indexerParams.PathsChanged == null || indexerParams.RootDirectory != indexerParams.DocumentHierarchyFactory.CurrentDocumentHierarchyPath)
+                {
+                    newSearcher = indexerParams.DocumentHierarchyFactory.CreateDocumentHierarchy(indexerParams.RootDirectory, indexerParams.FilesPatternProvider);
+                }
+                else
+                {
+                    newSearcher = indexerParams.DocumentHierarchyFactory.UpdateDocumentHierarchy(indexerParams.PathsChanged, indexerParams.FilesPatternProvider);
+                }
+                e.Result = new WorkerResult(this.StartTimestamp, newSearcher);
             }
-            else
-            {
-                newSearcher = indexerParams.DocumentHierarchyFactory.UpdateDocumentHierarchy(indexerParams.PathsChanged, indexerParams.FilesPatternProvider);
-            }
-            e.Result = new WorkerResult(this.StartTimestamp, newSearcher);
         }
 
        

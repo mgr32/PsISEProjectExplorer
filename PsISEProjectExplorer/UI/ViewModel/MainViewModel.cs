@@ -21,6 +21,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
+        private static string EmptyRootDir = "<Please open a Powershell file or click 'Change' button>";
+
         public TreeViewModel TreeViewModel { get; private set; }
 
         private string rootDirectoryToSearch;
@@ -118,7 +120,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public string RootDirectoryLabel
         {
-            get { return "Project root: " + this.RootDirectoryToSearch; }
+            get { return "Project root: " + (String.IsNullOrEmpty(this.RootDirectoryToSearch) ? EmptyRootDir : this.RootDirectoryToSearch); }
         }
 
         private bool SearchTreeInitialized { get; set; }
@@ -271,9 +273,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public void ChangeRootDirectory(string newPath)
         {
-            this.AutoUpdateRootDirectory = false;
             this.RootDirectoryToSearch = newPath;
-            this.RecalculateRootDirectory(false);
+            this.AutoUpdateRootDirectory = false;
         }
 
         private void RecalculateRootDirectory(bool alwaysReindex)

@@ -150,13 +150,16 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public void Delete()
         {
-            if (this.Parent != null)
+            lock (this.documentHierarchyNode)
             {
-                this.Parent.Children.Remove(this);
+                if (this.Parent != null)
+                {
+                    this.Parent.Children.Remove(this);
+                }
+                this.DocumentHierarchyNode = null;
+                this.Children = null;
+                this.Parent = null;
             }
-            this.DocumentHierarchyNode = null;
-            this.Children = null;
-            this.Parent = null;
         }
 
         public void UpdateNode(INode node)
