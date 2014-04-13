@@ -9,6 +9,7 @@ Provides a tree view that enables to index and explore whole directory structure
 * Visualize directory structure (also files not loaded to ISE yet) in a Solution Explorer-like tree view.
 * Show functions in leafs of the tree view and jump to the function definition (F12, similarly to some available Function Explorer plugins).
 * Search the tree view (file names, function names, optionally file contents).
+* File operations in tree view (context menu - add / rename / delete, drag&drop).
 * Find all occurrences of the text under the cursor (SHIFT+F12).
 * Locate current file in the tree view (ALT+SHIFT+L).
 * Automatic reindex on file system change.
