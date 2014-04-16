@@ -30,6 +30,8 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         private ObjectModelRoot HostObject { get; set; }
 
+        private string CurrentSelectedFile { get; set; }
+
         public IseIntegrator(ObjectModelRoot hostObject)
         {
             if (hostObject == null)
@@ -95,9 +97,12 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         {
             if (e.PropertyName == "LastEditorWithFocus")
             {
-                if (this.FileTabChanged != null)
-                {
-                    this.FileTabChanged(this, new IseEventArgs()); 
+                if (this.SelectedFilePath != this.CurrentSelectedFile) {
+                    this.CurrentSelectedFile = this.SelectedFilePath;
+                    if (this.FileTabChanged != null)
+                    {
+                        this.FileTabChanged(this, new IseEventArgs()); 
+                    }
                 }
                 
             }

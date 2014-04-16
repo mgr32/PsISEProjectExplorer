@@ -9,6 +9,10 @@ if ($copyToModules -ieq 'y') {
 		Remove-Item -Path $moduleDir -Force	-Recurse
         Write-Host "OK"
 	}
+	
+	Write-Host "Unblocking PSISEProjectExplorer files..." -NoNewLine
+	Get-ChildItem (Join-Path $currentDir "PsISEProjectExplorer") | Unblock-File
+	Write-Host "OK"
 
 	Write-Host "Copying PSISEProjectExplorer files to '$moduleDir'..." -NoNewline
 	Copy-Item -Path (Join-Path $currentDir "PsISEProjectExplorer") -Destination $moduleDir -Recurse -Force

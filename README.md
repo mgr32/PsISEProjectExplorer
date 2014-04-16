@@ -23,6 +23,7 @@ Requires Powershell 3.0 or above.
 
 * Automatic - run Install_to_UserModules.bat
 * Manual:
+ * Ensure all the files are unblocked (properties of the file / General)
  * Copy PSISEProjectExplorer to $env:USERPROFILE\Documents\WindowsPowerShell\Modules.
  * Launch PowerShell ISE.
  * Run 'Import-Module PsISEProjectExplorer'.

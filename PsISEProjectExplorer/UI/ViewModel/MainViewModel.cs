@@ -280,7 +280,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void OnFileSystemChanged(object sender, FileSystemChangedInfo changedInfo)
         {
-            var pathsChanged = changedInfo.PathsChanged.ToList();
+            var pathsChanged = changedInfo.PathsChanged.Where(p => p.RootPath == this.RootDirectoryToSearch).Select(p => p.PathChanged).ToList();
+            if (!pathsChanged.Any())
+            {
+                return;
+            }
             if (pathsChanged.Contains(this.RootDirectoryToSearch, StringComparer.InvariantCultureIgnoreCase))
             {
                 pathsChanged = null;

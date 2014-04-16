@@ -4,9 +4,9 @@ namespace PsISEProjectExplorer.Model
 {
     public class FileSystemChangedInfo
     {
-        public IEnumerable<string> PathsChanged { get; private set; }
+        public IEnumerable<ChangePoolEntry> PathsChanged { get; private set; }
 
-        public FileSystemChangedInfo(IEnumerable<string> pathsChanged)
+        public FileSystemChangedInfo(IEnumerable<ChangePoolEntry> pathsChanged)
         {
             this.PathsChanged = pathsChanged;
         }

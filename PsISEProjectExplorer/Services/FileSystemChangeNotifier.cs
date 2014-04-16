@@ -12,7 +12,7 @@ namespace PsISEProjectExplorer.Services
     {
         public static event EventHandler<FileSystemChangedInfo> FileSystemChanged;
 
-        private static readonly ISet<string> ChangePool = new HashSet<string>();
+        private static readonly ISet<ChangePoolEntry> ChangePool = new HashSet<ChangePoolEntry>();
 
         private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
@@ -71,7 +71,7 @@ namespace PsISEProjectExplorer.Services
             }
             lock (ChangePool)
             {
-                ChangePool.Add(e.FullPath);
+                ChangePool.Add(new ChangePoolEntry(e.FullPath, RootPath));
             }
         }
 
@@ -83,12 +83,12 @@ namespace PsISEProjectExplorer.Services
             {
                 if (isDir || FilesPatternProvider.DoesFileMatch(e.OldFullPath))
                 {
-                    ChangePool.Add(e.OldFullPath);
+                    ChangePool.Add(new ChangePoolEntry(e.OldFullPath, RootPath));
                 }
                 if ((isDir || FilesPatternProvider.DoesFileMatch(e.FullPath)) &&
                     e.FullPath.ToLowerInvariant() != e.OldFullPath.ToLowerInvariant())
                 {
-                    ChangePool.Add(e.FullPath);
+                    ChangePool.Add(new ChangePoolEntry(e.FullPath, RootPath));
                 }
             }
         }
@@ -107,7 +107,7 @@ namespace PsISEProjectExplorer.Services
                 {
                     if (ChangePool.Any())
                     {
-                        IList<string> pathsChanged = RemoveSubdirectories(ChangePool);
+                        IList<ChangePoolEntry> pathsChanged = RemoveSubdirectories(ChangePool);
                         var changedInfo = new FileSystemChangedInfo(pathsChanged);
                         FileSystemChanged(null, changedInfo);
                         ChangePool.Clear();
@@ -116,17 +116,19 @@ namespace PsISEProjectExplorer.Services
             }
         }
 
-        private static IList<string> RemoveSubdirectories(ISet<string> dirList)
+        private static IList<ChangePoolEntry> RemoveSubdirectories(ISet<ChangePoolEntry> dirList)
         {
-            IList<string> result = new List<string>();
-            foreach (string dir in dirList)
+            IList<ChangePoolEntry> result = new List<ChangePoolEntry>();
+            foreach (ChangePoolEntry entry in dirList)
             {
-                if (dirList.Where(d => d != dir).All(d => !FileSystemOperationsService.IsSubdirectory(d, dir)))
+                string dir = entry.PathChanged;
+                if (dirList.Select(d => d.PathChanged).Where(d => d != dir).All(d => !FileSystemOperationsService.IsSubdirectory(d, dir)))
                 {
-                    result.Add(dir);
+                    result.Add(entry);
                 }
             }
             return result;
         }
     }
+
 }
