@@ -81,6 +81,11 @@ namespace PsISEProjectExplorer
                 {
                     return;
                 }
+                var selectedItem = this.SearchResults.SelectedItem as TreeViewEntryItemModel;
+                if (selectedItem != null && selectedItem.Path == path)
+                {
+                    return;
+                }
                 TreeViewEntryItemModel item = this.MainViewModel.TreeViewModel.FindTreeViewEntryItemByPath(path);
                 if (item == null)
                 {
@@ -88,7 +93,6 @@ namespace PsISEProjectExplorer
                 }
 
                 SearchResults.ExpandAndSelectItem(item);
-                this.MainViewModel.IseIntegrator.SetFocusOnCurrentTab();
             });
         }
 
@@ -228,6 +232,28 @@ namespace PsISEProjectExplorer
                 e.Handled = true;
                 return;
             }
+
+        }
+
+        private void SearchResults_KeyDown(object sender, KeyEventArgs e)
+        {
+            var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
+            if (item == null || item.IsBeingEdited)
+            {
+                return;
+            }
+            if (e.Key == Key.Delete)
+            {
+                this.MainViewModel.DeleteTreeItem(item);
+                e.Handled = true;
+                return;
+            }
+            if (e.Key == Key.F2)
+            {
+                item.IsBeingEdited = true;
+                e.Handled = true;
+                return;
+            }
         }
 
         private void SearchResults_EndEdit(object sender, RoutedEventArgs e)
@@ -265,8 +291,13 @@ namespace PsISEProjectExplorer
 
         private void SearchResults_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed && !this.IsContextMenuOpened)
+            if (e.LeftButton == MouseButtonState.Pressed)
             {
+                var selectedItem = this.SearchResults.SelectedItem as TreeViewEntryItemModel;
+                if ((selectedItem != null && selectedItem.IsBeingEdited) || this.IsContextMenuOpened)
+                {
+                    return;
+                }
                 var mousePos = e.GetPosition(null);
                 var diff = this.DragStartPoint - mousePos;
 

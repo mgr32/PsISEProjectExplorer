@@ -50,7 +50,7 @@
         </StackPanel>
         <TextBlock HorizontalAlignment="Left" Margin="10,54,0,5" TextWrapping="Wrap" Text="Indexing..." VerticalAlignment="Top" Width="70" Visibility="{Binding Path=IndexingInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <uiHelpers:StretchingTreeView x:Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewModel.TreeViewItems}" PreviewMouseLeftButtonDown="SearchResults_PreviewMouseLeftButtonDown" PreviewMouseRightButtonDown="SearchResults_PreviewMouseRightButtonDown"
-                   x:FieldModifier="private" SelectedItemChanged="SearchResults_SelectedItemChanged" PreviewMouseMove="SearchResults_PreviewMouseMove" Drop="SearchResults_Drop" DragEnter="SearchResults_DragEnter" AllowDrop="True">
+                   x:FieldModifier="private" SelectedItemChanged="SearchResults_SelectedItemChanged" PreviewMouseMove="SearchResults_PreviewMouseMove" Drop="SearchResults_Drop" DragEnter="SearchResults_DragEnter" AllowDrop="True" KeyDown="SearchResults_KeyDown">
             <TreeView.Resources>
                 <ContextMenu x:Key="DirectoryContext" Opened="SearchResults_ContextMenuOpened" Closed="SearchResults_ContextMenuClosed">
                     <MenuItem Header="Add">
@@ -68,24 +68,24 @@
                             </MenuItem.Icon>
                         </MenuItem>
                     </MenuItem>
-                    <MenuItem Header="Rename" Click="SearchResults_Rename">
+                    <MenuItem Header="Rename" Click="SearchResults_Rename" InputGestureText="F2" >
                         <MenuItem.Icon>
                             <Image Source="Resources/textfield_rename.png" />
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="Delete" Click="SearchResults_Delete">
+                    <MenuItem Header="Delete" Click="SearchResults_Delete" InputGestureText="Del">
                         <MenuItem.Icon>
                             <Image Source="Resources/cross.png" />
                         </MenuItem.Icon>
                     </MenuItem>
                 </ContextMenu>
                 <ContextMenu x:Key="FileContext" Opened="SearchResults_ContextMenuOpened" Closed="SearchResults_ContextMenuClosed">
-                    <MenuItem Header="Rename" Click="SearchResults_Rename">
+                    <MenuItem Header="Rename" Click="SearchResults_Rename" InputGestureText="F2">
                         <MenuItem.Icon>
                             <Image Source="Resources/textfield_rename.png" />
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="Delete" Click="SearchResults_Delete">
+                    <MenuItem Header="Delete" Click="SearchResults_Delete" InputGestureText="Del">
                         <MenuItem.Icon>
                             <Image Source="Resources/cross.png" />
                         </MenuItem.Icon>

@@ -136,7 +136,6 @@ namespace PsISEProjectExplorer.UI.Helpers
                 {
                     currentContainer.IsSelected = true;
                     currentContainer.BringIntoView();
-                    currentContainer.Focus();
 
                     //the item was found
                     return true;

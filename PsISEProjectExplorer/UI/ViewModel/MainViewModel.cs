@@ -397,6 +397,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             if (!save || String.IsNullOrEmpty(newValue))
             {
+                this.DocumentHierarchyFactory.RemoveTemporaryNode(selectedItem.Node);
                 selectedItem.Delete();
                 return;
             }
@@ -408,6 +409,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             INode newNode = null;
             if (this.TreeViewModel.FindTreeViewEntryItemByPath(newPath) != null)
             {
+                this.DocumentHierarchyFactory.RemoveTemporaryNode(selectedItem.Node);
                 selectedItem.Delete();
                 MessageBoxHelper.ShowError("Item '" + newPath + "' already exists.");
                 return;

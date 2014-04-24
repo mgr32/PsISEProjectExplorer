@@ -72,6 +72,18 @@ namespace PsISEProjectExplorer.Services
             return null;
         }
 
+        public void RemoveTemporaryNode(INode node)
+        {
+            if (this.DocumentHierarchy == null)
+            {
+                return;
+            }
+            lock (this.DocumentHierarchy.RootNode)
+            {
+                this.DocumentHierarchy.RemoveNode(node);
+            }
+        }
+
         public DocumentHierarchySearcher UpdateDocumentHierarchy(IEnumerable<string> pathsToUpdate, FilesPatternProvider filesPatternProvider)
         {
             lock (this.DocumentHierarchy.RootNode)
