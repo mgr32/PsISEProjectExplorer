@@ -16,6 +16,8 @@ Provides a tree view that enables to index and explore whole directory structure
 
 Requires Powershell 3.0 or above.
 
+If you find it useful, see any bugs or have any suggestions for improvements feel free to add an issue or comment at the <b><a href="http://mgr32.github.io/PsISEProjectExplorer/">project home page</a></b>.
+
 ##### Screenshots
 ![ScreenShot](./PsISEExplorer_screen.png?raw=true)
 
