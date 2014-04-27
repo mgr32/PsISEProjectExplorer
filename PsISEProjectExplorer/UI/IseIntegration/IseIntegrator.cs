@@ -1,6 +1,7 @@
 ﻿using Microsoft.PowerShell.Host.ISE;
 using PsISEProjectExplorer.Model;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace PsISEProjectExplorer.UI.IseIntegration
@@ -91,6 +92,23 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                 return;
             }
             file.Editor.Focus();
+        }
+
+        public void CloseAllButThis()
+        {
+            if (this.HostObject.CurrentPowerShellTab == null || this.HostObject.CurrentPowerShellTab.Files == null)
+            {
+                return;
+            }
+            var filesToRemove = new List<ISEFile>(this.HostObject.CurrentPowerShellTab.Files);
+            var selectedFile = this.HostObject.CurrentPowerShellTab.Files.SelectedFile;
+            foreach (var file in filesToRemove)
+            {
+                if (file != selectedFile)
+                {
+                    this.HostObject.CurrentPowerShellTab.Files.Remove(file);
+                }
+            }
         }
 
         private void OnIseTabChanged(object sender, PropertyChangedEventArgs e)

@@ -18,6 +18,7 @@ function Register-PsISEProjectExplorerMenus() {
 	Register-PsISEProjectExplorerMenu -name 'Find All Occurrences' -scriptblock { (Get-PSISEProjectExplorerControlHandle).FindAllOccurrences() } -hotkey "SHIFT+F12"
 	Register-PsISEProjectExplorerMenu -name 'Locate Current File' -scriptblock { (Get-PSISEProjectExplorerControlHandle).LocateFileInTree() } -hotkey "ALT+SHIFT+L"
 	Register-PsISEProjectExplorerMenu -name 'Find In Files' -scriptblock { (Get-PSISEProjectExplorerControlHandle).FindInFiles() } -hotkey "CTRL+SHIFT+F"
+	Register-PsISEProjectExplorerMenu -name 'Close All But This' -scriptblock { (Get-PSISEProjectExplorerControlHandle).CloseAllButThis() } -hotkey "CTRL+ALT+W"
 }
 
 function Get-PSISEProjectExplorerControlHandle() {

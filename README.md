@@ -12,6 +12,7 @@ Provides a tree view that enables to index and explore whole directory structure
 * File operations in tree view (context menu - add / rename / delete, drag&drop).
 * Find all occurrences of the text under the cursor (SHIFT+F12).
 * Locate current file in the tree view (ALT+SHIFT+L).
+* Close All But This tab (CTRL+ALT+W).
 * Automatic reindex on file system change.
 
 Requires Powershell 3.0 or above.
@@ -51,6 +52,8 @@ Uses three background threads:
 * Third one for listening on file system changes (checking for accumulated changes each 100 ms).
 
 Uses a configuration file PsISEProjectExplorer.config stored next to PsISEProjectExplorer.dll ($env:USERPROFILE\Documents\WindowsPowerShell\Modules\PsISEProjectExplorer). Currently it contains only the last state of the UI.
+
+To modify keyboard shortcuts, edit PsISEProjectExplorer.psm1 file.
 
 ##### Third party libraries
 * <a href="https://lucenenet.apache.org">Apache Lucene .Net 3.0.3</a> (<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>)

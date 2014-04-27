@@ -105,6 +105,14 @@ namespace PsISEProjectExplorer
             });
         }
 
+        public void CloseAllButThis()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                this.MainViewModel.IseIntegrator.CloseAllButThis();
+            });
+        }
+
         private void ChangeWorkspace_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new VistaFolderBrowserDialog
