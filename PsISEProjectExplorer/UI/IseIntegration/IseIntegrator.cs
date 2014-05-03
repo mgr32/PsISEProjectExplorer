@@ -1,4 +1,5 @@
 ﻿using Microsoft.PowerShell.Host.ISE;
+using NLog;
 using PsISEProjectExplorer.Model;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 {
     public class IseIntegrator
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         
         public string SelectedFilePath
         { 
@@ -62,7 +64,18 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         {
             if (this.HostObject.CurrentPowerShellTab.Files.SelectedFile != null)
             {
-                this.HostObject.CurrentPowerShellTab.Files.SelectedFile.Editor.SetCaretPosition(line, column);
+                var editor = this.HostObject.CurrentPowerShellTab.Files.SelectedFile.Editor;
+                if (editor.LineCount > line)
+                {
+                    try
+                    {
+                        editor.SetCaretPosition(line, column);
+                    }
+                    catch (Exception e) 
+                    {
+                        Logger.Error("Failed to set cursor", e);
+                    }
+                }
             }
         }
 
@@ -70,7 +83,18 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         {
             if (this.HostObject.CurrentPowerShellTab.Files.SelectedFile != null)
             {
-                this.HostObject.CurrentPowerShellTab.Files.SelectedFile.Editor.Select(line, column, line, column + length);
+                var editor = this.HostObject.CurrentPowerShellTab.Files.SelectedFile.Editor;
+                if (editor.LineCount > line)
+                {
+                    try
+                    {
+                        editor.Select(line, column, line, column + length);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error("Failed to select text", e);
+                    }
+                }
             }
         }
 
