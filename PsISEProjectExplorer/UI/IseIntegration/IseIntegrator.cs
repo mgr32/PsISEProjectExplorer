@@ -130,7 +130,14 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             {
                 if (file != selectedFile)
                 {
-                    this.HostObject.CurrentPowerShellTab.Files.Remove(file);
+                    try
+                    {
+                        this.HostObject.CurrentPowerShellTab.Files.Remove(file);
+                    }
+                    catch
+                    {
+                        // ignore -> can be unsaved
+                    }
                 }
             }
         }

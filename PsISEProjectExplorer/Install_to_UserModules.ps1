@@ -4,18 +4,17 @@ $profileFile = "$($env:USERPROFILE)\Documents\WindowsPowerShell\Microsoft.PowerS
 
 $copyToModules = Read-Host 'Install PsISEProjectExplorer to your Modules directory [y/n]?'
 if ($copyToModules -ieq 'y') {
-	if (Test-Path $moduleDir) {
-		Write-Host "Removing directory '$moduleDir'..." -NoNewline
-		Remove-Item -Path $moduleDir -Force	-Recurse
+	if (!(Test-Path $moduleDir)) {
+		Write-Host "Creating directory '$moduleDir'..." -NoNewline
+		New-Item -Path $moduleDir -ItemType Directory | Out-Null
         Write-Host "OK"
 	}
-	
 	Write-Host "Unblocking PSISEProjectExplorer files..." -NoNewLine
 	Get-ChildItem (Join-Path $currentDir "PsISEProjectExplorer") | Unblock-File
 	Write-Host "OK"
 
 	Write-Host "Copying PSISEProjectExplorer files to '$moduleDir'..." -NoNewline
-	Copy-Item -Path (Join-Path $currentDir "PsISEProjectExplorer") -Destination $moduleDir -Recurse -Force
+	Copy-Item -Path (Join-Path $currentDir "PsISEProjectExplorer\*") -Destination $moduleDir -Recurse -Force
     Write-Host "OK"
 }
 
