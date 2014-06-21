@@ -270,6 +270,8 @@ namespace PsISEProjectExplorer
             if (e.Key == Key.Enter)
             {
                 this.MainViewModel.TreeViewModel.OpenItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.MainViewModel.SearchText);
+                e.Handled = true;
+                return;
             }
         }
 
