@@ -135,6 +135,11 @@ namespace PsISEProjectExplorer
             }
         }
 
+        private void RefreshDirectoryStructure_Click(object sender, RoutedEventArgs e)
+        {
+            this.MainViewModel.RecalculateRootDirectory(true);
+        }
+
         private void ConfigureLogging()
         {
             #if DEBUG
@@ -341,16 +346,20 @@ namespace PsISEProjectExplorer
             {
                 var item = e.Data.GetData(typeof(TreeViewEntryItemModel)) as TreeViewEntryItemModel;
                 var treeView = sender as TreeView;
-                if (treeView == null)
+                if (treeView == null || item == null)
                 {
                     return;
                 }
                 var treeViewItem = treeView.FindItemFromSource((DependencyObject)e.OriginalSource);
-                var dropTarget = treeViewItem.Header as TreeViewEntryItemModel;
-
-                if (dropTarget == null || item == null)
-                    return;
-
+                TreeViewEntryItemModel dropTarget = null;
+                if (treeViewItem != null)
+                {
+                    dropTarget = treeViewItem.Header as TreeViewEntryItemModel;
+                    if (dropTarget == null)
+                    {
+                        return;
+                    }
+                }
                 this.MainViewModel.MoveTreeItem(item, dropTarget);
             }
         }

@@ -299,7 +299,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.AutoUpdateRootDirectory = false;
         }
 
-        private void RecalculateRootDirectory(bool alwaysReindex)
+        public void RecalculateRootDirectory(bool alwaysReindex)
         {
             if (this.IseIntegrator.SelectedFilePath != null && (this.AutoUpdateRootDirectory || this.RootDirectoryToSearch == null))
             {
@@ -539,7 +539,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
             try
             {
                 string newPath;
-                if (destinationItem.NodeType == NodeType.File)
+                // moved to the empty place, i.e. to the workspace directory
+                if (destinationItem == null)
+                {
+                    newPath = this.GenerateNewPathForDir(this.RootDirectoryToSearch, movedItem.Name);
+                } else if (destinationItem.NodeType == NodeType.File)
                 {
                     newPath = this.GenerateNewPath(destinationItem.Path, movedItem.Name);
                 }
@@ -554,7 +558,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.FilesPatternProvider.RemoveAdditionalPath(movedItem.Path);
                 this.FilesPatternProvider.AddAdditionalPath(newPath);
                 FileSystemOperationsService.RenameFileOrDirectory(movedItem.Path, newPath);
-                destinationItem.IsExpanded = true;
+                if (destinationItem != null)
+                {
+                    destinationItem.IsExpanded = true;
+                }
             }
             catch (Exception e)
             {

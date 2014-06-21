@@ -44,6 +44,9 @@
             <ToggleButton IsChecked="{Binding Path=SyncWithActiveDocument}" Margin="0,0,4,0">
                 <Image Source="Resources\toolbar_sync.png" ToolTip="Sync with Active Document" />
             </ToggleButton>
+            <Button Margin="0,0,4,0" Click="RefreshDirectoryStructure_Click">
+                <Image Source="Resources\toolbar_refresh.png" ToolTip="Refresh Directory Structure" />
+            </Button>
             <ToggleButton IsChecked="{Binding Path=AutoUpdateRootDirectory}">
                 <Image Source="Resources\toolbar_autoUpdateProjectDir.png" ToolTip="Auto-update Project Root"/>
             </ToggleButton>

@@ -65,7 +65,7 @@ namespace PsISEProjectExplorer.Services
             {
                 return;
             }
-            if (!isDir && e.ChangeType != WatcherChangeTypes.Deleted && !FilesPatternProvider.DoesFileMatch(e.FullPath))
+            if (!isDir && !FilesPatternProvider.DoesFileMatch(e.FullPath))
             {
                 return;
             }
