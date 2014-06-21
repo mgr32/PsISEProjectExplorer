@@ -28,7 +28,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public IseIntegrator IseIntegrator { private get; set; }
 
-        private TreeViewEntryItemModel RootTreeViewEntryItem { get; set; }
+        public TreeViewEntryItemModel RootTreeViewEntryItem { get; private set; }
 
         public string PathOfItemToSelectOnRefresh { get; set; }
 

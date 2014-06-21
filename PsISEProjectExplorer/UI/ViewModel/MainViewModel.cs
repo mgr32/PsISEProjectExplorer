@@ -513,19 +513,23 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        public void AddNewTreeItem(TreeViewEntryItemModel selectedItem, NodeType nodeType)
+        public void AddNewTreeItem(TreeViewEntryItemModel parent, NodeType nodeType)
         {
-            if (selectedItem == null || this.DocumentHierarchyFactory == null)
+            if (this.DocumentHierarchyFactory == null)
             {
                 return;
             }
-            selectedItem.IsExpanded = true;
-            INode newNode = this.DocumentHierarchyFactory.CreateTemporaryNode(selectedItem.Node, nodeType);
+            INode parentNode = null;
+            if (parent == null) {
+                parent = this.TreeViewModel.RootTreeViewEntryItem;
+            }
+            parent.IsExpanded = true;
+            INode newNode = this.DocumentHierarchyFactory.CreateTemporaryNode(parent.Node, nodeType);
             if (newNode == null)
             {
                 return;
             }
-            var newItem = new TreeViewEntryItemModel(newNode, selectedItem, true);
+            var newItem = new TreeViewEntryItemModel(newNode, parent, true);
             newItem.IsBeingEdited = true;
             newItem.IsBeingAdded = true;
         }

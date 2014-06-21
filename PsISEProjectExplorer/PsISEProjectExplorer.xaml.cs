@@ -157,6 +157,11 @@ namespace PsISEProjectExplorer
 
         private void SearchResults_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            var item = this.SearchResults.FindItemFromSource((DependencyObject)e.OriginalSource);
+            if (item == null && this.SearchResults.SelectedItem != null)
+            {
+                ((TreeViewEntryItemModel)this.SearchResults.SelectedItem).IsSelected = false;
+            }
             this.DragStartPoint = e.GetPosition(null);
             if (e.ClickCount > 1)
             {
@@ -167,7 +172,34 @@ namespace PsISEProjectExplorer
 
         private void SearchResults_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            this.SearchResults.SelectItemFromSource((DependencyObject)e.OriginalSource);
+            TreeViewEntryItemModel item;
+            if (!this.SearchResults.SelectItemFromSource((DependencyObject)e.OriginalSource))
+            {
+                this.SearchResults.ContextMenu = this.SearchResults.Resources["EmptyContext"] as ContextMenu;
+                item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
+                if (item != null)
+                {
+                    item.IsSelected = false;
+                }
+                return;
+            }
+            item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
+            if (item == null)
+            {
+                // should not happen
+                this.SearchResults.ContextMenu = null;
+            } else if (item.NodeType == Enums.NodeType.Directory)
+            {
+                this.SearchResults.ContextMenu = this.SearchResults.Resources["DirectoryContext"] as ContextMenu;
+            }
+            else if (item.NodeType == Enums.NodeType.File)
+            {
+                this.SearchResults.ContextMenu = this.SearchResults.Resources["FileContext"] as ContextMenu;
+            }
+            else
+            {
+                this.SearchResults.ContextMenu = null;
+            }
         }
 
         private void SearchResults_KeyUp(object sender, KeyEventArgs e)
@@ -188,20 +220,12 @@ namespace PsISEProjectExplorer
         private void SearchResults_AddDirectory(object sender, RoutedEventArgs e)
         {
             var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
-            if (item == null)
-            {
-                return;
-            }
             this.MainViewModel.AddNewTreeItem(item, NodeType.Directory);
         }
 
         private void SearchResults_AddFile(object sender, RoutedEventArgs e)
         {
             var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
-            if (item == null)
-            {
-                return;
-            }
             this.MainViewModel.AddNewTreeItem(item, NodeType.File);
         }
 
@@ -284,28 +308,6 @@ namespace PsISEProjectExplorer
             }
             var newValue = ((TextBox)sender).Text;
             this.MainViewModel.EndTreeEdit(newValue, true, item);
-        }
-
-        private void SearchResults_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
-            if (item == null)
-            {
-                this.SearchResults.ContextMenu = null;
-                return;
-            }
-            if (item.NodeType == Enums.NodeType.Directory)
-            {
-                this.SearchResults.ContextMenu = this.SearchResults.Resources["DirectoryContext"] as ContextMenu;
-            }
-            else if (item.NodeType == Enums.NodeType.File)
-            {
-                this.SearchResults.ContextMenu = this.SearchResults.Resources["FileContext"] as ContextMenu;
-            }
-            else
-            {
-                this.SearchResults.ContextMenu = null;
-            }
         }
 
         private void SearchResults_PreviewMouseMove(object sender, MouseEventArgs e)

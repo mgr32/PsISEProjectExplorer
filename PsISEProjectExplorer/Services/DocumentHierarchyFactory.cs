@@ -34,7 +34,7 @@ namespace PsISEProjectExplorer.Services
 
         public INode CreateTemporaryNode(INode parent, NodeType nodeType)
         {
-            if (this.DocumentHierarchy == null)
+            if (this.DocumentHierarchy == null || parent == null)
             {
                 return null;
             }
