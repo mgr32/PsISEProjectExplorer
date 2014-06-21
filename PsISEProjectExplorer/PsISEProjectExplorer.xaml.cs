@@ -267,6 +267,10 @@ namespace PsISEProjectExplorer
                 e.Handled = true;
                 return;
             }
+            if (e.Key == Key.Enter)
+            {
+                this.MainViewModel.TreeViewModel.OpenItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.MainViewModel.SearchText);
+            }
         }
 
         private void SearchResults_EndEdit(object sender, RoutedEventArgs e)
