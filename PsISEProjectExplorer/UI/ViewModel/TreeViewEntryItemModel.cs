@@ -39,7 +39,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return "Resources/" + this.NodeType.ToString().ToLowerInvariant() + ".png";
+                string fileName = this.NodeType.ToString().ToLowerInvariant();
+                if (!this.Node.IsValid)
+                {
+                    fileName += "_invalid";
+                }
+                return String.Format("Resources/{0}.png", fileName);
             }
         }
 
@@ -58,7 +63,15 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 return this.Node.Path;
             }
         }
-        
+
+        public string Tooltip
+        {
+            get
+            {
+                return this.Node.Metadata;
+            }
+        }
+
         public TreeViewEntryItemModel Parent { get; private set; }
 
         private bool isExpanded;

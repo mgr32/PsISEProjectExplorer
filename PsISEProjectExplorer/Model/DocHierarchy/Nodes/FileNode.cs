@@ -6,8 +6,8 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
     {
         public override NodeType NodeType { get { return NodeType.File; } }
 
-        public FileNode(string path, string name, INode parent)
-            : base(path, name, parent)
+        public FileNode(string path, string name, INode parent, string errorMessage)
+            : base(path, name, parent, errorMessage == null, errorMessage)
         {
         }
 

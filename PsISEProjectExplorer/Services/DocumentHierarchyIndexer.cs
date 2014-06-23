@@ -30,10 +30,10 @@ namespace PsISEProjectExplorer.Services
             {
                 return false;
             }
-            INode lastDirNode = this.FillHierarchyWithIntermediateDirectories(parser.Path, parser.IsDirectory);
+            INode lastDirNode = this.FillHierarchyWithIntermediateDirectories(parser.Path, parser.IsDirectory, parser.ErrorMessage);
             if (!parser.IsDirectory)
             {
-                INode fileNode = this.DocumentHierarchy.CreateNewFileNode(parser.Path, parser.FileContents, lastDirNode);
+                INode fileNode = this.DocumentHierarchy.CreateNewFileNode(parser.Path, parser.FileContents, lastDirNode, parser.ErrorMessage);
                 foreach (PowershellFunction func in parser.PowershellFunctions)
                 {
                     this.DocumentHierarchy.CreateNewFunctionNode(parser.Path, func, fileNode);
@@ -42,7 +42,7 @@ namespace PsISEProjectExplorer.Services
             return true;
         }
 
-        private INode FillHierarchyWithIntermediateDirectories(string path, bool lastSegmentIsDirectory)
+        private INode FillHierarchyWithIntermediateDirectories(string path, bool lastSegmentIsDirectory, string errorMessage)
         {
             IList<string> segments = path.Replace(this.RootNode.Path + "\\", "").Split('\\').ToList();
             var currentNode = this.RootNode;
@@ -59,7 +59,7 @@ namespace PsISEProjectExplorer.Services
             {
                 currentAbsolutePath = Path.Combine(currentAbsolutePath, segment);
                 currentNode = this.DocumentHierarchy.GetNode(currentAbsolutePath) ??
-                             this.DocumentHierarchy.CreateNewDirectoryNode(currentAbsolutePath, currentNode);
+                    this.DocumentHierarchy.CreateNewDirectoryNode(currentAbsolutePath, currentNode, currentAbsolutePath == path ? errorMessage : null);
             }
             return currentNode;
         }

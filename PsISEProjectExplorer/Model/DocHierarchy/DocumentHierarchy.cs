@@ -41,19 +41,20 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
         }
 
 
-        public INode CreateNewDirectoryNode(string absolutePath, INode parent)
+        public INode CreateNewDirectoryNode(string absolutePath, INode parent, string errorMessage)
         {
             string name = absolutePath.Substring(absolutePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
-            INode node = new DirectoryNode(absolutePath, name, parent);
+            INode node;
+            node = new DirectoryNode(absolutePath, name, parent, errorMessage);
             this.NodeMap.Add(absolutePath, node);
             this.FullTextDirectory.DocumentCreator.AddDirectoryEntry(absolutePath, name);
             return node;
         }
 
-        public INode CreateNewFileNode(string absolutePath, string fileContents, INode parent)
+        public INode CreateNewFileNode(string absolutePath, string fileContents, INode parent, string errorMessage)
         {
             string fileName = Path.GetFileName(absolutePath);
-            INode fileNode = new FileNode(absolutePath, fileName, parent);
+            INode fileNode = new FileNode(absolutePath, fileName, parent, errorMessage);
             this.NodeMap.Add(absolutePath, fileNode);
             this.FullTextDirectory.DocumentCreator.AddFileEntry(absolutePath, fileName, fileContents);
             return fileNode;
@@ -67,16 +68,16 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             return functionNode;
         }
 
-        public INode UpdateDirectoryNodePath(INode node, string newPath)
+        public INode UpdateDirectoryNodePath(INode node, string newPath, string errorMessage)
         {
             this.RemoveNode(node);
-            return this.CreateNewDirectoryNode(newPath, node.Parent);
+            return this.CreateNewDirectoryNode(newPath, node.Parent, errorMessage);
         }
 
-        public INode UpdateFileNodePath(INode node, string newPath)
+        public INode UpdateFileNodePath(INode node, string newPath, string errorMessage)
         {
             this.RemoveNode(node);
-            return this.CreateNewFileNode(newPath, string.Empty, node.Parent);
+            return this.CreateNewFileNode(newPath, string.Empty, node.Parent, errorMessage);
         }
 
         public IEnumerable<SearchResult> SearchNodesFullText(string filter, FullTextFieldType fieldType)

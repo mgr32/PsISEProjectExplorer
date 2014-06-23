@@ -519,7 +519,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 return;
             }
-            INode parentNode = null;
             if (parent == null) {
                 parent = this.TreeViewModel.RootTreeViewEntryItem;
             }

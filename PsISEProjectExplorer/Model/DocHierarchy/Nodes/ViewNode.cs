@@ -26,6 +26,23 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             }
         }
 
+        public bool IsValid
+        {
+            get
+            {
+                return this.Node.IsValid;
+            }
+        }
+
+        public string Metadata
+        {
+            get
+            {
+                return this.Node.Metadata;
+            }
+        }
+
+
         public INode Parent { get; private set; }
 
         public ISet<INode> Children { get; private set; }

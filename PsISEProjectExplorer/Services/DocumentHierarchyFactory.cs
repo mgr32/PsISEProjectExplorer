@@ -2,6 +2,7 @@
 using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -42,11 +43,11 @@ namespace PsISEProjectExplorer.Services
             {
                 if (nodeType == NodeType.Directory)
                 {
-                    return this.DocumentHierarchy.CreateNewDirectoryNode(parent.Path + @"\", parent);
+                    return this.DocumentHierarchy.CreateNewDirectoryNode(parent.Path + @"\", parent, null);
                 }
                 if (nodeType == NodeType.File)
                 {
-                    return this.DocumentHierarchy.CreateNewFileNode(parent.Path + @"\", string.Empty, parent);
+                    return this.DocumentHierarchy.CreateNewFileNode(parent.Path + @"\", string.Empty, parent, null);
                 }
             }
             return null;
@@ -62,11 +63,11 @@ namespace PsISEProjectExplorer.Services
             {
                 if (node.NodeType == NodeType.Directory)
                 {
-                    return this.DocumentHierarchy.UpdateDirectoryNodePath(node, newPath);
+                    return this.DocumentHierarchy.UpdateDirectoryNodePath(node, newPath, null);
                 }
                 if (node.NodeType == NodeType.File)
                 {
-                    return this.DocumentHierarchy.UpdateFileNodePath(node, newPath);
+                    return this.DocumentHierarchy.UpdateFileNodePath(node, newPath, null);
                 }
             }
             return null;
@@ -102,7 +103,7 @@ namespace PsISEProjectExplorer.Services
                     }
                     if (File.Exists(path) && filesPatternProvider.DoesFileMatch(path))
                     {
-                        fileSystemEntryList.Add(new PowershellFileParser(path, false));
+                        fileSystemEntryList.Add(new PowershellFileParser(path, isDirectory: false));
                     }
                     else if (Directory.Exists(path))
                     {
@@ -131,13 +132,25 @@ namespace PsISEProjectExplorer.Services
             bool anyMatchingFilesInDir = this.FillFileListRecursively(path, result, filesPatternProvider);
             if (filesPatternProvider.IncludeAllFiles || anyMatchingFilesInDir || filesPatternProvider.IsInAdditonalPaths(path))
             {
-                result.Add(new PowershellFileParser(path, true));
+                result.Add(new PowershellFileParser(path, isDirectory: true));
             }
         }
 
         private bool FillFileListRecursively(string path, IList<PowershellFileParser> result, FilesPatternProvider filesPatternProvider)
         {
-            foreach (string dir in Directory.EnumerateDirectories(path))
+            IEnumerable<string> dirs = null;
+
+            try {
+                dirs = Directory.EnumerateDirectories(path);
+            } catch (Exception e) 
+            {
+                if (!this.IsReparsePoint(path))
+                {
+                    result.Add(new PowershellFileParser(path, isDirectory: true, errorMessage: e.Message));
+                }
+                return false;
+            }
+            foreach (string dir in dirs)
             {
                 if (!filesPatternProvider.DoesDirectoryMatch(dir))
                 {
@@ -146,16 +159,52 @@ namespace PsISEProjectExplorer.Services
                 var anyMatchingFilesInDir = this.FillFileListRecursively(dir, result, filesPatternProvider);
                 if (filesPatternProvider.IncludeAllFiles || anyMatchingFilesInDir || filesPatternProvider.IsInAdditonalPaths(dir))
                 {
-                    result.Add(new PowershellFileParser(dir, true));
+                    // ignore reparse points
+                    if (anyMatchingFilesInDir || !this.IsReparsePoint(dir))
+                    {
+                        result.Add(new PowershellFileParser(dir, isDirectory: true));
+                    }
                 }
             }
+            return this.AddFilesInDirectory(path, result, filesPatternProvider);
+            
+        }
 
-            var files = Directory.GetFiles(path, filesPatternProvider.GetFilesPattern());
+        private bool IsReparsePoint(string path)
+        {
+            try
+            {
+                return (File.GetAttributes(path) & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool AddFilesInDirectory(string path, IList<PowershellFileParser> result, FilesPatternProvider filesPatternProvider)
+        {
+            IEnumerable<string> files = null;
+            try
+            {
+                files = Directory.GetFiles(path, filesPatternProvider.GetFilesPattern());
+            }
+            catch (Exception e)
+            {
+                var entry = result.FirstOrDefault(pfp => pfp.Path == path);
+                if (entry == null)
+                {
+                    entry = new PowershellFileParser(path, isDirectory: true);
+                }
+                entry.ErrorMessage = e.Message;
+            }
+
             foreach (string file in files)
             {
-                result.Add(new PowershellFileParser(file, false));
+                result.Add(new PowershellFileParser(file, isDirectory: false));
             }
             return files.Any();
+
         }
 
     }

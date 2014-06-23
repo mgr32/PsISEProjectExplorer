@@ -1,6 +1,7 @@
 ﻿using Microsoft.PowerShell.Host.ISE;
 using NLog;
 using PsISEProjectExplorer.Model;
+using PsISEProjectExplorer.UI.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -48,7 +49,14 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         public void GoToFile(string filePath)
         {
-             this.HostObject.CurrentPowerShellTab.Files.Add(filePath);
+            try
+            {
+                this.HostObject.CurrentPowerShellTab.Files.Add(filePath);
+            }
+            catch (Exception e)
+            {
+                MessageBoxHelper.ShowError(String.Format("Cannot open file due to Powershell ISE error: '{0}'", e.Message));
+            }
         }
 
         public void ReopenFileAfterRename(string oldPath, string newPath)

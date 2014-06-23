@@ -6,8 +6,8 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
     {
         public override NodeType NodeType { get { return NodeType.Directory; } }
 
-        public DirectoryNode(string path, string name, INode parent)
-            : base(path, name, parent)
+        public DirectoryNode(string path, string name, INode parent, string errorMessage)
+            : base(path, name, parent, errorMessage == null, errorMessage)
         {
         }
     }

@@ -9,27 +9,22 @@ namespace PsISEProjectExplorer.Services
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public static string ReadFileAsString(string path) {
-            try
+        // note: exceptions not handled
+        public static string ReadFileAsString(string path) 
+        {
+            using (var fs = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
-                using (var fs = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+                using (var bs = new BufferedStream(fs))
                 {
-                    using (var bs = new BufferedStream(fs))
+                    using (var sr = new StreamReader(bs))
                     {
-                        using (var sr = new StreamReader(bs))
-                        {
-                            return sr.ReadToEnd();
-                        }
+                        return sr.ReadToEnd();
                     }
                 }
             }
-            catch (IOException)
-            {
-                Logger.Error("Cannot read file '" + path + "'");
-                return null;
-            }
         }
 
+        // note: exceptions handled and ignored (logged only)
         public static IEnumerable<LineInfo> ReadFileAsEnumerableWithWrap(string path, int startLine)
         {
             FileStream fs = null;
@@ -58,10 +53,13 @@ namespace PsISEProjectExplorer.Services
             int lineNum = 0;
             do 
             {
-                try {
+                try 
+                {
                     line = sr.ReadLine();
                     lineNum++;
-                } catch {
+                } 
+                catch 
+                {
                     Logger.Error("Cannot read from file '" + path + "'");
                     sr.Dispose();
                     bs.Dispose();
@@ -79,7 +77,8 @@ namespace PsISEProjectExplorer.Services
                         wrappedLines.Add(line);
                     }
                 }
-            } while (line != null);
+            } 
+            while (line != null);
             sr.Dispose();
             bs.Dispose();
             fs.Dispose();

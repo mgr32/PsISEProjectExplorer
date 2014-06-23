@@ -11,7 +11,7 @@
         <ResourceDictionary>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <DataTemplate x:Key="StandardTemplate">
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" ToolTip="{Binding Path=Tooltip}">
                     <Image Source="{Binding Path=Image}" />
                     <TextBlock Text="{Binding Path=Name}" Margin="5,0,0,0" />
                 </StackPanel>
