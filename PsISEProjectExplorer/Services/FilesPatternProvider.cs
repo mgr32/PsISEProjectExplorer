@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace PsISEProjectExplorer.Services
@@ -30,12 +31,12 @@ namespace PsISEProjectExplorer.Services
 
         public bool DoesFileMatch(string fileName)
         {
-            return (this.IncludeAllFiles || PowershellFilesRegex.IsMatch(fileName)) && !ExcludeRegex.IsMatch(fileName);
+            return (this.IncludeAllFiles || PowershellFilesRegex.IsMatch(fileName)) && !ExcludeRegex.IsMatch(fileName) && !IsReparsePointOrHiddenSystem(fileName);
         }
 
         public bool DoesDirectoryMatch(string dirName)
         {
-            return !ExcludeRegex.IsMatch(dirName);
+            return !ExcludeRegex.IsMatch(dirName) && !IsReparsePointOrHiddenSystem(dirName);
         }
 
         public string GetFilesPattern()
@@ -61,6 +62,21 @@ namespace PsISEProjectExplorer.Services
         public void ClearAdditionalPaths()
         {
             this.AdditionalPaths.Clear();
+        }
+
+        private bool IsReparsePointOrHiddenSystem(string path)
+        {
+            try
+            {
+                var attributes = File.GetAttributes(path);
+                return (attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint ||
+                    ((attributes & FileAttributes.Hidden) == FileAttributes.Hidden &&
+                     (attributes & FileAttributes.System) == FileAttributes.System);
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

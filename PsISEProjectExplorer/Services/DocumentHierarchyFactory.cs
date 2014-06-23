@@ -144,7 +144,7 @@ namespace PsISEProjectExplorer.Services
                 dirs = Directory.EnumerateDirectories(path);
             } catch (Exception e) 
             {
-                if (!this.IsReparsePoint(path))
+                if (filesPatternProvider.DoesDirectoryMatch(path))
                 {
                     result.Add(new PowershellFileParser(path, isDirectory: true, errorMessage: e.Message));
                 }
@@ -157,29 +157,12 @@ namespace PsISEProjectExplorer.Services
                     continue;
                 }
                 var anyMatchingFilesInDir = this.FillFileListRecursively(dir, result, filesPatternProvider);
-                if (filesPatternProvider.IncludeAllFiles || anyMatchingFilesInDir || filesPatternProvider.IsInAdditonalPaths(dir))
+                if (filesPatternProvider.DoesDirectoryMatch(dir) && (filesPatternProvider.IncludeAllFiles || anyMatchingFilesInDir || filesPatternProvider.IsInAdditonalPaths(dir)))
                 {
-                    // ignore reparse points
-                    if (anyMatchingFilesInDir || !this.IsReparsePoint(dir))
-                    {
-                        result.Add(new PowershellFileParser(dir, isDirectory: true));
-                    }
+                    result.Add(new PowershellFileParser(dir, isDirectory: true));
                 }
             }
             return this.AddFilesInDirectory(path, result, filesPatternProvider);
-            
-        }
-
-        private bool IsReparsePoint(string path)
-        {
-            try
-            {
-                return (File.GetAttributes(path) & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint;
-            }
-            catch
-            {
-                return false;
-            }
         }
 
         private bool AddFilesInDirectory(string path, IList<PowershellFileParser> result, FilesPatternProvider filesPatternProvider)
@@ -199,7 +182,7 @@ namespace PsISEProjectExplorer.Services
                 entry.ErrorMessage = e.Message;
             }
 
-            foreach (string file in files)
+            foreach (string file in files.Where(f => filesPatternProvider.DoesFileMatch(f)))
             {
                 result.Add(new PowershellFileParser(file, isDirectory: false));
             }
