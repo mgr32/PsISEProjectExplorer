@@ -11,9 +11,11 @@ using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.ViewModel;
 using System;
 using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace PsISEProjectExplorer
 {
@@ -49,6 +51,21 @@ namespace PsISEProjectExplorer
             this.MainViewModel.ActiveDocumentSyncEvent += OnActiveDocumentSyncEvent;
             this.DataContext = this.MainViewModel;
             InitializeComponent();
+            this.Dispatcher.UnhandledExceptionFilter += DispatchUnhandledExceptionFilterHandler;
+        }
+
+        private static void DispatchUnhandledExceptionFilterHandler(object sender, DispatcherUnhandledExceptionFilterEventArgs args)
+        {
+            Exception e = (Exception)args.Exception;
+            StringBuilder msg = new StringBuilder();
+            msg.AppendLine("An unhandled exception occurred in PsISEProjectExplorer: ");
+            msg.AppendLine(e.ToString());
+            msg.AppendLine();
+            var msgClipboard = msg.ToString();
+            msg.AppendLine("Please create an issue at https://github.com/mgr32/PsISEProjectExplorer describing context of your action and pasting information stored in the clipboard.");
+            Clipboard.SetText(msgClipboard.ToString());
+            MessageBoxHelper.ShowError(msg.ToString());
+            args.RequestCatch = false;
         }
 
         private void OnActiveDocumentSyncEvent(object sender, IseEventArgs args)
