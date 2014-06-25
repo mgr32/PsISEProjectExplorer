@@ -166,13 +166,18 @@ namespace PsISEProjectExplorer.UI.ViewModel
             set
             {
                 this.iseIntegrator = value;
+                this.IseFileReloader = new IseFileReloader(this.iseIntegrator);
                 this.TreeViewModel.IseIntegrator = this.iseIntegrator;
                 this.iseIntegrator.FileTabChanged += OnFileTabChanged;
                 this.RecalculateRootDirectory(true);
             }
         }
 
+        private IseFileReloader IseFileReloader { get; set; }
+
         private FilesPatternProvider FilesPatternProvider { get; set; }
+
+        private FileSystemChangeWatcher FileSystemChangeWatcher { get; set; }
 
         public MainViewModel()
         {
@@ -187,10 +192,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
             { 
                 this.rootDirectoryToSearch = null;
             }
-            this.TreeViewModel = new TreeViewModel();
+            this.FileSystemChangeWatcher = new FileSystemChangeWatcher(OnFileSystemChanged);
+            this.TreeViewModel = new TreeViewModel(this.FileSystemChangeWatcher);
             this.SearchOptions = new SearchOptions { IncludeAllParents = true, SearchField = searchField };
             this.DocumentHierarchyFactory = new DocumentHierarchyFactory();
-            FileSystemChangeNotifier.FileSystemChanged += OnFileSystemChanged;
         }
 
         public void GoToDefinition()

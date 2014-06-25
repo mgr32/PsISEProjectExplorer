@@ -80,6 +80,7 @@
     <Compile Include="Services\DocumentHierarchyIndexer.cs" />
     <Compile Include="Services\FileReader.cs" />
     <Compile Include="Services\FileSystemChangeNotifier.cs" />
+    <Compile Include="Services\FileSystemChangeWatcher.cs" />
     <Compile Include="Services\FileSystemOperationsService.cs" />
     <Compile Include="Services\PowershellFileParser.cs" />
     <Compile Include="Enums\FullTextFieldType.cs" />
@@ -102,6 +103,8 @@
     <Compile Include="UI\Helpers\TreeViewDropHighlighter.cs" />
     <Compile Include="UI\Helpers\TreeViewMouseHelper.cs" />
     <Compile Include="UI\IseIntegration\IseEventArgs.cs" />
+    <Compile Include="UI\IseIntegration\IseFileReloader.cs" />
+    <Compile Include="UI\IseIntegration\IseFileWatcher.cs" />
     <Compile Include="UI\IseIntegration\IseIntegrator.cs" />
     <Compile Include="UI\Ookii.Dialogs.Wpf\Interop\COMGuids.cs" />
     <Compile Include="UI\Ookii.Dialogs.Wpf\Interop\ErrorHelper.cs" />

@@ -4,7 +4,9 @@ using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.UI.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 
 namespace PsISEProjectExplorer.UI.IseIntegration
 {
@@ -27,6 +29,16 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             {
                 var file = this.HostObject.CurrentPowerShellTab.Files.SelectedFile;
                 return (file == null ? null : file.Editor.SelectedText);
+            }
+        }
+
+
+        public IEnumerable<string> OpenFiles
+        {
+            get
+            {
+                var files = this.HostObject.CurrentPowerShellTab.Files;
+                return files == null ? new List<string>() : files.Select(f => f.FullPath).ToList();
             }
         }
 
@@ -61,7 +73,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         public void ReopenFileAfterRename(string oldPath, string newPath)
         {
-            ISEFile file = this.FindFile(oldPath);
+            ISEFile file = this.GetIseFile(oldPath);
             if (file != null) 
             {
                 file.SaveAs(newPath);
@@ -150,6 +162,38 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             }
         }
 
+        public void CloseFile(string path)
+        {
+            var file = this.GetIseFile(path);
+            if (file != null)
+            {
+                try
+                {
+                    this.HostObject.CurrentPowerShellTab.Files.Remove(file);
+                }
+                catch (Exception e)
+                {
+                    MessageBoxHelper.ShowError(String.Format("Cannot close file '{0}': {1}", file.FullPath, e.Message));
+                }
+            }
+        }
+
+        public bool IsFileSaved(string path)
+        {
+            var file = this.GetIseFile(path);
+            return (file != null && file.IsSaved);
+        }
+
+        public void AttachFileCollectionChangedHandler(NotifyCollectionChangedEventHandler handler)
+        {
+            this.HostObject.CurrentPowerShellTab.Files.CollectionChanged += handler;
+            var openFiles = this.HostObject.CurrentPowerShellTab.Files;
+            if (openFiles.Any())
+            {
+                handler(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, openFiles));
+            }
+        }
+
         private void OnIseTabChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "LastEditorWithFocus")
@@ -161,20 +205,17 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                         this.FileTabChanged(this, new IseEventArgs()); 
                     }
                 }
-                
             }
         }
 
-        private ISEFile FindFile(string path)
+        private ISEFile GetIseFile(string path)
         {
-            foreach (ISEFile file in this.HostObject.CurrentPowerShellTab.Files)
+            if (this.HostObject.CurrentPowerShellTab == null || this.HostObject.CurrentPowerShellTab.Files == null)
             {
-                if (file.FullPath.Equals(path, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return file;
-                }
+                return null;
             }
-            return null;
+            return this.HostObject.CurrentPowerShellTab.Files.FirstOrDefault(f => f.FullPath.Equals(path, StringComparison.InvariantCultureIgnoreCase));
         }
+
     }
 }

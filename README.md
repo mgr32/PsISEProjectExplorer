@@ -55,6 +55,22 @@ Uses a configuration file PsISEProjectExplorer.config stored next to PsISEProjec
 
 To modify keyboard shortcuts, edit PsISEProjectExplorer.psm1 file.
 
+##### How to build
+
+* Open PsISEProjectExplorer.sln.
+* Select 'Release' configuration.
+* Build Solution (F7).
+
+It will create output in bin\Release directory.
+
+##### How to debug
+
+* Ensure you don't have PsISEProjectExplorer module in your profile directory (see Debug_LoadToIse.bat).
+* Open PsISEProjectExplorer.sln.
+* Select 'Debug' configuration.
+* Start Debugging (F5). It will run Powershell ISE with Debug_LoadToIse.ps1 opened.
+* Run Debug_LoadToIse.ps1 in Powershell ISE (F5). It will start PsISEProjectExplorer in debug mode.
+
 ##### Third party libraries
 * <a href="https://lucenenet.apache.org">Apache Lucene .Net 3.0.3</a> (<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>)
 * <a href="http://nlog-project.org">NLog 2.1</a> (<a href="https://github.com/NLog/NLog/blob/master/LICENSE.txt">BSD license</a>)

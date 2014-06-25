@@ -32,12 +32,19 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public string PathOfItemToSelectOnRefresh { get; set; }
 
+        private FileSystemChangeWatcher FileSystemChangeWatcher { get; set; }
+
+        public TreeViewModel(FileSystemChangeWatcher fileSystemChangeWatcher)
+        {
+            this.FileSystemChangeWatcher = fileSystemChangeWatcher;
+        }
+
         public void RefreshFromRoot(INode newDocumentHierarchyRoot, bool expandAllNodes, FilesPatternProvider filesPatternProvider)
         {
             if (newDocumentHierarchyRoot == null)
             {
                 this.SetNewRootItem(null);
-                FileSystemChangeNotifier.Watch(null, filesPatternProvider);
+                this.FileSystemChangeWatcher.Watch(null, filesPatternProvider);
                 return;
             }
 
@@ -45,7 +52,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 var newRootItem = new TreeViewEntryItemModel(newDocumentHierarchyRoot, null, false);
                 this.SetNewRootItem(newRootItem);
-                FileSystemChangeNotifier.Watch(newRootItem.Node.Path, filesPatternProvider);
+                this.FileSystemChangeWatcher.Watch(newRootItem.Node.Path, filesPatternProvider);
             }
             lock (newDocumentHierarchyRoot)
             {
