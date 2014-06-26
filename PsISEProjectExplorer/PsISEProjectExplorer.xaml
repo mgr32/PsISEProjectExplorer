@@ -10,6 +10,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <uiHelpers:EmptyListToVisibilityConverter x:Key="EmptyListToVisibilityConverter"/>
             <DataTemplate x:Key="StandardTemplate">
                 <StackPanel Orientation="Horizontal" ToolTip="{Binding Path=Tooltip}">
                     <Image Source="{Binding Path=Image}" />
@@ -27,8 +28,15 @@
         
     </UserControl.Resources>
     <Grid d:DataContext="{d:DesignInstance viewModel:MainViewModel}">
-        <TextBlock HorizontalAlignment="Stretch" Margin="10,5,66,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Text="{Binding Path=RootDirectoryLabel}" VerticalAlignment="Top" />
-        <Button Content="Change" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Top" Width="51" Click="ChangeWorkspace_Click"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,5,0,0" TextWrapping="NoWrap" Text="Workspace:" VerticalAlignment="Top"
+                   Visibility="{Binding Path=WorkspaceDirectoryModel.WorkspaceDirectories, Converter={StaticResource EmptyListToVisibilityConverter}}" />
+        <ComboBox HorizontalAlignment="Stretch" Margin="72,1,66,0" ItemsSource="{Binding Path=WorkspaceDirectoryModel.WorkspaceDirectories}" 
+                  SelectedValue="{Binding Path=WorkspaceDirectoryModel.CurrentWorkspaceDirectory}" VerticalAlignment="Top" MaxDropDownHeight="Auto"
+                  Visibility="{Binding Path=WorkspaceDirectoryModel.WorkspaceDirectories, Converter={StaticResource EmptyListToVisibilityConverter}}" />
+        <TextBlock HorizontalAlignment="Stretch" Margin="10,5,66,0" Text="[Please open a Powershell file or click 'Change' button]"
+                  VerticalAlignment="Top" 
+                  Visibility="{Binding Path=WorkspaceDirectoryModel.WorkspaceDirectories, Converter={StaticResource EmptyListToVisibilityConverter}, ConverterParameter=VisibleOnEmpty}"/>
+        <Button Content="Change" HorizontalAlignment="Right" Margin="0,1,10,0" VerticalAlignment="Top" Width="51" Click="ChangeWorkspace_Click"/>
         <TextBox Name="TextBoxSearchText" HorizontalAlignment="Stretch" Height="21" Margin="10,25,36,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged, Delay=150}" MaxLength="100"
                  x:FieldModifier="private" />
         <Button VerticalAlignment="Top" Height="21" Margin="10,25,10,0" HorizontalAlignment="Right" Click="TextBoxSearchClear_Click">
@@ -47,13 +55,31 @@
             <Button Margin="0,0,4,0" Click="RefreshDirectoryStructure_Click">
                 <Image Source="Resources\toolbar_refresh.png" ToolTip="Refresh Directory Structure" />
             </Button>
-            <ToggleButton IsChecked="{Binding Path=AutoUpdateRootDirectory}">
-                <Image Source="Resources\toolbar_autoUpdateProjectDir.png" ToolTip="Auto-update Project Root"/>
+            <ToggleButton IsChecked="{Binding Path=WorkspaceDirectoryModel.AutoUpdateRootDirectory}">
+                <Image Source="Resources\toolbar_autoUpdateProjectDir.png" ToolTip="Auto-update Workspace Directory"/>
             </ToggleButton>
         </StackPanel>
         <TextBlock HorizontalAlignment="Left" Margin="10,54,0,5" TextWrapping="Wrap" Text="Indexing..." VerticalAlignment="Top" Width="70" Visibility="{Binding Path=IndexingInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,75,10,10" TextWrapping="Wrap" Text="No files to show. Please enable 'Show All Files' or change workspace directory." VerticalAlignment="Top">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=TreeViewModel.TreeViewItems, Converter={StaticResource EmptyListToVisibilityConverter}}" Value="Collapsed" />
+                                <Condition Binding="{Binding Path=IndexingInProgress}" Value="false" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+                   
         <uiHelpers:StretchingTreeView x:Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewModel.TreeViewItems}" PreviewMouseLeftButtonDown="SearchResults_PreviewMouseLeftButtonDown" PreviewMouseRightButtonDown="SearchResults_PreviewMouseRightButtonDown"
-                   x:FieldModifier="private" PreviewMouseMove="SearchResults_PreviewMouseMove" Drop="SearchResults_Drop" DragEnter="SearchResults_DragEnter" AllowDrop="True" KeyDown="SearchResults_KeyDown">
+                   x:FieldModifier="private" PreviewMouseMove="SearchResults_PreviewMouseMove" Drop="SearchResults_Drop" DragEnter="SearchResults_DragEnter" AllowDrop="True" KeyDown="SearchResults_KeyDown"
+                   Visibility="{Binding Path=TreeViewModel.TreeViewItems, Converter={StaticResource EmptyListToVisibilityConverter}}">
             <TreeView.Resources>
                 <ContextMenu x:Key="DirectoryContext" Opened="SearchResults_ContextMenuOpened" Closed="SearchResults_ContextMenuClosed">
                     <MenuItem Header="Open in Explorer" Click="SearchResults_OpenInExplorer">

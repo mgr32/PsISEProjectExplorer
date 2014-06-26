@@ -97,6 +97,7 @@
     <Compile Include="Enums\NodeType.cs" />
     <Compile Include="Services\PowershellTokenizer.cs" />
     <Compile Include="Services\TokenLocator.cs" />
+    <Compile Include="UI\Helpers\EmptyListToVisibilityConverter.cs" />
     <Compile Include="UI\Helpers\FocusExtensions.cs" />
     <Compile Include="UI\Helpers\MessageBoxHelper.cs" />
     <Compile Include="UI\Helpers\StretchingTreeView.cs" />
@@ -119,6 +120,7 @@
     <Compile Include="UI\ViewModel\TreeViewEntryItemObservableSet.cs" />
     <Compile Include="UI\Helpers\TreeViewHelper.cs" />
     <Compile Include="UI\ViewModel\TreeViewModel.cs" />
+    <Compile Include="UI\ViewModel\WorkspaceDirectoryModel.cs" />
     <Compile Include="UI\Workers\BackgroundIndexer.cs">
       <SubType>Component</SubType>
     </Compile>

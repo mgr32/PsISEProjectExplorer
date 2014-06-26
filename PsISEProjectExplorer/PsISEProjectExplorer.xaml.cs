@@ -135,8 +135,8 @@ namespace PsISEProjectExplorer
         {
             var dialog = new VistaFolderBrowserDialog
             {
-                SelectedPath = this.MainViewModel.RootDirectoryToSearch,
-                Description = "Please select the new project root folder.",
+                SelectedPath = this.MainViewModel.WorkspaceDirectoryModel.CurrentWorkspaceDirectory,
+                Description = "Please select the new workspace folder.",
                 UseDescriptionForTitle = true
             };
             bool? dialogResult = dialog.ShowDialog();
@@ -148,14 +148,15 @@ namespace PsISEProjectExplorer
                 }
                 else
                 {
-                    this.MainViewModel.ChangeRootDirectory(dialog.SelectedPath);
+                    this.MainViewModel.WorkspaceDirectoryModel.SetWorkspaceDirectory(dialog.SelectedPath);
+                    this.MainViewModel.WorkspaceDirectoryModel.AutoUpdateRootDirectory = false;
                 }
             }
         }
 
         private void RefreshDirectoryStructure_Click(object sender, RoutedEventArgs e)
         {
-            this.MainViewModel.RecalculateRootDirectory(true);
+            this.MainViewModel.ReindexSearchTree(null);
         }
 
         private void ConfigureLogging()
@@ -386,7 +387,7 @@ namespace PsISEProjectExplorer
                         return;
                     }
                 }
-                string destPath = dropTarget != null ? dropTarget.Path : this.MainViewModel.RootDirectoryToSearch;
+                string destPath = dropTarget != null ? dropTarget.Path : this.MainViewModel.WorkspaceDirectoryModel.CurrentWorkspaceDirectory;
                 if (item != dropTarget && MessageBoxHelper.ShowConfirmMessage(
                         String.Format("Please confirm you want to move '{0}' to '{1}'.", item.Path, destPath)))
                 {
