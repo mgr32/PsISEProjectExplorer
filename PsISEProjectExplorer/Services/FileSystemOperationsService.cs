@@ -65,6 +65,11 @@ namespace PsISEProjectExplorer.Services
 
         public static bool IsSubdirectory(string rootDir, string potentialSubDir)
         {
+            if (String.IsNullOrEmpty(rootDir) == null || String.IsNullOrEmpty(potentialSubDir) == null)
+            {
+                return false;
+            }
+
             DirectoryInfo root = new DirectoryInfo(rootDir);
             DirectoryInfo sub = new DirectoryInfo(potentialSubDir);
             while (sub.Parent != null)
