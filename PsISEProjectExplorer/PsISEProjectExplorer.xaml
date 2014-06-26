@@ -56,6 +56,12 @@
                    x:FieldModifier="private" PreviewMouseMove="SearchResults_PreviewMouseMove" Drop="SearchResults_Drop" DragEnter="SearchResults_DragEnter" AllowDrop="True" KeyDown="SearchResults_KeyDown">
             <TreeView.Resources>
                 <ContextMenu x:Key="DirectoryContext" Opened="SearchResults_ContextMenuOpened" Closed="SearchResults_ContextMenuClosed">
+                    <MenuItem Header="Open in Explorer" Click="SearchResults_OpenInExplorer">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/directory.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
                     <MenuItem Header="Add">
                         <MenuItem.Icon>
                             <Image Source="Resources/add.png" />
@@ -83,6 +89,12 @@
                     </MenuItem>
                 </ContextMenu>
                 <ContextMenu x:Key="FileContext" Opened="SearchResults_ContextMenuOpened" Closed="SearchResults_ContextMenuClosed">
+                    <MenuItem Header="Open in Explorer" Click="SearchResults_OpenInExplorer">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/directory.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
                     <MenuItem Header="Rename" Click="SearchResults_Rename" InputGestureText="F2">
                         <MenuItem.Icon>
                             <Image Source="Resources/textfield_rename.png" />

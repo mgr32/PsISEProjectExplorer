@@ -10,6 +10,7 @@ using PsISEProjectExplorer.UI.Helpers;
 using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.ViewModel;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -405,6 +406,36 @@ namespace PsISEProjectExplorer
         private void SearchResults_ContextMenuOpened(object sender, RoutedEventArgs e)
         {
             this.IsContextMenuOpened = true;
+        }
+
+        private void SearchResults_OpenInExplorer(object sender, RoutedEventArgs e)
+        {
+            string pathToOpen = null;
+            try
+            {
+                var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
+                if (item == null)
+                {
+                    return;
+                }
+                if (item.NodeType == NodeType.Directory)
+                {
+                    pathToOpen = item.Path;
+                }
+                else if (item.NodeType == NodeType.File)
+                {
+                    pathToOpen = Path.GetDirectoryName(item.Path);
+                }
+                else
+                {
+                    return;
+                }
+                Process.Start(pathToOpen);
+            }
+            catch (Exception ex)
+            {
+                MessageBoxHelper.ShowError(String.Format("Cannot open path: '{0}' - {1}.", pathToOpen, ex.Message));
+            }
         }
 
    }
