@@ -386,7 +386,12 @@ namespace PsISEProjectExplorer
                         return;
                     }
                 }
-                this.MainViewModel.MoveTreeItem(item, dropTarget);
+                string destPath = dropTarget != null ? dropTarget.Path : this.MainViewModel.RootDirectoryToSearch;
+                if (MessageBoxHelper.ShowConfirmMessage(
+                        String.Format("Please confirm you want to move '{0}' to '{1}'.", item.Path, destPath)))
+                {
+                    this.MainViewModel.MoveTreeItem(item, dropTarget);
+                }
             }
         }
 
@@ -410,31 +415,26 @@ namespace PsISEProjectExplorer
 
         private void SearchResults_OpenInExplorer(object sender, RoutedEventArgs e)
         {
-            string pathToOpen = null;
+            var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
+            if (item == null)
+            {
+                return;
+            }
             try
             {
-                var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
-                if (item == null)
-                {
-                    return;
-                }
                 if (item.NodeType == NodeType.Directory)
                 {
-                    pathToOpen = item.Path;
+                    Process.Start(item.Path);
                 }
                 else if (item.NodeType == NodeType.File)
                 {
-                    pathToOpen = Path.GetDirectoryName(item.Path);
+                    Process.Start("explorer.exe", "/select, \"" + item.Path + "\"");
                 }
-                else
-                {
-                    return;
-                }
-                Process.Start(pathToOpen);
+                
             }
             catch (Exception ex)
             {
-                MessageBoxHelper.ShowError(String.Format("Cannot open path: '{0}' - {1}.", pathToOpen, ex.Message));
+                MessageBoxHelper.ShowError(String.Format("Cannot open path: '{0}' - {1}.", item.Path, ex.Message));
             }
         }
 
