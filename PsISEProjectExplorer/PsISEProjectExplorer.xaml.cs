@@ -387,7 +387,7 @@ namespace PsISEProjectExplorer
                     }
                 }
                 string destPath = dropTarget != null ? dropTarget.Path : this.MainViewModel.RootDirectoryToSearch;
-                if (MessageBoxHelper.ShowConfirmMessage(
+                if (item != dropTarget && MessageBoxHelper.ShowConfirmMessage(
                         String.Format("Please confirm you want to move '{0}' to '{1}'.", item.Path, destPath)))
                 {
                     this.MainViewModel.MoveTreeItem(item, dropTarget);
