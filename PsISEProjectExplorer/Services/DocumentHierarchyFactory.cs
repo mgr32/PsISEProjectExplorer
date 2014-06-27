@@ -4,6 +4,7 @@ using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -22,15 +23,14 @@ namespace PsISEProjectExplorer.Services
             }
         }
 
-        public DocumentHierarchySearcher CreateDocumentHierarchy(string path, FilesPatternProvider filesPatternProvider)
+        public DocumentHierarchySearcher CreateDocumentHierarchySearcher(string path)
         {
             if (string.IsNullOrEmpty(path))
             {
                 return null;
             }
             this.DocumentHierarchy = new DocumentHierarchy(new RootNode(path));
-            this.UpdateDocumentHierarchy(new List<string> { path }, filesPatternProvider);
-            return new DocumentHierarchySearcher(this.DocumentHierarchy);
+            return new DocumentHierarchySearcher(this.DocumentHierarchy);           
         }
 
         public INode CreateTemporaryNode(INode parent, NodeType nodeType)
@@ -85,14 +85,16 @@ namespace PsISEProjectExplorer.Services
             }
         }
 
-        public DocumentHierarchySearcher UpdateDocumentHierarchy(IEnumerable<string> pathsToUpdate, FilesPatternProvider filesPatternProvider)
+        public bool UpdateDocumentHierarchy(IEnumerable<string> pathsToUpdate, FilesPatternProvider filesPatternProvider, BackgroundWorker worker)
         {
+            if (this.DocumentHierarchy == null)
+            {
+                return false;
+            }
             lock (this.DocumentHierarchy.RootNode)
             {
                 var documentHierarchyIndexer = new DocumentHierarchyIndexer(this.DocumentHierarchy);
-                IList<PowershellFileParser> fileSystemEntryList = new List<PowershellFileParser>();
                 bool changed = false;
-
                 foreach (string path in pathsToUpdate)
                 {
                     INode node = this.DocumentHierarchy.GetNode(path);
@@ -101,42 +103,87 @@ namespace PsISEProjectExplorer.Services
                         this.DocumentHierarchy.RemoveNode(node);
                         changed = true;
                     }
-                    if (File.Exists(path) && filesPatternProvider.DoesFileMatch(path))
+                    var fileSystemEntryList = this.GetFileList(path, filesPatternProvider, worker);
+                    foreach (PowershellFileParser fileSystemEntry in fileSystemEntryList)
                     {
-                        fileSystemEntryList.Add(new PowershellFileParser(path, isDirectory: false));
-                    }
-                    else if (Directory.Exists(path))
-                    {
-                        this.FillFileListRecursivelyRoot(path, fileSystemEntryList, filesPatternProvider);
-                    }
+                        documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
+                        changed = true;
+                    }    
                 }
-
-                foreach (PowershellFileParser fileSystemEntry in fileSystemEntryList)
-                {
-                    documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
-                }
-                if (fileSystemEntryList.Any())
-                {
-                    changed = true;
-                }
-                return changed ? new DocumentHierarchySearcher(this.DocumentHierarchy) : null;
+                return changed;
             }
         }
 
-        private void FillFileListRecursivelyRoot(string path, IList<PowershellFileParser> result, FilesPatternProvider filesPatternProvider)
+        private void ReportProgress(BackgroundWorker worker, string path)
+        {
+            if (worker.CancellationPending)
+            {
+                throw new OperationCanceledException();
+            }
+            worker.ReportProgress(0, path);
+        }
+
+        private IEnumerable<PowershellFileParser> GetFileList(string path, FilesPatternProvider filesPatternProvider, BackgroundWorker worker)
+        {
+            PowershellFileParser parser = null;
+            Queue<string> pathsToEnumerate = new Queue<string>();
+
+            if (File.Exists(path) && filesPatternProvider.DoesFileMatch(path))
+            {
+                parser = new PowershellFileParser(path, isDirectory: false);
+                yield return parser;
+            }
+            if (!Directory.Exists(path) || !filesPatternProvider.DoesDirectoryMatch(path))
+            {
+                yield break;
+            }
+            pathsToEnumerate.Enqueue(path);
+            while (pathsToEnumerate.Any())
+            {
+                IEnumerable<string> dirs = null;
+                parser = null;
+                string currentPath = pathsToEnumerate.Dequeue();
+
+                this.ReportProgress(worker, currentPath);
+
+                foreach (var file in this.GetFilesInDirectory(currentPath, filesPatternProvider))
+                {
+                    yield return file;
+                }
+
+                try {
+                    dirs = Directory.EnumerateDirectories(currentPath).Where(dir => filesPatternProvider.DoesDirectoryMatch(dir));
+                } catch (Exception e) 
+                {
+                    parser = new PowershellFileParser(currentPath, isDirectory: true, errorMessage: e.Message);
+                }
+                if (parser != null)
+                {
+                    yield return parser;
+                    continue;
+                }
+                foreach (string dir in dirs)
+                {
+                    pathsToEnumerate.Enqueue(dir);
+                }
+            } while (pathsToEnumerate.Any());
+        }
+
+    /*
+        private void FillFileListRecursivelyRoot(string path, IList<PowershellFileParser> result, FilesPatternProvider filesPatternProvider, BackgroundWorker worker)
         {
             if (!filesPatternProvider.DoesDirectoryMatch(path))
             {
                 return;
             }
-            bool anyMatchingFilesInDir = this.FillFileListRecursively(path, result, filesPatternProvider);
+            bool anyMatchingFilesInDir = this.FillFileListRecursively(path, result, filesPatternProvider, worker);
             if (filesPatternProvider.IncludeAllFiles || anyMatchingFilesInDir || filesPatternProvider.IsInAdditonalPaths(path))
             {
                 result.Add(new PowershellFileParser(path, isDirectory: true));
             }
         }
 
-        private bool FillFileListRecursively(string path, IList<PowershellFileParser> result, FilesPatternProvider filesPatternProvider)
+        private bool FillFileListRecursively(string path, IList<PowershellFileParser> result, FilesPatternProvider filesPatternProvider, BackgroundWorker worker)
         {
             IEnumerable<string> dirs = null;
 
@@ -150,45 +197,51 @@ namespace PsISEProjectExplorer.Services
                 }
                 return false;
             }
+
+            this.ReportProgress(worker, new IndexingProgressInfo(IndexingProgressInfo.ProgressType.EnumeratingFiles, path));
+            bool anyMatchingFiles = this.AddFilesInDirectory(path, result, filesPatternProvider);
+            
             foreach (string dir in dirs)
             {
                 if (!filesPatternProvider.DoesDirectoryMatch(dir))
                 {
                     continue;
                 }
-                var anyMatchingFilesInDir = this.FillFileListRecursively(dir, result, filesPatternProvider);
+                this.ReportProgress(worker, new IndexingProgressInfo(IndexingProgressInfo.ProgressType.EnumeratingDirectories, dir));
+                var anyMatchingFilesInDir = this.FillFileListRecursively(dir, result, filesPatternProvider, worker);
                 if (filesPatternProvider.DoesDirectoryMatch(dir) && (filesPatternProvider.IncludeAllFiles || anyMatchingFilesInDir || filesPatternProvider.IsInAdditonalPaths(dir)))
                 {
                     result.Add(new PowershellFileParser(dir, isDirectory: true));
                 }
             }
-            return this.AddFilesInDirectory(path, result, filesPatternProvider);
-        }
 
-        private bool AddFilesInDirectory(string path, IList<PowershellFileParser> result, FilesPatternProvider filesPatternProvider)
+            return anyMatchingFiles;
+        }
+    */
+        private IEnumerable<PowershellFileParser> GetFilesInDirectory(string path, FilesPatternProvider filesPatternProvider)
         {
             IEnumerable<string> files = null;
+            PowershellFileParser parser = null;
             try
             {
-                files = Directory.GetFiles(path, filesPatternProvider.GetFilesPattern());
+                files = Directory.GetFiles(path, filesPatternProvider.GetFilesPattern()).Where(f => filesPatternProvider.DoesFileMatch(f));
             }
             catch (Exception e)
             {
-                var entry = result.FirstOrDefault(pfp => pfp.Path == path);
-                if (entry == null)
-                {
-                    entry = new PowershellFileParser(path, isDirectory: true);
-                }
-                entry.ErrorMessage = e.Message;
+                parser = new PowershellFileParser(path, isDirectory: true, errorMessage: e.Message);
             }
 
-            foreach (string file in files.Where(f => filesPatternProvider.DoesFileMatch(f)))
+            if (parser != null)
             {
-                result.Add(new PowershellFileParser(file, isDirectory: false));
+                yield return parser;
+                yield break;
             }
-            return files.Any();
 
+            foreach (string file in files)
+            {
+                parser = new PowershellFileParser(file, isDirectory: false);
+                yield return parser;
+            }
         }
-
     }
 }

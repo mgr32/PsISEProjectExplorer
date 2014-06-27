@@ -59,8 +59,8 @@
                 <Image Source="Resources\toolbar_autoUpdateProjectDir.png" ToolTip="Auto-update Workspace Directory"/>
             </ToggleButton>
         </StackPanel>
-        <TextBlock HorizontalAlignment="Left" Margin="10,54,0,5" TextWrapping="Wrap" Text="Indexing..." VerticalAlignment="Top" Width="70" Visibility="{Binding Path=IndexingInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <TextBlock HorizontalAlignment="Left" Margin="10,75,10,10" TextWrapping="Wrap" Text="No files to show. Please enable 'Show All Files' or change workspace directory." VerticalAlignment="Top">
+        <TextBlock HorizontalAlignment="Left" Margin="10,54,0,5" TextWrapping="Wrap" Text="Indexing..." VerticalAlignment="Top" Width="70" Visibility="{Binding Path=IndexingSearchingModel.IndexingInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,75,10,10" TextWrapping="Wrap" Text="{Binding Path=NoTreeItemsString}" VerticalAlignment="Top">
             <TextBlock.Style>
                 <Style TargetType="TextBlock">
                     <Setter Property="Visibility" Value="Collapsed" />
@@ -68,7 +68,7 @@
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding Path=TreeViewModel.TreeViewItems, Converter={StaticResource EmptyListToVisibilityConverter}}" Value="Collapsed" />
-                                <Condition Binding="{Binding Path=IndexingInProgress}" Value="false" />
+                                <Condition Binding="{Binding Path=IsTreeViewReady}" Value="true" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Visibility" Value="Visible" />
                         </MultiDataTrigger>

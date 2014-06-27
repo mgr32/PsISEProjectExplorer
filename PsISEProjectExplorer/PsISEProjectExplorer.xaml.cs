@@ -156,7 +156,7 @@ namespace PsISEProjectExplorer
 
         private void RefreshDirectoryStructure_Click(object sender, RoutedEventArgs e)
         {
-            this.MainViewModel.ReindexSearchTree(null);
+            this.MainViewModel.ReindexSearchTree();
         }
 
         private void ConfigureLogging()

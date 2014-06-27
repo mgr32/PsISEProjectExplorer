@@ -116,6 +116,7 @@
     <Compile Include="UI\Ookii.Dialogs.Wpf\VistaFolderBrowserDialog.cs" />
     <Compile Include="UI\ViewModel\BaseViewModel.cs" />
     <Compile Include="UI\ViewModel\DefaultTreeViewEntryItemComparer.cs" />
+    <Compile Include="UI\ViewModel\IndexingSearchingModel.cs" />
     <Compile Include="UI\ViewModel\MainViewModel.cs" />
     <Compile Include="UI\ViewModel\TreeViewEntryItemObservableSet.cs" />
     <Compile Include="UI\Helpers\TreeViewHelper.cs" />
@@ -133,7 +134,8 @@
     <Compile Include="Model\DocHierarchy\Nodes\AbstractNode.cs" />
     <Compile Include="FullText\FullTextDirectory.cs" />
     <Compile Include="UI\Workers\BackgroundSearcherParams.cs" />
-    <Compile Include="UI\Workers\WorkerResult.cs" />
+    <Compile Include="UI\Workers\SearcherResult.cs" />
+    <Compile Include="UI\Workers\IndexerResult.cs" />
     <Page Include="PsISEProjectExplorer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

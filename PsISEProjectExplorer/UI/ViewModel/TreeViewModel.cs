@@ -28,7 +28,21 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public IseIntegrator IseIntegrator { private get; set; }
 
-        public TreeViewEntryItemModel RootTreeViewEntryItem { get; private set; }
+        private TreeViewEntryItemModel rootTreeViewEntryItem;
+
+        public TreeViewEntryItemModel RootTreeViewEntryItem
+        {
+            get
+            {
+                return this.rootTreeViewEntryItem;
+            }
+            private set
+            {
+                this.rootTreeViewEntryItem = value;
+                this.OnPropertyChanged();
+                this.OnPropertyChanged("TreeViewItems");
+            }
+        }
 
         public string PathOfItemToSelectOnRefresh { get; set; }
 
@@ -39,19 +53,24 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.FileSystemChangeWatcher = fileSystemChangeWatcher;
         }
 
+        public void Clear()
+        {
+            this.RootTreeViewEntryItem = null;
+            this.FileSystemChangeWatcher.StopWatching();
+        }
+
         public void RefreshFromRoot(INode newDocumentHierarchyRoot, bool expandAllNodes, FilesPatternProvider filesPatternProvider)
         {
             if (newDocumentHierarchyRoot == null)
             {
-                this.SetNewRootItem(null);
-                this.FileSystemChangeWatcher.Watch(null, filesPatternProvider);
+                this.Clear();
                 return;
             }
 
             if (this.RootTreeViewEntryItem == null || !this.RootTreeViewEntryItem.Node.Equals(newDocumentHierarchyRoot))
             {
                 var newRootItem = new TreeViewEntryItemModel(newDocumentHierarchyRoot, null, false);
-                this.SetNewRootItem(newRootItem);
+                this.RootTreeViewEntryItem = newRootItem;
                 this.FileSystemChangeWatcher.Watch(newRootItem.Node.Path, filesPatternProvider);
             }
             lock (newDocumentHierarchyRoot)
@@ -81,11 +100,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 }
             }
             return null;
-        }
-
-        private void SetNewRootItem(TreeViewEntryItemModel rootItem)
-        {
-            this.RootTreeViewEntryItem = rootItem;
         }
 
         private void RefreshFromIntermediateNode(INode node, TreeViewEntryItemModel treeViewEntryItem, bool expandAllNodes)

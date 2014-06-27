@@ -14,10 +14,11 @@ namespace PsISEProjectExplorer.UI.Workers
         public BackgroundSearcher()
         {
             this.StartTimestamp = DateTime.Now;
-            this.DoWork += RunIndexing;
+            this.DoWork += RunSearching;
+            this.WorkerSupportsCancellation = true;
         }
 
-        private void RunIndexing(object sender, DoWorkEventArgs e)
+        private void RunSearching(object sender, DoWorkEventArgs e)
         {
             var indexerParams = (BackgroundSearcherParams)e.Argument;
             if (indexerParams.DocumentHierarchySearcher == null) 
@@ -26,8 +27,15 @@ namespace PsISEProjectExplorer.UI.Workers
                 return;
             }
             Logger.Info("Searching started, text: " + indexerParams.SearchText);
-            INode result = indexerParams.DocumentHierarchySearcher.GetFilteredDocumentHierarchyNodes(indexerParams.SearchText, indexerParams.SearchOptions);
-            e.Result = new WorkerResult(this.StartTimestamp, result);
+            try
+            {
+                INode result = indexerParams.DocumentHierarchySearcher.GetFilteredDocumentHierarchyNodes(indexerParams.SearchText, indexerParams.SearchOptions, this);
+                e.Result = new SearcherResult(this.StartTimestamp, result);
+            }
+            catch (OperationCanceledException)
+            {
+                e.Cancel = true;
+            }
         }
     }
 

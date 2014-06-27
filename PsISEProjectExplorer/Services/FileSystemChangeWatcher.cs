@@ -25,6 +25,16 @@ namespace PsISEProjectExplorer.Services
             this.Watcher = new FileSystemWatcher();
         }
 
+        public void StopWatching()
+        {
+            lock (FileSystemChangeNotifier)
+            {
+                this.Watcher.EnableRaisingEvents = false;
+                this.FileSystemChangeNotifier.ClearChangePool();
+                this.RootPath = null;
+            }
+        }
+
         public void Watch(string path, FilesPatternProvider filesPatternProvider)
         {
             lock (FileSystemChangeNotifier)

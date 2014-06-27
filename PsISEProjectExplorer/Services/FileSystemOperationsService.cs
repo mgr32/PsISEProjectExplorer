@@ -65,7 +65,7 @@ namespace PsISEProjectExplorer.Services
 
         public static bool IsSubdirectory(string rootDir, string potentialSubDir)
         {
-            if (String.IsNullOrEmpty(rootDir) == null || String.IsNullOrEmpty(potentialSubDir) == null)
+            if (String.IsNullOrEmpty(rootDir) || String.IsNullOrEmpty(potentialSubDir))
             {
                 return false;
             }

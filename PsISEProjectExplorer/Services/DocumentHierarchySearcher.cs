@@ -4,6 +4,7 @@ using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace PsISEProjectExplorer.Services
@@ -17,7 +18,7 @@ namespace PsISEProjectExplorer.Services
             this.DocumentHierarchy = documentHierarchy;
         }
 
-        public INode GetFilteredDocumentHierarchyNodes(string filter, SearchOptions searchOptions)
+        public INode GetFilteredDocumentHierarchyNodes(string filter, SearchOptions searchOptions, BackgroundWorker worker)
         {
             if (this.DocumentHierarchy == null)
             {
@@ -35,13 +36,14 @@ namespace PsISEProjectExplorer.Services
                     .SearchNodesFullText(filter, searchOptions.SearchField)
                     .Select(result => result.Node)
                     .ToList();
+                this.ReportProgress(worker);
                 if (searchOptions.IncludeAllParents)
                 {
-                    this.FillNewFilteredDocumentHierarchyRecursively(nodes, newRoot, this.DocumentHierarchy.RootNode);
+                    this.FillNewFilteredDocumentHierarchyRecursively(nodes, newRoot, this.DocumentHierarchy.RootNode, worker);
                 }
                 else
                 {
-                    this.FillNewDocumentHierarchyRecursively(nodes, newRoot);
+                    this.FillNewDocumentHierarchyRecursively(nodes, newRoot, worker);
                 }
 
                 return newRoot;
@@ -63,19 +65,20 @@ namespace PsISEProjectExplorer.Services
             }
         }
 
-        private void FillNewDocumentHierarchyRecursively(IEnumerable<INode> filteredNodes, INode newParent) 
+        private void FillNewDocumentHierarchyRecursively(IEnumerable<INode> filteredNodes, INode newParent, BackgroundWorker worker) 
         {
             foreach (INode node in filteredNodes)
             {
                 var newNode = new ViewNode(node, newParent);
                 if (node.Children.Any())
                 {
-                    this.FillNewDocumentHierarchyRecursively(node.Children, newNode);
+                    this.FillNewDocumentHierarchyRecursively(node.Children, newNode, worker);
                 }
             }
+            this.ReportProgress(worker);
         }
 
-        private void FillNewFilteredDocumentHierarchyRecursively(ICollection<INode> filteredNodes, INode newParent, INode oldParent)
+        private void FillNewFilteredDocumentHierarchyRecursively(ICollection<INode> filteredNodes, INode newParent, INode oldParent, BackgroundWorker worker)
         {
             if (!oldParent.Children.Any())
             {
@@ -88,9 +91,18 @@ namespace PsISEProjectExplorer.Services
                     var newNode = new ViewNode(node, newParent);
                     if (node.Children.Any())
                     {
-                        this.FillNewFilteredDocumentHierarchyRecursively(filteredNodes, newNode, node);
+                        this.FillNewFilteredDocumentHierarchyRecursively(filteredNodes, newNode, node, worker);
                     }
                 }
+            }
+            this.ReportProgress(worker);
+        }
+
+        private void ReportProgress(BackgroundWorker worker)
+        {
+            if (worker.CancellationPending)
+            {
+                throw new OperationCanceledException();
             }
         }
     }
