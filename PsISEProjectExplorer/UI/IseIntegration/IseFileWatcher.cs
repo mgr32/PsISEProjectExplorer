@@ -22,7 +22,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             this.Watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Security;
             this.Watcher.Changed += OnFileChanged;
             this.Watcher.Deleted += OnFileChanged;
-            this.Watcher.Renamed += OnFileChanged;
+            this.Watcher.Renamed += OnFileRenamed;
             this.Watcher.EnableRaisingEvents = true;
         }
 
@@ -39,6 +39,11 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         private void OnFileChanged(object source, FileSystemEventArgs e)
         {
             this.FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.FullPath, String.Empty));
+        }
+
+        private void OnFileRenamed(object source, RenamedEventArgs e)
+        {
+            this.FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.OldFullPath, String.Empty, e.FullPath));
         }
 
     }

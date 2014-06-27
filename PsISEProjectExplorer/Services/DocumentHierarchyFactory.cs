@@ -137,6 +137,8 @@ namespace PsISEProjectExplorer.Services
             {
                 yield break;
             }
+            parser = new PowershellFileParser(path, isDirectory: true);
+            yield return parser;
             pathsToEnumerate.Enqueue(path);
             while (pathsToEnumerate.Any())
             {
@@ -164,60 +166,16 @@ namespace PsISEProjectExplorer.Services
                 }
                 foreach (string dir in dirs)
                 {
+                    if (filesPatternProvider.DoesDirectoryMatch(dir) && (filesPatternProvider.IncludeAllFiles || filesPatternProvider.IsInAdditonalPaths(dir)))
+                    {
+                        parser = new PowershellFileParser(dir, isDirectory: true);
+                        yield return parser;
+                    }
                     pathsToEnumerate.Enqueue(dir);
                 }
             } while (pathsToEnumerate.Any());
         }
 
-    /*
-        private void FillFileListRecursivelyRoot(string path, IList<PowershellFileParser> result, FilesPatternProvider filesPatternProvider, BackgroundWorker worker)
-        {
-            if (!filesPatternProvider.DoesDirectoryMatch(path))
-            {
-                return;
-            }
-            bool anyMatchingFilesInDir = this.FillFileListRecursively(path, result, filesPatternProvider, worker);
-            if (filesPatternProvider.IncludeAllFiles || anyMatchingFilesInDir || filesPatternProvider.IsInAdditonalPaths(path))
-            {
-                result.Add(new PowershellFileParser(path, isDirectory: true));
-            }
-        }
-
-        private bool FillFileListRecursively(string path, IList<PowershellFileParser> result, FilesPatternProvider filesPatternProvider, BackgroundWorker worker)
-        {
-            IEnumerable<string> dirs = null;
-
-            try {
-                dirs = Directory.EnumerateDirectories(path);
-            } catch (Exception e) 
-            {
-                if (filesPatternProvider.DoesDirectoryMatch(path))
-                {
-                    result.Add(new PowershellFileParser(path, isDirectory: true, errorMessage: e.Message));
-                }
-                return false;
-            }
-
-            this.ReportProgress(worker, new IndexingProgressInfo(IndexingProgressInfo.ProgressType.EnumeratingFiles, path));
-            bool anyMatchingFiles = this.AddFilesInDirectory(path, result, filesPatternProvider);
-            
-            foreach (string dir in dirs)
-            {
-                if (!filesPatternProvider.DoesDirectoryMatch(dir))
-                {
-                    continue;
-                }
-                this.ReportProgress(worker, new IndexingProgressInfo(IndexingProgressInfo.ProgressType.EnumeratingDirectories, dir));
-                var anyMatchingFilesInDir = this.FillFileListRecursively(dir, result, filesPatternProvider, worker);
-                if (filesPatternProvider.DoesDirectoryMatch(dir) && (filesPatternProvider.IncludeAllFiles || anyMatchingFilesInDir || filesPatternProvider.IsInAdditonalPaths(dir)))
-                {
-                    result.Add(new PowershellFileParser(dir, isDirectory: true));
-                }
-            }
-
-            return anyMatchingFiles;
-        }
-    */
         private IEnumerable<PowershellFileParser> GetFilesInDirectory(string path, FilesPatternProvider filesPatternProvider)
         {
             IEnumerable<string> files = null;

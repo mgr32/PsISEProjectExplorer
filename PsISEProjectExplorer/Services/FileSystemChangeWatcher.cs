@@ -74,7 +74,8 @@ namespace PsISEProjectExplorer.Services
             {
                 return;
             }
-            if (!isDir && !this.FilesPatternProvider.DoesFileMatch(e.FullPath))
+            // if !isDir, it can be either a file, or a deleted directory
+            if (!isDir && e.ChangeType != WatcherChangeTypes.Deleted && !this.FilesPatternProvider.DoesFileMatch(e.FullPath))
             {
                 return;
             }

@@ -30,9 +30,12 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
 
         public void RemoveNode(INode node)
         {
-            this.NodeMap.Remove(node.Path);
-            this.FullTextDirectory.DeleteDocument(node.Path);
-            node.Remove();
+            if (node.Path != this.RootNode.Path)
+            {
+                this.NodeMap.Remove(node.Path);
+                this.FullTextDirectory.DeleteDocument(node.Path);
+                node.Remove();
+            }
             var itemsToBeRemoved = new List<INode>(node.Children);
             foreach (INode child in itemsToBeRemoved)
             {

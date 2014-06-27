@@ -239,13 +239,13 @@ namespace PsISEProjectExplorer
         private void SearchResults_AddDirectory(object sender, RoutedEventArgs e)
         {
             var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
-            this.MainViewModel.AddNewTreeItem(item, NodeType.Directory);
+            this.MainViewModel.TreeViewModel.AddNewTreeItem(item, NodeType.Directory);
         }
 
         private void SearchResults_AddFile(object sender, RoutedEventArgs e)
         {
             var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
-            this.MainViewModel.AddNewTreeItem(item, NodeType.File);
+            this.MainViewModel.TreeViewModel.AddNewTreeItem(item, NodeType.File);
         }
 
         private void SearchResults_Rename(object sender, RoutedEventArgs e)
@@ -265,7 +265,7 @@ namespace PsISEProjectExplorer
             {
                 return;
             }
-            this.MainViewModel.DeleteTreeItem(item);
+            this.MainViewModel.TreeViewModel.DeleteTreeItem(item);
         }
 
         private void SearchResults_EditKeyDown(object sender, KeyEventArgs e)
@@ -278,13 +278,13 @@ namespace PsISEProjectExplorer
             var newValue = ((TextBox)sender).Text;
             if (e.Key == Key.Escape)
             {
-                this.MainViewModel.EndTreeEdit(newValue, false, item);
+                this.MainViewModel.TreeViewModel.EndTreeEdit(newValue, false, item, !this.MainViewModel.SearchInFiles);
                 e.Handled = true;
                 return;
             }
             if (e.Key == Key.Enter)
             {
-                this.MainViewModel.EndTreeEdit(newValue, true, item);
+                this.MainViewModel.TreeViewModel.EndTreeEdit(newValue, true, item, !this.MainViewModel.SearchInFiles);
                 e.Handled = true;
                 return;
             }
@@ -300,7 +300,7 @@ namespace PsISEProjectExplorer
             }
             if (e.Key == Key.Delete)
             {
-                this.MainViewModel.DeleteTreeItem(item);
+                this.MainViewModel.TreeViewModel.DeleteTreeItem(item);
                 e.Handled = true;
                 return;
             }
@@ -326,7 +326,7 @@ namespace PsISEProjectExplorer
                 return;
             }
             var newValue = ((TextBox)sender).Text;
-            this.MainViewModel.EndTreeEdit(newValue, true, item);
+            this.MainViewModel.TreeViewModel.EndTreeEdit(newValue, true, item, !this.MainViewModel.SearchInFiles);
         }
 
         private void SearchResults_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -391,7 +391,7 @@ namespace PsISEProjectExplorer
                 if (item != dropTarget && MessageBoxHelper.ShowConfirmMessage(
                         String.Format("Please confirm you want to move '{0}' to '{1}'.", item.Path, destPath)))
                 {
-                    this.MainViewModel.MoveTreeItem(item, dropTarget);
+                    this.MainViewModel.TreeViewModel.MoveTreeItem(item, dropTarget, this.MainViewModel.WorkspaceDirectoryModel.CurrentWorkspaceDirectory);
                 }
             }
         }

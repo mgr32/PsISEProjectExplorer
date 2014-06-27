@@ -102,25 +102,47 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                     }
                     else
                     {
-                        this.ReloadFileOpenInIse(pathChanged);
+                        this.ReloadFileOpenInIse(changePoolEntry);
                     }
                 }
             }
         }
 
-        private void ReloadFileOpenInIse(string path)
+        private void ReloadFileOpenInIse(ChangePoolEntry changeEntry)
         {
+            string path = changeEntry.PathChanged;
+            if (!this.IseIntegrator.OpenFiles.Contains(path))
+            {
+                return;
+            }
             var fileExists = File.Exists(path);
-            this.IseIntegrator.GoToFile(path);
+            if (fileExists)
+            {
+                this.IseIntegrator.GoToFile(path);
+            }
             if (this.IseIntegrator.IsFileSaved(path))
             {
-                string question = fileExists ?
-                    String.Format("File '{0}' has been modified by another program.\n\nDo you want to reload it?", path) :
-                    String.Format("File '{0}' has been deleted or moved.\n\nDo you want to close it?", path);
+                string question;
+                if (fileExists)
+                {
+                    question = String.Format("File '{0}' has been modified by another program.\n\nDo you want to reload it?", path);
+                }
+                else if (changeEntry.PathAfterRename != null)
+                {
+                    question = String.Format("File '{0}' has been moved to '{1}'.\n\nDo you want to reload it?", path, changeEntry.PathAfterRename);
+                }
+                else
+                {
+                    question = String.Format("File '{0}' has been deleted.\n\nDo you want to close it?", path);
+                }
                 if (MessageBoxHelper.ShowQuestion("Reload file", question))
                 {
                     this.IseIntegrator.CloseFile(path);
-                    if (fileExists)
+                    if (changeEntry.PathAfterRename != null)
+                    {
+                        this.IseIntegrator.GoToFile(changeEntry.PathAfterRename);
+                    }
+                    else if (fileExists)
                     {
                         this.IseIntegrator.GoToFile(path);
                     }
@@ -128,9 +150,19 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             }
             else
             {
-                string message = fileExists ?
-                    String.Format("File '{0}' has been modified by another program.\n\nSince the file has been changed in ISE editor, you will need to reload it manually.", path) :
-                    String.Format("File '{0}' has been deleted or moved. Since the file has been changed in ISE editor, you will need to reload it manually.", path);
+                string message;
+                if (fileExists)
+                {
+                    message = String.Format("File '{0}' has been modified by another program.\n\nSince the file had been changed in ISE editor, you will need to reload it manually.", path);
+                }
+                else if (changeEntry.PathAfterRename != null)
+                {
+                    message = String.Format("File '{0}' has been moved to '{1}.\n\nSince the file had been changed in ISE editor, you will need to reload it manually.", path, changeEntry.PathAfterRename);
+                }
+                else
+                {
+                    message = String.Format("File '{0}' has been deleted. Since the file had been changed in ISE editor, you will need to reload it manually.", path);
+                }
                 MessageBoxHelper.ShowInfo(message);
             }
         }

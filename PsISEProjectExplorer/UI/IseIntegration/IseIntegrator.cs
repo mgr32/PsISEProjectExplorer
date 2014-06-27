@@ -71,15 +71,6 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             }
         }
 
-        public void ReopenFileAfterRename(string oldPath, string newPath)
-        {
-            ISEFile file = this.GetIseFile(oldPath);
-            if (file != null) 
-            {
-                file.SaveAs(newPath);
-            }
-        }
-
         public void SetCursor(int line, int column)
         {
             if (this.HostObject.CurrentPowerShellTab.Files.SelectedFile != null)

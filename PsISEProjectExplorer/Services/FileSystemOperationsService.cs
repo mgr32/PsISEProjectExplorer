@@ -43,6 +43,10 @@ namespace PsISEProjectExplorer.Services
             {
                 File.Delete(filePath);
             }
+            else
+            {
+                throw new InvalidOperationException(String.Format("Path '{0}' does not exist.", filePath));
+            }
         }
 
         public static void CreateFile(string filePath)
