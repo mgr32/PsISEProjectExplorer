@@ -255,7 +255,7 @@ namespace PsISEProjectExplorer
             {
                 return;
             }
-            item.IsBeingEdited = true;
+            this.MainViewModel.TreeViewModel.StartEditingTreeItem(item);
         }
 
         private void SearchResults_Delete(object sender, RoutedEventArgs e)
@@ -306,7 +306,7 @@ namespace PsISEProjectExplorer
             }
             if (e.Key == Key.F2)
             {
-                item.IsBeingEdited = true;
+                this.MainViewModel.TreeViewModel.StartEditingTreeItem(item);
                 e.Handled = true;
                 return;
             }
@@ -387,9 +387,7 @@ namespace PsISEProjectExplorer
                         return;
                     }
                 }
-                string destPath = dropTarget != null ? dropTarget.Path : this.MainViewModel.WorkspaceDirectoryModel.CurrentWorkspaceDirectory;
-                if (item != dropTarget && MessageBoxHelper.ShowConfirmMessage(
-                        String.Format("Please confirm you want to move '{0}' to '{1}'.", item.Path, destPath)))
+                if (item != dropTarget)
                 {
                     this.MainViewModel.TreeViewModel.MoveTreeItem(item, dropTarget, this.MainViewModel.WorkspaceDirectoryModel.CurrentWorkspaceDirectory);
                 }

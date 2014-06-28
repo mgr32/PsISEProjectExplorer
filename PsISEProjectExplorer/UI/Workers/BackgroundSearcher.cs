@@ -20,16 +20,16 @@ namespace PsISEProjectExplorer.UI.Workers
 
         private void RunSearching(object sender, DoWorkEventArgs e)
         {
-            var indexerParams = (BackgroundSearcherParams)e.Argument;
-            if (indexerParams.DocumentHierarchySearcher == null) 
+            var searcherParams = (BackgroundSearcherParams)e.Argument;
+            if (searcherParams.DocumentHierarchySearcher == null) 
             {
                 e.Result = null;
                 return;
             }
-            Logger.Info("Searching started, text: " + indexerParams.SearchText);
+            Logger.Info("Searching started, text: " + searcherParams.SearchText);
             try
             {
-                INode result = indexerParams.DocumentHierarchySearcher.GetFilteredDocumentHierarchyNodes(indexerParams.SearchText, indexerParams.SearchOptions, this);
+                INode result = searcherParams.DocumentHierarchySearcher.GetFilteredDocumentHierarchyNodes(searcherParams.SearchText, searcherParams.SearchOptions, this);
                 e.Result = new SearcherResult(this.StartTimestamp, result);
             }
             catch (OperationCanceledException)

@@ -200,6 +200,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 return;
             }
+            if (!this.HandleUnsavedFileManipulation(selectedItem))
+            {
+                return;
+            }
             int numFilesInside = 0;
             try
             {
@@ -216,6 +220,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 try
                 {
+                    this.IseIntegrator.CloseFile(selectedItem.Path);
                     this.FilesPatternProvider.RemoveAdditionalPath(selectedItem.Path);
                     FileSystemOperationsService.DeleteFileOrDirectory(selectedItem.Path);
                 }
@@ -247,9 +252,27 @@ namespace PsISEProjectExplorer.UI.ViewModel
             newItem.IsBeingAdded = true;
         }
 
+        public void StartEditingTreeItem(TreeViewEntryItemModel item)
+        {
+            if (!this.HandleUnsavedFileManipulation(item))
+            {
+                return;
+            }
+            item.IsBeingEdited = true;
+        }
+
         public void MoveTreeItem(TreeViewEntryItemModel movedItem, TreeViewEntryItemModel destinationItem, string rootDirectory)
         {
             if (movedItem == destinationItem)
+            {
+                return;
+            }
+            if (!this.HandleUnsavedFileManipulation(movedItem))
+            {
+                return;
+            }
+            string destPath = destinationItem != null ? destinationItem.Path : rootDirectory;
+            if (!MessageBoxHelper.ShowConfirmMessage(String.Format("Please confirm you want to move '{0}' to '{1}'.", movedItem.Path, destPath)))
             {
                 return;
             }
@@ -275,7 +298,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 }
                 this.FilesPatternProvider.RemoveAdditionalPath(movedItem.Path);
                 this.FilesPatternProvider.AddAdditionalPath(newPath);
+                bool closed = this.IseIntegrator.CloseFile(movedItem.Path);
                 FileSystemOperationsService.RenameFileOrDirectory(movedItem.Path, newPath);
+                if (closed)
+                {
+                    this.IseIntegrator.GoToFile(newPath);
+                }
                 if (destinationItem != null)
                 {
                     destinationItem.IsExpanded = true;
@@ -322,7 +350,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 string oldPath = selectedItem.Path;
                 string newPath = this.GenerateNewPath(selectedItem.Path, newValue);
+                bool closed = this.IseIntegrator.CloseFile(oldPath);
                 FileSystemOperationsService.RenameFileOrDirectory(oldPath, newPath);
+                if (closed)
+                {
+                    this.IseIntegrator.GoToFile(newPath);
+                }
             }
             catch (Exception e)
             {
@@ -414,6 +447,17 @@ namespace PsISEProjectExplorer.UI.ViewModel
             var newPath = System.IO.Path.Combine(currentPath, newValue);
             this.PathOfItemToSelectOnRefresh = newPath;
             return newPath;
+        }
+
+        private bool HandleUnsavedFileManipulation(TreeViewEntryItemModel selectedItem)
+        {
+            if (selectedItem.NodeType == NodeType.File && this.IseIntegrator.OpenFiles.Contains(selectedItem.Path) && !this.IseIntegrator.IsFileSaved(selectedItem.Path))
+            {
+                this.IseIntegrator.GoToFile(selectedItem.Path);
+                MessageBoxHelper.ShowInfo("Please save your changes or close the file first.");
+                return false;
+            }
+            return true;
         }
     }
 }
