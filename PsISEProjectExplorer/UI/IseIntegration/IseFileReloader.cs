@@ -48,6 +48,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                             this.IseFileWatchers[path].StopWatching();
                             this.IseFileWatchers.Remove(path);
                         }
+                        oldItem.PropertyChanged -= OnIseFilePropertyChanged;
                     }
                 }
             }
@@ -61,31 +62,50 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                         var path = newItem.FullPath;
                         if (!this.IseFileWatchers.ContainsKey(path))
                         {
-                            this.IseFileWatchers.Add(path, new IseFileWatcher(this.FileSystemChangeNotifier, path));
+                            this.IseFileWatchers.Add(path, new IseFileWatcher(this.FileSystemChangeNotifier, path, newItem));
                         }
+                        newItem.PropertyChanged -= OnIseFilePropertyChanged;
                         newItem.PropertyChanged += OnIseFilePropertyChanged;
                     }
                 }
             }
         }
 
+        private void RefreshWatchers()
+        {
+            foreach (var watcher in this.IseFileWatchers.Values)
+            {
+                watcher.StopWatching();
+            }
+            this.IseFileWatchers.Clear();
+            this.OnIseFilesCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, this.IseIntegrator.OpenIseFiles.ToList()));
+        }
+
         private void OnIseFilePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             ISEFile file = sender as ISEFile;
-            if (file == null || e.PropertyName != "IsSaved")
+            if (file == null)
             {
                 return;
             }
-            lock (this.PathsToIgnore)
+            if (e.PropertyName == "IsSaved")
             {
-                if (file.IsSaved)
+                lock (this.PathsToIgnore)
                 {
-                    this.PathsToIgnore.Add(file.FullPath);
+                    if (file.IsSaved)
+                    {
+                        this.PathsToIgnore.Add(file.FullPath);
+                    }
+                    else
+                    {
+                        this.PathsToIgnore.Remove(file.FullPath);
+                    }
                 }
-                else
-                {
-                    this.PathsToIgnore.Remove(file.FullPath);
-                }
+            }
+            else if (e.PropertyName == "FullPath")
+            {
+                // on 'save as', we don't have to access to the old name - need to refresh everything
+                this.RefreshWatchers();
             }
         }
 

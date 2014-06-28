@@ -1,4 +1,5 @@
-﻿using PsISEProjectExplorer.Model;
+﻿using Microsoft.PowerShell.Host.ISE;
+using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Services;
 using System;
 using System.Collections.Generic;
@@ -15,8 +16,11 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         private FileSystemWatcher Watcher { get; set; }
 
-        public IseFileWatcher(FileSystemChangeNotifier fileSystemChangeNotifier, string path)
+        public ISEFile IseFile { get; private set; }
+
+        public IseFileWatcher(FileSystemChangeNotifier fileSystemChangeNotifier, string path, ISEFile iseFile)
         {
+            this.IseFile = iseFile;
             this.FileSystemChangeNotifier = fileSystemChangeNotifier;
             this.Watcher = new FileSystemWatcher(Path.GetDirectoryName(path), Path.GetFileName(path));
             this.Watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Security;
@@ -29,11 +33,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         public void StopWatching()
         {
             this.Watcher.EnableRaisingEvents = false;
-        }
-
-        public void StartWatching()
-        {
-            this.Watcher.EnableRaisingEvents = true;
+            this.IseFile = null;
         }
 
         private void OnFileChanged(object source, FileSystemEventArgs e)

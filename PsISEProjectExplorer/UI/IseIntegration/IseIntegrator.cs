@@ -32,13 +32,20 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             }
         }
 
+        public IEnumerable<ISEFile> OpenIseFiles
+        {
+            get
+            {
+                var files = this.HostObject.CurrentPowerShellTab.Files;
+                return files == null ? new List<ISEFile>() : files.ToList();
+            }
+        }
 
         public IEnumerable<string> OpenFiles
         {
             get
             {
-                var files = this.HostObject.CurrentPowerShellTab.Files;
-                return files == null ? new List<string>() : files.Select(f => f.FullPath).ToList();
+                return this.OpenIseFiles.Select(f => f.FullPath).ToList();
             }
         }
 
