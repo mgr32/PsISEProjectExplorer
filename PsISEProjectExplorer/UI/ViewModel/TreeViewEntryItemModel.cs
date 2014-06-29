@@ -8,6 +8,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
 {
     public class TreeViewEntryItemModel : BaseViewModel
     {
+        public static object RootLockObject = new object();
+
         private INode documentHierarchyNode;
 
         private INode DocumentHierarchyNode { 
@@ -150,20 +152,24 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 throw new ArgumentNullException("node");
             }
-            this.DocumentHierarchyNode = node;
-            this.Parent = parent;
-            this.Children = new TreeViewEntryItemObservableSet();
-            if (this.Parent != null)
+            var lockObject = this.Parent == null ? RootLockObject : this.Parent;
+            lock (lockObject)
             {
-                this.Parent.Children.Add(this);
+                this.DocumentHierarchyNode = node;
+                this.Parent = parent;
+                this.Children = new TreeViewEntryItemObservableSet();
+                if (this.Parent != null)
+                {
+                    this.Parent.Children.Add(this);
+                }
+                this.IsSelected = isSelected;
             }
-            this.IsSelected = isSelected;
-            
         }
 
         public void Delete()
         {
-            lock (this.documentHierarchyNode)
+            var lockObject = this.Parent == null ? RootLockObject : this.Parent;
+            lock (lockObject)
             {
                 if (this.Parent != null)
                 {

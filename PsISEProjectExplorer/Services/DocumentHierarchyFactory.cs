@@ -39,36 +39,30 @@ namespace PsISEProjectExplorer.Services
             {
                 return null;
             }
-            lock (this.DocumentHierarchy.RootNode)
+            if (nodeType == NodeType.Directory)
             {
-                if (nodeType == NodeType.Directory)
-                {
-                    return this.DocumentHierarchy.CreateNewDirectoryNode(parent.Path + @"\", parent, null);
-                }
-                if (nodeType == NodeType.File)
-                {
-                    return this.DocumentHierarchy.CreateNewFileNode(parent.Path + @"\", string.Empty, parent, null);
-                }
+                return this.DocumentHierarchy.CreateNewDirectoryNode(parent.Path + @"\", parent, null);
+            }
+            if (nodeType == NodeType.File)
+            {
+                return this.DocumentHierarchy.CreateNewFileNode(parent.Path + @"\", string.Empty, parent, null);
             }
             return null;
         }
 
         public INode UpdateTemporaryNode(INode node, string newPath)
         {
-            if (this.DocumentHierarchy == null)
+            if (this.DocumentHierarchy == null || node == null)
             {
                 return null;
             }
-            lock (this.DocumentHierarchy.RootNode)
+            if (node.NodeType == NodeType.Directory)
             {
-                if (node.NodeType == NodeType.Directory)
-                {
-                    return this.DocumentHierarchy.UpdateDirectoryNodePath(node, newPath, null);
-                }
-                if (node.NodeType == NodeType.File)
-                {
-                    return this.DocumentHierarchy.UpdateFileNodePath(node, newPath, null);
-                }
+                return this.DocumentHierarchy.UpdateDirectoryNodePath(node, newPath, null);
+            }
+            if (node.NodeType == NodeType.File)
+            {
+                return this.DocumentHierarchy.UpdateFileNodePath(node, newPath, null);
             }
             return null;
         }
@@ -79,10 +73,7 @@ namespace PsISEProjectExplorer.Services
             {
                 return;
             }
-            lock (this.DocumentHierarchy.RootNode)
-            {
-                this.DocumentHierarchy.RemoveNode(node);
-            }
+            this.DocumentHierarchy.RemoveNode(node);
         }
 
         public bool UpdateDocumentHierarchy(IEnumerable<string> pathsToUpdate, FilesPatternProvider filesPatternProvider, BackgroundWorker worker)
@@ -91,27 +82,25 @@ namespace PsISEProjectExplorer.Services
             {
                 return false;
             }
-            lock (this.DocumentHierarchy.RootNode)
+            var documentHierarchyIndexer = new DocumentHierarchyIndexer(this.DocumentHierarchy);
+            bool changed = false;
+            foreach (string path in pathsToUpdate)
             {
-                var documentHierarchyIndexer = new DocumentHierarchyIndexer(this.DocumentHierarchy);
-                bool changed = false;
-                foreach (string path in pathsToUpdate)
+                INode node = this.DocumentHierarchy.GetNode(path);
+                if (node != null)
                 {
-                    INode node = this.DocumentHierarchy.GetNode(path);
-                    if (node != null)
-                    {
-                        this.DocumentHierarchy.RemoveNode(node);
-                        changed = true;
-                    }
-                    var fileSystemEntryList = this.GetFileList(path, filesPatternProvider, worker);
-                    foreach (PowershellFileParser fileSystemEntry in fileSystemEntryList)
-                    {
-                        documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
-                        changed = true;
-                    }    
+                    this.DocumentHierarchy.RemoveNode(node);
+                    changed = true;
                 }
-                return changed;
+                var fileSystemEntryList = this.GetFileList(path, filesPatternProvider, worker);
+                foreach (PowershellFileParser fileSystemEntry in fileSystemEntryList)
+                {
+                    documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
+                    changed = true;
+                }    
             }
+            return changed;
+            
         }
 
         private void ReportProgress(BackgroundWorker worker, string path)
@@ -146,8 +135,6 @@ namespace PsISEProjectExplorer.Services
                 parser = null;
                 string currentPath = pathsToEnumerate.Dequeue();
 
-                this.ReportProgress(worker, currentPath);
-
                 foreach (var file in this.GetFilesInDirectory(currentPath, filesPatternProvider))
                 {
                     yield return file;
@@ -173,6 +160,7 @@ namespace PsISEProjectExplorer.Services
                     }
                     pathsToEnumerate.Enqueue(dir);
                 }
+                this.ReportProgress(worker, currentPath);
             } while (pathsToEnumerate.Any());
         }
 

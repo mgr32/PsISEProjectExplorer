@@ -9,6 +9,7 @@ using System.Linq;
 
 namespace PsISEProjectExplorer.FullText
 {
+    // note: one instance of this class can be used by many threads
     public class FullTextDirectory
     {
         private Analyzer Analyzer { get; set; }
@@ -53,23 +54,29 @@ namespace PsISEProjectExplorer.FullText
 
         private IList<SearchResult> RunQuery(Query query)
         {
-            var newReader = this.IndexReader.Reopen();
-            if (newReader != this.IndexReader)
+            // If two threads ran this method simultaneously, there would be issues with this.IndexReader.
+            // Alternatively, there could be one RAMDirectory per filesystem directory.
+            lock (this)
             {
-                this.IndexReader.Dispose();
-                this.IndexReader = newReader;
-            }
-            var searcher = new IndexSearcher(this.IndexReader);
-            if (query == null)
-            {
-                return new List<SearchResult>();
-            }
-            TopDocs hits = searcher.Search(query, 1000);
+                IndexReader newReader = this.IndexReader.Reopen();
+                if (newReader != this.IndexReader)
+                {
+                    this.IndexReader.Dispose();
+                    this.IndexReader = newReader;
+                }
 
-            return hits.ScoreDocs
-                .Select(scoreDoc => searcher.Doc(scoreDoc.Doc).Get(FullTextFieldType.Path.ToString()))
-                .Select(path => new SearchResult(path))
-                .ToList();
+                IndexSearcher searcher; searcher = new IndexSearcher(newReader);
+                if (query == null)
+                {
+                    return new List<SearchResult>();
+                }
+                TopDocs hits = searcher.Search(query, 1000);
+
+                return hits.ScoreDocs
+                    .Select(scoreDoc => searcher.Doc(scoreDoc.Doc).Get(FullTextFieldType.Path.ToString()))
+                    .Select(path => new SearchResult(path))
+                    .ToList();
+            }
         }
 
     }

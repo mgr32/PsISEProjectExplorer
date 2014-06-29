@@ -9,10 +9,13 @@ namespace PsISEProjectExplorer.UI.Workers
 
         public INode ResultNode { get; private set; }
 
-        public SearcherResult(DateTime startTimeStamp, INode resultNode)
+        public string Path { get; private set; }
+
+        public SearcherResult(DateTime startTimeStamp, INode resultNode, string path)
         {
             this.StartTimestamp = startTimeStamp;
             this.ResultNode = resultNode;
+            this.Path = path;
         }
     }
 }

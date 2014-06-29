@@ -160,20 +160,21 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             }
         }
 
-        public void CloseFile(string path)
+        public bool CloseFile(string path)
         {
             var file = this.GetIseFile(path);
             if (file != null)
             {
                 try
                 {
-                    this.HostObject.CurrentPowerShellTab.Files.Remove(file);
+                    return this.HostObject.CurrentPowerShellTab.Files.Remove(file);
                 }
                 catch (Exception e)
                 {
                     MessageBoxHelper.ShowError(String.Format("Cannot close file '{0}': {1}", file.FullPath, e.Message));
                 }
             }
+            return false;
         }
 
         public bool IsFileSaved(string path)

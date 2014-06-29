@@ -52,7 +52,9 @@ namespace PsISEProjectExplorer
             this.MainViewModel.ActiveDocumentSyncEvent += OnActiveDocumentSyncEvent;
             this.DataContext = this.MainViewModel;
             InitializeComponent();
+            // #if !DEBUG
             this.Dispatcher.UnhandledExceptionFilter += DispatchUnhandledExceptionFilterHandler;
+            //#endif
         }
 
         private static void DispatchUnhandledExceptionFilterHandler(object sender, DispatcherUnhandledExceptionFilterEventArgs args)
