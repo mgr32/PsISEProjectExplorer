@@ -33,6 +33,11 @@ namespace PsISEProjectExplorer.UI.Workers
             Logger.Info("Indexing started, rootDir: " + indexerParams.RootDirectory + ", pathsChanged: " + (indexerParams.PathsChanged == null ? "null" : String.Join(", ", indexerParams.PathsChanged)));
             lock (BackgroundIndexerLock)
             {
+                if (this.CancellationPending)
+                {
+                    e.Cancel = true;
+                    return;
+                }
                 try
                 {
                     this.IndexingStateChangedHandler(this, true);

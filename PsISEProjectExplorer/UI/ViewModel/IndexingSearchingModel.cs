@@ -31,6 +31,21 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        private bool searchingInProgress;
+
+        public bool SearchingInProgress
+        {
+            get
+            {
+                return this.searchingInProgress;
+            }
+            private set
+            {
+                this.searchingInProgress = value;
+                this.OnPropertyChanged("SearchingInProgress");
+            }
+        }
+
         private BackgroundIndexer BackgroundIndexer { get; set; }
 
         private BackgroundSearcher BackgroundSearcher { get; set; }
@@ -64,16 +79,19 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.BackgroundIndexer.RunWorkerAsync(indexerParams);
         }
 
-        private void IndexingStateChangedHandler(object sender, bool value)
-        {
-            this.IndexingInProgress = value;
-        }
-
         public void RunSearch(BackgroundSearcherParams searcherParams)
         {
-            this.BackgroundSearcher = new BackgroundSearcher();
-            this.BackgroundSearcher.RunWorkerCompleted += this.BackgroundSearcherWorkCompleted;
-            this.BackgroundSearcher.RunWorkerAsync(searcherParams);
+            if (searcherParams.Path == null && this.BackgroundSearcher != null)
+            {
+                this.BackgroundSearcher.CancelAsync();
+            }
+            var searcher = new BackgroundSearcher(this.SearchingStateChangedHandler);
+            searcher.RunWorkerCompleted += this.BackgroundSearcherWorkCompleted;
+            searcher.RunWorkerAsync(searcherParams);
+            if (searcherParams.Path == null)
+            {
+                this.BackgroundSearcher = searcher;
+            }
         }
 
         private void BackgroundIndexerWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -121,7 +139,16 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.SearcherResultHandler(this, result);
             }
-            
+        }
+
+        private void IndexingStateChangedHandler(object sender, bool value)
+        {
+            this.IndexingInProgress = value;
+        }
+
+        private void SearchingStateChangedHandler(object sender, bool value)
+        {
+            this.SearchingInProgress = value;
         }
     }
 }

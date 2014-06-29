@@ -291,7 +291,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void RunSearch(string path = null)
         {
-           // this.IsTreeViewReady = false;
             var searcherParams = new BackgroundSearcherParams(this.DocumentHierarchySearcher, this.SearchOptions, this.SearchText, path);
             this.IndexingSearchingModel.RunSearch(searcherParams);
         }
@@ -300,14 +299,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             bool expandNewNodes = !String.IsNullOrWhiteSpace(this.SearchText);
             this.TreeViewModel.RefreshFromNode(result.ResultNode, result.Path, expandNewNodes);
-           // this.IsTreeViewReady = true;
             // when 'Sync with active document' is enabled and search results changed, we need to try to locate current document in the new search results
             this.ActiveDocumentPotentiallyChanged();
         }
 
         private void OnIndexingFinished(object sender, IndexerResult result)
         {
-            //this.RunSearch();
+            // nothing here - all searching should be done in OnIndexingProgress
         }
 
         private void OnIndexingProgress(object sender, string path)
