@@ -91,6 +91,7 @@ namespace PsISEProjectExplorer.Services
                 {
                     this.DocumentHierarchy.RemoveNode(node);
                     changed = true;
+                    this.ReportProgress(worker, path);
                 }
                 var fileSystemEntryList = this.GetFileList(path, filesPatternProvider, worker);
                 foreach (PowershellFileParser fileSystemEntry in fileSystemEntryList)
@@ -121,6 +122,8 @@ namespace PsISEProjectExplorer.Services
             {
                 parser = new PowershellFileParser(path, isDirectory: false);
                 yield return parser;
+                this.ReportProgress(worker, path);
+                yield break;
             }
             if (!Directory.Exists(path) || !filesPatternProvider.DoesDirectoryMatch(path))
             {

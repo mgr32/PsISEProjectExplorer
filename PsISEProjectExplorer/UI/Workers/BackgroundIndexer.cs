@@ -16,15 +16,13 @@ namespace PsISEProjectExplorer.UI.Workers
 
         public DateTime StartTimestamp { get; private set; }
 
-        private EventHandler<bool> IndexingStateChangedHandler;
 
-        public BackgroundIndexer(EventHandler<bool> indexingStateChangedHandler)
+        public BackgroundIndexer()
         {
             this.StartTimestamp = DateTime.Now;
             this.DoWork += RunIndexing;
             this.WorkerReportsProgress = true;
             this.WorkerSupportsCancellation = true;
-            this.IndexingStateChangedHandler = indexingStateChangedHandler;
         }
 
         private void RunIndexing(object sender, DoWorkEventArgs e)
@@ -40,7 +38,6 @@ namespace PsISEProjectExplorer.UI.Workers
                 }
                 try
                 {
-                    this.IndexingStateChangedHandler(this, true);
                     IEnumerable<string> paths;
                     if (indexerParams.PathsChanged == null)
                     {
@@ -56,10 +53,6 @@ namespace PsISEProjectExplorer.UI.Workers
                 catch (OperationCanceledException)
                 {
                     e.Cancel = true;
-                }
-                finally
-                {
-                    this.IndexingStateChangedHandler(this, false);
                 }
             }
         }

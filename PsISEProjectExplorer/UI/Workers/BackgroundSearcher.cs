@@ -2,6 +2,7 @@
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using System;
 using System.ComponentModel;
+using System.Threading;
 
 namespace PsISEProjectExplorer.UI.Workers
 {
@@ -14,14 +15,11 @@ namespace PsISEProjectExplorer.UI.Workers
 
         public DateTime StartTimestamp { get; private set; }
 
-        private EventHandler<bool> SearchingStateChangedHandler;
-
-        public BackgroundSearcher(EventHandler<bool> searchingStateChangedHandler)
+        public BackgroundSearcher()
         {
             this.StartTimestamp = DateTime.Now;
             this.DoWork += RunSearching;
             this.WorkerSupportsCancellation = true;
-            this.SearchingStateChangedHandler = searchingStateChangedHandler;
         }
 
         private void RunSearching(object sender, DoWorkEventArgs e)
@@ -54,20 +52,16 @@ namespace PsISEProjectExplorer.UI.Workers
                 e.Cancel = true;
                 return;
             }
-            Logger.Info(String.Format("Searching started, path: {0}, text: {1} ", searcherParams.Path, searcherParams.SearchOptions.SearchText));
+            Logger.Info(String.Format("Searching started, path: {0}, text: {1} ", searcherParams.Path ?? "null", searcherParams.SearchOptions.SearchText));
             try
             {
-                this.SearchingStateChangedHandler(this, true);
+                Thread.CurrentThread.Priority = ThreadPriority.Lowest;
                 INode result = searcherParams.DocumentHierarchySearcher.GetDocumentHierarchyViewNodeProjection(searcherParams.Path, searcherParams.SearchOptions, this);
                 e.Result = new SearcherResult(this.StartTimestamp, result, searcherParams.Path, searcherParams.SearchOptions);
             }
             catch (OperationCanceledException)
             {
                 e.Cancel = true;
-            }
-            finally
-            {
-                this.SearchingStateChangedHandler(this, false);
             }
         }
     }

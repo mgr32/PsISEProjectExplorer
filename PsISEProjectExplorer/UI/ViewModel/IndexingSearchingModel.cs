@@ -9,42 +9,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
     public class IndexingSearchingModel : BaseViewModel
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
-        private bool indexingInProgress;
-
-        public bool IndexingInProgress
-        {
-            get
-            {
-                return this.indexingInProgress;
-            }
-            private set
-            {
-                this.indexingInProgress = value;
-                this.OnPropertyChanged("IndexingInProgress");
-            }
-        }
-
-        private bool searchingInProgress;
-
-        public bool SearchingInProgress
-        {
-            get
-            {
-                return this.searchingInProgress;
-            }
-            private set
-            {
-                this.searchingInProgress = value;
-                this.OnPropertyChanged("SearchingInProgress");
-            }
-        }
 
         private BackgroundIndexer BackgroundIndexer { get; set; }
 
@@ -65,13 +36,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public void ReindexSearchTree(BackgroundIndexerParams indexerParams)
         {
-            if (this.BackgroundIndexer != null)
+            if (indexerParams.PathsChanged == null && this.BackgroundIndexer != null)
             {
                 this.BackgroundIndexer.CancelAsync();
             }
             
-            this.IndexingInProgress = true;
-            this.BackgroundIndexer = new BackgroundIndexer(this.IndexingStateChangedHandler);
+            this.BackgroundIndexer = new BackgroundIndexer();
             this.BackgroundIndexer.RunWorkerCompleted += this.BackgroundIndexerWorkCompleted;
             this.BackgroundIndexer.ProgressChanged += this.BackgroundIndexerProgressChanged;
             this.BackgroundIndexer.RunWorkerAsync(indexerParams);
@@ -83,7 +53,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.BackgroundSearcher.CancelAsync();
             }
-            var searcher = new BackgroundSearcher(this.SearchingStateChangedHandler);
+            var searcher = new BackgroundSearcher();
             searcher.RunWorkerCompleted += this.BackgroundSearcherWorkCompleted;
             searcher.RunWorkerAsync(searcherParams);
             if (searcherParams.Path == null)
@@ -94,22 +64,19 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void BackgroundIndexerWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            this.IndexingInProgress = false;
             if (e.Cancelled)
             {
+                this.IndexerResultHandler(this, null);
                 return;
             }
             var result = (IndexerResult)e.Result;
             if (result == null || !result.IsChanged)
             {
+                this.IndexerResultHandler(this, null);
                 return;
             }
             Logger.Debug("Indexing ended");
-            if (this.IndexerResultHandler != null)
-            {
-                this.IndexerResultHandler(this, result);
-            }
-            
+            this.IndexerResultHandler(this, result);
         }
 
         private void BackgroundIndexerProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -125,28 +92,17 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             if (e.Cancelled)
             {
+                this.SearcherResultHandler(this, null);
                 return;
             }
             var result = (SearcherResult)e.Result;
             if (result == null)
             {
+                this.SearcherResultHandler(this, null);
                 return;
             }
-            Logger.Debug(String.Format("Searching ended, path: {0}", result.ResultNode != null ? result.ResultNode.Path : "null"));
-            if (this.SearcherResultHandler != null)
-            {
-                this.SearcherResultHandler(this, result);
-            }
-        }
-
-        private void IndexingStateChangedHandler(object sender, bool value)
-        {
-            this.IndexingInProgress = value;
-        }
-
-        private void SearchingStateChangedHandler(object sender, bool value)
-        {
-            this.SearchingInProgress = value;
+            Logger.Debug(String.Format("Searching ended, path: {0}", result.Path ?? "null"));
+            this.SearcherResultHandler(this, result);
         }
     }
 }

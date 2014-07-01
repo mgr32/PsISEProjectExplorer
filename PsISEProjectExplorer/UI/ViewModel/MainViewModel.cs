@@ -46,8 +46,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
             get
             {
                 return String.Format("Found {0} files{1}", this.TreeViewModel.NumberOfFiles, 
-                    this.IndexingSearchingModel.IndexingInProgress ? ", indexing in progress..." : 
-                    this.IndexingSearchingModel.SearchingInProgress ? ", searching in progress..." : ".");
+                    this.NumOfIndexingThreads > 0 ? ", indexing in progress..." : 
+                    this.NumOfSearchingThreads > 0 ? ", searching in progress..." : ".");
             }
         }
 
@@ -98,17 +98,38 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        private bool isTreeViewReady;
+        private int numOfSearchingThreads;
 
-        public bool IsTreeViewReady
+        private int NumOfSearchingThreads
         {
-            get { return this.isTreeViewReady; }
+            get
+            {
+                return this.numOfSearchingThreads;
+            }
             set
             {
-                this.isTreeViewReady = value;
+                this.numOfSearchingThreads = value;
                 this.OnPropertyChanged();
+                this.OnPropertyChanged("TreeItemsResultString");
             }
         }
+
+        private int numOfIndexingThreads;
+
+        private int NumOfIndexingThreads
+        {
+            get
+            {
+                return this.numOfIndexingThreads;
+            }
+            set
+            {
+                this.numOfIndexingThreads = value;
+                this.OnPropertyChanged();
+                this.OnPropertyChanged("TreeItemsResultString");
+            }
+        }
+
 
         private SearchOptions SearchOptions { get; set; }
 
@@ -156,7 +177,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.DocumentHierarchyFactory = new DocumentHierarchyFactory();
             this.FileSystemChangeWatcher = new FileSystemChangeWatcher(this.ReindexOnFileSystemChanged);
             this.IndexingSearchingModel = new IndexingSearchingModel(this.OnSearchingFinished, this.OnIndexingFinished, this.OnIndexingProgress);
-            this.IndexingSearchingModel.PropertyChanged += (s, e) => { if (e.PropertyName == "IndexingInProgress" || e.PropertyName == "SearchingInProgress") this.OnPropertyChanged("TreeItemsResultString"); };
             this.TreeViewModel = new TreeViewModel(this.FileSystemChangeWatcher, this.DocumentHierarchyFactory, this.FilesPatternProvider);
             this.TreeViewModel.PropertyChanged += (s, e) => { if (e.PropertyName == "NumberOfFiles") this.OnPropertyChanged("TreeItemsResultString"); };
             this.WorkspaceDirectoryModel = new WorkspaceDirectoryModel();
@@ -280,37 +300,62 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void ReindexSearchTree(IEnumerable<string> pathsChanged)
         {
+            lock (this)
+            {
+                this.NumOfIndexingThreads++;
+            }
             var indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyFactory, this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, pathsChanged, this.FilesPatternProvider);
             this.IndexingSearchingModel.ReindexSearchTree(indexerParams);
         }
 
         private void RunSearch(string path = null)
         {
+            lock (this)
+            {
+                this.NumOfSearchingThreads++;
+            }
+            if (path == null)
+            {
+                this.ClearTreeView();
+            }
             var searcherParams = new BackgroundSearcherParams(this.DocumentHierarchySearcher, this.SearchOptions, path);
             this.IndexingSearchingModel.RunSearch(searcherParams);
         }
 
         private void OnSearchingFinished(object sender, SearcherResult result)
         {
-            if (!result.SearchOptions.Equals(this.SearchOptions))
+            try
             {
-                // this means that SearchOptions have been changed in the meantime, so we need to ignore the result.
-                return;
+                if (result == null || !result.SearchOptions.Equals(this.SearchOptions))
+                {
+                    // this means that the thread was cancelled or SearchOptions have been changed in the meantime, so we need to ignore the result.
+                    return;
+                }
+                bool expandNewNodes = !String.IsNullOrWhiteSpace(this.SearchText);
+                this.TreeViewModel.RefreshFromNode(result.ResultNode, result.Path, expandNewNodes);
+                // when 'Sync with active document' is enabled and search results changed, we need to try to locate current document in the new search results
+                this.ActiveDocumentPotentiallyChanged();
             }
-            bool expandNewNodes = !String.IsNullOrWhiteSpace(this.SearchText);
-            this.TreeViewModel.RefreshFromNode(result.ResultNode, result.Path, expandNewNodes);
-            // when 'Sync with active document' is enabled and search results changed, we need to try to locate current document in the new search results
-            this.ActiveDocumentPotentiallyChanged();
-        }
-
-        private void OnIndexingFinished(object sender, IndexerResult result)
-        {
-            // nothing here - all searching should be done in OnIndexingProgress
+            finally
+            {
+                lock (this)
+                {
+                    this.NumOfSearchingThreads--;
+                }
+            }
         }
 
         private void OnIndexingProgress(object sender, string path)
         {
             this.RunSearch(path);
+        }
+
+        private void OnIndexingFinished(object sender, IndexerResult result)
+        {
+            lock (this)
+            {
+                this.NumOfIndexingThreads--;
+            }
         }
 
     }
