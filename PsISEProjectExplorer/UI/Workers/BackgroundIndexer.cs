@@ -16,7 +16,6 @@ namespace PsISEProjectExplorer.UI.Workers
 
         public DateTime StartTimestamp { get; private set; }
 
-
         public BackgroundIndexer()
         {
             this.StartTimestamp = DateTime.Now;
@@ -25,6 +24,7 @@ namespace PsISEProjectExplorer.UI.Workers
             this.WorkerSupportsCancellation = true;
         }
 
+        // running in Indexing thread
         private void RunIndexing(object sender, DoWorkEventArgs e)
         {
             var indexerParams = (BackgroundIndexerParams)e.Argument;
@@ -55,6 +55,12 @@ namespace PsISEProjectExplorer.UI.Workers
                     e.Cancel = true;
                 }
             }
+        }
+
+        // running in Indexing thread
+        public void ReportProgressInCurrentThread(string path)
+        {
+            this.OnProgressChanged(new ProgressChangedEventArgs(0, path));
         }
     }
 }

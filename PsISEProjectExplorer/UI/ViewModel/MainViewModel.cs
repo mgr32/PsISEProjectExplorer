@@ -266,8 +266,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
      
         public void ReindexSearchTree()
         {
-            this.ClearTreeView();
-            this.ReindexSearchTree(null);
+            lock (this)
+            {
+                this.ClearTreeView();
+                this.ReindexSearchTree(null);
+            }
         }
 
         private void ClearTreeView()
@@ -298,6 +301,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        // running in UI thread
         private void ReindexSearchTree(IEnumerable<string> pathsChanged)
         {
             lock (this)
@@ -308,6 +312,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.IndexingSearchingModel.ReindexSearchTree(indexerParams);
         }
 
+        // running in Indexing or UI thread
         private void RunSearch(string path = null)
         {
             lock (this)
@@ -322,6 +327,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.IndexingSearchingModel.RunSearch(searcherParams);
         }
 
+        // running in Indexing or UI thread
         private void OnSearchingFinished(object sender, SearcherResult result)
         {
             try
@@ -332,9 +338,15 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     return;
                 }
                 bool expandNewNodes = !String.IsNullOrWhiteSpace(this.SearchText);
-                this.TreeViewModel.RefreshFromNode(result.ResultNode, result.Path, expandNewNodes);
-                // when 'Sync with active document' is enabled and search results changed, we need to try to locate current document in the new search results
-                this.ActiveDocumentPotentiallyChanged();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    this.TreeViewModel.RefreshFromNode(result.ResultNode, result.Path, expandNewNodes);
+                    // when 'Sync with active document' is enabled and search results changed, we need to try to locate current document in the new search results
+                    if (string.IsNullOrEmpty(result.Path))
+                    {
+                        this.ActiveDocumentPotentiallyChanged();
+                    }
+                });
             }
             finally
             {
@@ -345,11 +357,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        // running in Indexing thread
         private void OnIndexingProgress(object sender, string path)
         {
             this.RunSearch(path);
         }
 
+        // running in UI thread
         private void OnIndexingFinished(object sender, IndexerResult result)
         {
             lock (this)

@@ -17,9 +17,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private BackgroundIndexer BackgroundIndexer { get; set; }
+        private IList<BackgroundIndexer> BackgroundIndexers { get; set; }
 
-        private BackgroundSearcher BackgroundSearcher { get; set; }
+        private IList<BackgroundSearcher> BackgroundSearchers { get; set; }
 
         private EventHandler<IndexerResult> IndexerResultHandler { get; set; }
 
@@ -32,36 +32,60 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.SearcherResultHandler = searcherResultHandler;
             this.IndexerResultHandler = indexerResultHandler;
             this.IndexerProgressHandler = indexerProgressHandler;
+            this.BackgroundIndexers = new List<BackgroundIndexer>();
+            this.BackgroundSearchers = new List<BackgroundSearcher>();
         }
 
+        // running in UI thread
         public void ReindexSearchTree(BackgroundIndexerParams indexerParams)
         {
-            if (indexerParams.PathsChanged == null && this.BackgroundIndexer != null)
+            lock (this.BackgroundIndexers)
             {
-                this.BackgroundIndexer.CancelAsync();
+                if (indexerParams.PathsChanged == null)
+                {
+                    foreach (var ind in this.BackgroundIndexers)
+                    {
+                        ind.CancelAsync();
+                    }
+                    this.BackgroundIndexers.Clear();
+                }
+
+                var indexer = new BackgroundIndexer();
+                indexer.RunWorkerCompleted += this.BackgroundIndexerWorkCompleted;
+                indexer.ProgressChanged += this.BackgroundIndexerProgressChanged;
+                indexer.RunWorkerAsync(indexerParams);
+                this.BackgroundIndexers.Add(indexer);
             }
-            
-            this.BackgroundIndexer = new BackgroundIndexer();
-            this.BackgroundIndexer.RunWorkerCompleted += this.BackgroundIndexerWorkCompleted;
-            this.BackgroundIndexer.ProgressChanged += this.BackgroundIndexerProgressChanged;
-            this.BackgroundIndexer.RunWorkerAsync(indexerParams);
         }
 
+        // running in Indexing or UI thread
         public void RunSearch(BackgroundSearcherParams searcherParams)
         {
-            if (searcherParams.Path == null && this.BackgroundSearcher != null)
+            lock (this.BackgroundSearchers)
             {
-                this.BackgroundSearcher.CancelAsync();
-            }
-            var searcher = new BackgroundSearcher();
-            searcher.RunWorkerCompleted += this.BackgroundSearcherWorkCompleted;
-            searcher.RunWorkerAsync(searcherParams);
-            if (searcherParams.Path == null)
-            {
-                this.BackgroundSearcher = searcher;
+                if (searcherParams.Path == null)
+                {
+                    foreach (var sear in this.BackgroundSearchers)
+                    {
+                        sear.CancelAsync();
+                    }
+                    this.BackgroundSearchers.Clear();
+                }
+                var searcher = new BackgroundSearcher();
+                searcher.RunWorkerCompleted += this.BackgroundSearcherWorkCompleted;
+                if (searcherParams.Path != null)
+                {
+                    searcher.RunWorkerSync(searcherParams);
+                }
+                else
+                {
+                    searcher.RunWorkerAsync(searcherParams);
+                    this.BackgroundSearchers.Add(searcher);
+                }
             }
         }
 
+        // running in UI thread
         private void BackgroundIndexerWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Cancelled)
@@ -79,6 +103,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.IndexerResultHandler(this, result);
         }
 
+        // running in Indexing thread
         private void BackgroundIndexerProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             if (this.IndexerProgressHandler != null)
@@ -88,6 +113,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        // running in Indexing or UI thread
         private void BackgroundSearcherWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Cancelled)

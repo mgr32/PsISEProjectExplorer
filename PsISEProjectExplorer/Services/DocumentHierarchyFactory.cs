@@ -2,6 +2,7 @@
 using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
+using PsISEProjectExplorer.UI.Workers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -76,7 +77,7 @@ namespace PsISEProjectExplorer.Services
             this.DocumentHierarchy.RemoveNode(node);
         }
 
-        public bool UpdateDocumentHierarchy(IEnumerable<string> pathsToUpdate, FilesPatternProvider filesPatternProvider, BackgroundWorker worker)
+        public bool UpdateDocumentHierarchy(IEnumerable<string> pathsToUpdate, FilesPatternProvider filesPatternProvider, BackgroundIndexer worker)
         {
             if (this.DocumentHierarchy == null)
             {
@@ -104,16 +105,16 @@ namespace PsISEProjectExplorer.Services
             
         }
 
-        private void ReportProgress(BackgroundWorker worker, string path)
+        private void ReportProgress(BackgroundIndexer worker, string path)
         {
             if (worker.CancellationPending)
             {
                 throw new OperationCanceledException();
             }
-            worker.ReportProgress(0, path);
+            worker.ReportProgressInCurrentThread(path);
         }
 
-        private IEnumerable<PowershellFileParser> GetFileList(string path, FilesPatternProvider filesPatternProvider, BackgroundWorker worker)
+        private IEnumerable<PowershellFileParser> GetFileList(string path, FilesPatternProvider filesPatternProvider, BackgroundIndexer worker)
         {
             PowershellFileParser parser = null;
             Queue<string> pathsToEnumerate = new Queue<string>();

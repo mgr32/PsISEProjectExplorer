@@ -22,6 +22,13 @@ namespace PsISEProjectExplorer.UI.Workers
             this.WorkerSupportsCancellation = true;
         }
 
+        public void RunWorkerSync(BackgroundSearcherParams argument)
+        {
+            var args = new DoWorkEventArgs(argument);
+            this.RunSearching(this, args);
+            this.OnRunWorkerCompleted(new RunWorkerCompletedEventArgs(args.Result, null, args.Cancel));
+        }
+
         private void RunSearching(object sender, DoWorkEventArgs e)
         {
             var searcherParams = (BackgroundSearcherParams)e.Argument;
@@ -55,7 +62,6 @@ namespace PsISEProjectExplorer.UI.Workers
             Logger.Info(String.Format("Searching started, path: {0}, text: {1} ", searcherParams.Path ?? "null", searcherParams.SearchOptions.SearchText));
             try
             {
-                Thread.CurrentThread.Priority = ThreadPriority.Lowest;
                 INode result = searcherParams.DocumentHierarchySearcher.GetDocumentHierarchyViewNodeProjection(searcherParams.Path, searcherParams.SearchOptions, this);
                 e.Result = new SearcherResult(this.StartTimestamp, result, searcherParams.Path, searcherParams.SearchOptions);
             }
