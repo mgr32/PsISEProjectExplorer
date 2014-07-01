@@ -19,11 +19,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
 {
     public class MainViewModel : BaseViewModel
     {
-
-        private static readonly string NOITEMS_NOSEARCH = "No files to show. Please enable 'Show All Files' or change workspace directory.";
-
-        private static readonly string NOITEMS_SEARCH = "No items matching your query.";
-
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public TreeViewModel TreeViewModel { get; private set; }
@@ -34,26 +29,25 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public event EventHandler<IseEventArgs> ActiveDocumentSyncEvent;
 
-        private string searchText;
-
         public string SearchText
         {
-            get { return this.searchText; }
+            get { return this.SearchOptions.SearchText; }
             set
             {
-                this.searchText = value;
-                Logger.Debug("Search text changed to: " + this.searchText);
+                this.SearchOptions.SearchText = value;
+                Logger.Debug("Search text changed to: " + this.SearchOptions.SearchText);
                 this.OnPropertyChanged();
-                this.OnPropertyChanged("NoTreeItemsString");
                 this.RunSearch();
             }
         }
 
-        public string NoTreeItemsString
+        public string TreeItemsResultString
         {
             get
             {
-                return String.IsNullOrEmpty(this.SearchText) ? NOITEMS_NOSEARCH : NOITEMS_SEARCH;
+                return String.Format("Found {0} files{1}", this.TreeViewModel.NumberOfFiles, 
+                    this.IndexingSearchingModel.IndexingInProgress ? ", indexing in progress..." : 
+                    this.IndexingSearchingModel.SearchingInProgress ? ", searching in progress..." : ".");
             }
         }
 
@@ -157,12 +151,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.FilesPatternProvider = new FilesPatternProvider(this.showAllFiles);
             this.syncWithActiveDocument = ConfigHandler.ReadConfigBoolValue("SyncWithActiveDocument", false);
             var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
-            this.SearchOptions = new SearchOptions { SearchField = searchField };
+            this.SearchOptions = new SearchOptions(searchField, string.Empty);
 
             this.DocumentHierarchyFactory = new DocumentHierarchyFactory();
             this.FileSystemChangeWatcher = new FileSystemChangeWatcher(this.ReindexOnFileSystemChanged);
             this.IndexingSearchingModel = new IndexingSearchingModel(this.OnSearchingFinished, this.OnIndexingFinished, this.OnIndexingProgress);
+            this.IndexingSearchingModel.PropertyChanged += (s, e) => { if (e.PropertyName == "IndexingInProgress" || e.PropertyName == "SearchingInProgress") this.OnPropertyChanged("TreeItemsResultString"); };
             this.TreeViewModel = new TreeViewModel(this.FileSystemChangeWatcher, this.DocumentHierarchyFactory, this.FilesPatternProvider);
+            this.TreeViewModel.PropertyChanged += (s, e) => { if (e.PropertyName == "NumberOfFiles") this.OnPropertyChanged("TreeItemsResultString"); };
             this.WorkspaceDirectoryModel = new WorkspaceDirectoryModel();
             if (this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory != null)
             {
@@ -197,14 +193,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
             
             // TODO: this is hacky...
-            this.searchText = string.Empty;
+            this.SearchOptions.SearchText = string.Empty;
             this.SearchInFiles = true;
             this.SearchText = funcName;
         }
 
         public void FindInFiles()
         {
-            this.searchText = string.Empty;
+            this.SearchOptions.SearchText = string.Empty;
             this.SearchInFiles = true;
         }
 
@@ -251,7 +247,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
         public void ReindexSearchTree()
         {
             this.ClearTreeView();
-            //this.IsTreeViewReady = false;
             this.ReindexSearchTree(null);
         }
 
@@ -291,12 +286,17 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void RunSearch(string path = null)
         {
-            var searcherParams = new BackgroundSearcherParams(this.DocumentHierarchySearcher, this.SearchOptions, this.SearchText, path);
+            var searcherParams = new BackgroundSearcherParams(this.DocumentHierarchySearcher, this.SearchOptions, path);
             this.IndexingSearchingModel.RunSearch(searcherParams);
         }
 
         private void OnSearchingFinished(object sender, SearcherResult result)
         {
+            if (!result.SearchOptions.Equals(this.SearchOptions))
+            {
+                // this means that SearchOptions have been changed in the meantime, so we need to ignore the result.
+                return;
+            }
             bool expandNewNodes = !String.IsNullOrWhiteSpace(this.SearchText);
             this.TreeViewModel.RefreshFromNode(result.ResultNode, result.Path, expandNewNodes);
             // when 'Sync with active document' is enabled and search results changed, we need to try to locate current document in the new search results

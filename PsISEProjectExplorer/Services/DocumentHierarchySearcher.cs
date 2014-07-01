@@ -27,19 +27,19 @@ namespace PsISEProjectExplorer.Services
         }
 
         // note: can be invoked by multiple threads simultaneously
-        public INode GetDocumentHierarchyViewNodeProjection(string path, string filter, SearchOptions searchOptions, BackgroundWorker worker)
+        public INode GetDocumentHierarchyViewNodeProjection(string path, SearchOptions searchOptions, BackgroundWorker worker)
         {
             if (this.DocumentHierarchy == null)
             {
                 return null;
             }
             var node = path == null ? this.DocumentHierarchy.RootNode : this.DocumentHierarchy.GetNode(path);
-            if (node == null || String.IsNullOrWhiteSpace(filter))
+            if (node == null || String.IsNullOrWhiteSpace(searchOptions.SearchText))
             {
                 return node;
             }
             IList<INode> filteredNodes = this.DocumentHierarchy
-                .SearchNodesFullText(filter, searchOptions.SearchField)
+                .SearchNodesFullText(searchOptions.SearchText, searchOptions.SearchField)
                 .Where(result => result.Path.StartsWith(node.Path)) // TODO: filter it earlier for performance
                 .Select(result => result.Node)
                 .ToList();

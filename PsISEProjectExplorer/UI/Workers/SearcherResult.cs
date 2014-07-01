@@ -1,4 +1,5 @@
-﻿using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
+﻿using PsISEProjectExplorer.Model;
+using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using System;
 
 namespace PsISEProjectExplorer.UI.Workers
@@ -11,11 +12,14 @@ namespace PsISEProjectExplorer.UI.Workers
 
         public string Path { get; private set; }
 
-        public SearcherResult(DateTime startTimeStamp, INode resultNode, string path)
+        public SearchOptions SearchOptions { get; private set; }
+
+        public SearcherResult(DateTime startTimeStamp, INode resultNode, string path, SearchOptions searchOptions)
         {
             this.StartTimestamp = startTimeStamp;
             this.ResultNode = resultNode;
             this.Path = path;
+            this.SearchOptions = searchOptions;
         }
     }
 }

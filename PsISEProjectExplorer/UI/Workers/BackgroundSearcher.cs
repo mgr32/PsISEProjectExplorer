@@ -54,12 +54,12 @@ namespace PsISEProjectExplorer.UI.Workers
                 e.Cancel = true;
                 return;
             }
-            Logger.Info(String.Format("Searching started, path: {0}, text: {1} ", searcherParams.Path, searcherParams.SearchText));
+            Logger.Info(String.Format("Searching started, path: {0}, text: {1} ", searcherParams.Path, searcherParams.SearchOptions.SearchText));
             try
             {
                 this.SearchingStateChangedHandler(this, true);
-                INode result = searcherParams.DocumentHierarchySearcher.GetDocumentHierarchyViewNodeProjection(searcherParams.Path, searcherParams.SearchText, searcherParams.SearchOptions, this);
-                e.Result = new SearcherResult(this.StartTimestamp, result, searcherParams.Path);
+                INode result = searcherParams.DocumentHierarchySearcher.GetDocumentHierarchyViewNodeProjection(searcherParams.Path, searcherParams.SearchOptions, this);
+                e.Result = new SearcherResult(this.StartTimestamp, result, searcherParams.Path, searcherParams.SearchOptions);
             }
             catch (OperationCanceledException)
             {

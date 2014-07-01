@@ -7,14 +7,12 @@ namespace PsISEProjectExplorer.UI.Workers
     {
         public DocumentHierarchySearcher DocumentHierarchySearcher { get; private set; }
         public SearchOptions SearchOptions { get; private set; }
-        public string SearchText { get; private set; }
         public string Path { get; private set; }
 
-        public BackgroundSearcherParams(DocumentHierarchySearcher documentHierarchySearcher, SearchOptions searchOptions, string searchText, string path)
+        public BackgroundSearcherParams(DocumentHierarchySearcher documentHierarchySearcher, SearchOptions searchOptions, string path)
         {
             this.DocumentHierarchySearcher = documentHierarchySearcher;
-            this.SearchOptions = searchOptions;
-            this.SearchText = searchText;
+            this.SearchOptions = new SearchOptions(searchOptions);
             this.Path = path;
         }
         

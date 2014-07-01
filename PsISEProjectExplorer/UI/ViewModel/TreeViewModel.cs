@@ -45,6 +45,21 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        private int numberOfFiles;
+
+        public int NumberOfFiles
+        { 
+            get
+            {
+                return this.numberOfFiles;
+            }
+            private set
+            {
+                this.numberOfFiles = value;
+                this.OnPropertyChanged();
+            }   
+        }
+
         private string PathOfItemToSelectOnRefresh { get; set; }
 
         private FileSystemChangeWatcher FileSystemChangeWatcher { get; set; }
@@ -69,6 +84,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.ItemsMap.Clear();
                 this.RootTreeViewEntryItem = rootNode == null ? null : this.CreateTreeViewEntryItemModel(rootNode, null, false);
+                this.NumberOfFiles = 0;
             }
         }
 
@@ -489,6 +505,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 var item = new TreeViewEntryItemModel(node, parent, isSelected);
                 this.ItemsMap[node.Path] = item;
+                if (node.NodeType == NodeType.File)
+                {
+                    lock (TreeViewEntryItemModel.RootLockObject)
+                    {
+                        this.NumberOfFiles++;
+                    }
+                }
                 return item;
             }
         }
@@ -508,21 +531,31 @@ namespace PsISEProjectExplorer.UI.ViewModel
             return item;
         }       
 
-        private void DeleteTreeViewEntryItemModel(TreeViewEntryItemModel item)
+        private void DeleteTreeViewEntryItemModel(TreeViewEntryItemModel item, bool first = true)
         {
+            if (item == this.RootTreeViewEntryItem)
+            {
+                return;
+            }
             var lockObject = item.Parent == null ? TreeViewEntryItemModel.RootLockObject : item.Parent;
             lock (lockObject)
             {
-                if (item == this.RootTreeViewEntryItem)
-                {
-                    return;
-                }
                 this.ItemsMap.Remove(item.Path);
+                if (item.NodeType == NodeType.File)
+                {
+                    lock (TreeViewEntryItemModel.RootLockObject)
+                    {
+                        this.NumberOfFiles--;
+                    }
+                }
                 foreach (var child in item.Children)
                 {
-                    this.ItemsMap.Remove(child.Path);
+                    this.DeleteTreeViewEntryItemModel(child, false);
                 }
-                item.Delete();
+                if (first)
+                {
+                    item.Delete();
+                }
             }
         }
     }

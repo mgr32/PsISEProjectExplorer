@@ -56,8 +56,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private EventHandler<SearcherResult> SearcherResultHandler { get; set; }
 
-
-
         public IndexingSearchingModel(EventHandler<SearcherResult> searcherResultHandler, EventHandler<IndexerResult> indexerResultHandler, EventHandler<string> indexerProgressHandler)
         {
             this.SearcherResultHandler = searcherResultHandler;
