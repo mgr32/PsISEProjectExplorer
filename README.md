@@ -14,6 +14,7 @@ Provides a tree view that enables to index and explore whole directory structure
 * Locate current file in the tree view (ALT+SHIFT+L).
 * Close All But This tab (CTRL+ALT+W).
 * Automatic reindex on file system change.
+* Ask user to reload files on file system change (editor functionality missing in ISE).
 
 Requires Powershell 3.0 or above.
 
