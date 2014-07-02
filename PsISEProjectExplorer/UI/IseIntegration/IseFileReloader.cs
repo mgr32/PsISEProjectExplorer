@@ -104,11 +104,10 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             }
             else if (e.PropertyName == "FullPath")
             {
-                // on 'save as', we don't have to access to the old name - need to refresh everything
+                // on 'save as' we don't have to access to the old name - need to refresh everything
                 this.RefreshWatchers();
             }
         }
-
         private void OnIseFileChangedBatch(object sender, FileSystemChangedInfo changedInfo)
         {
             foreach (var changePoolEntry in changedInfo.PathsChanged)
@@ -129,17 +128,22 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         private void ReloadFileOpenInIse(ChangePoolEntry changeEntry)
         {
             string path = changeEntry.PathChanged;
-            if (!this.IseIntegrator.OpenFiles.Contains(path))
+            var iseFile = this.IseIntegrator.OpenIseFiles.FirstOrDefault(f => f.FullPath == path);
+            if (iseFile == null)
             {
                 return;
             }
             var fileExists = File.Exists(path);
-            if (fileExists)
-            {
-                this.IseIntegrator.GoToFile(path);
-            }
             if (this.IseIntegrator.IsFileSaved(path))
             {
+                if (fileExists)
+                {
+                    if (this.CompareFileContents(path, iseFile.Editor.Text))
+                    {
+                        return;
+                    }
+                    this.IseIntegrator.GoToFile(path);
+                }
                 string question;
                 if (fileExists)
                 {
@@ -171,6 +175,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                 string message;
                 if (fileExists)
                 {
+                    this.IseIntegrator.GoToFile(path);
                     message = String.Format("File '{0}' has been modified by another program.\n\nSince the file had been changed in ISE editor, you will need to reload it manually.", path);
                 }
                 else if (changeEntry.PathAfterRename != null)
@@ -183,6 +188,20 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                 }
                 MessageBoxHelper.ShowInfo(message);
             }
+        }
+
+        private bool CompareFileContents(string path, string fileContentsToCompare)
+        {
+            string fileText = null;
+            try
+            {
+                fileText = File.ReadAllText(path);
+            } 
+            catch (Exception)
+            {
+                return false;
+            }
+            return fileText == fileContentsToCompare;
         }
     }
 }
