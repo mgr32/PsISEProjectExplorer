@@ -39,9 +39,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
         // running in UI thread
         public void ReindexSearchTree(BackgroundIndexerParams indexerParams)
         {
-            lock (this.BackgroundIndexers)
+            if (indexerParams.PathsChanged == null)
             {
-                if (indexerParams.PathsChanged == null)
+                lock (this.BackgroundIndexers)
                 {
                     foreach (var ind in this.BackgroundIndexers)
                     {
@@ -49,11 +49,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     }
                     this.BackgroundIndexers.Clear();
                 }
+            }
 
-                var indexer = new BackgroundIndexer();
-                indexer.RunWorkerCompleted += this.BackgroundIndexerWorkCompleted;
-                indexer.ProgressChanged += this.BackgroundIndexerProgressChanged;
-                indexer.RunWorkerAsync(indexerParams);
+            var indexer = new BackgroundIndexer();
+            indexer.RunWorkerCompleted += this.BackgroundIndexerWorkCompleted;
+            indexer.ProgressChanged += this.BackgroundIndexerProgressChanged;
+            indexer.RunWorkerAsync(indexerParams);
+            lock (this.BackgroundIndexers)
+            {
                 this.BackgroundIndexers.Add(indexer);
             }
         }
@@ -61,9 +64,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
         // running in Indexing or UI thread
         public void RunSearch(BackgroundSearcherParams searcherParams)
         {
-            lock (this.BackgroundSearchers)
+            if (searcherParams.Path == null)
             {
-                if (searcherParams.Path == null)
+                lock (this.BackgroundSearchers)
                 {
                     foreach (var sear in this.BackgroundSearchers)
                     {
@@ -71,15 +74,18 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     }
                     this.BackgroundSearchers.Clear();
                 }
-                var searcher = new BackgroundSearcher();
-                searcher.RunWorkerCompleted += this.BackgroundSearcherWorkCompleted;
-                if (searcherParams.Path != null)
+            }
+            var searcher = new BackgroundSearcher();
+            searcher.RunWorkerCompleted += this.BackgroundSearcherWorkCompleted;
+            if (searcherParams.Path != null)
+            {
+                searcher.RunWorkerSync(searcherParams);
+            }
+            else
+            {
+                searcher.RunWorkerAsync(searcherParams);
+                lock (this.BackgroundSearchers)
                 {
-                    searcher.RunWorkerSync(searcherParams);
-                }
-                else
-                {
-                    searcher.RunWorkerAsync(searcherParams);
                     this.BackgroundSearchers.Add(searcher);
                 }
             }
@@ -88,6 +94,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
         // running in UI thread
         private void BackgroundIndexerWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            var indexer = sender as BackgroundIndexer;
+            if (indexer != null)
+            {
+                lock (this.BackgroundIndexers)
+                {
+                    this.BackgroundIndexers.Remove(indexer);
+                }
+            }
             if (e.Cancelled)
             {
                 this.IndexerResultHandler(this, null);
@@ -116,6 +130,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
         // running in Indexing or UI thread
         private void BackgroundSearcherWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            var searcher = sender as BackgroundSearcher;
+            if (searcher != null)
+            {
+                lock (this.BackgroundSearchers)
+                {
+                    this.BackgroundSearchers.Remove(searcher);
+                }
+            }
             if (e.Cancelled)
             {
                 this.SearcherResultHandler(this, null);

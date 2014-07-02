@@ -111,19 +111,17 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         private void OnIseFileChangedBatch(object sender, FileSystemChangedInfo changedInfo)
         {
-            lock (this.PathsToIgnore)
+            foreach (var changePoolEntry in changedInfo.PathsChanged)
             {
-                foreach (var changePoolEntry in changedInfo.PathsChanged)
+                var pathChanged = changePoolEntry.PathChanged;
+                bool pathIgnored;
+                lock (this.PathsToIgnore)
                 {
-                    var pathChanged = changePoolEntry.PathChanged;
-                    if (this.PathsToIgnore.Contains(pathChanged))
-                    {
-                        this.PathsToIgnore.Remove(pathChanged);
-                    }
-                    else
-                    {
-                        this.ReloadFileOpenInIse(changePoolEntry);
-                    }
+                    pathIgnored = this.PathsToIgnore.Remove(pathChanged);
+                }
+                if (!pathIgnored)
+                {
+                    this.ReloadFileOpenInIse(changePoolEntry);
                 }
             }
         }

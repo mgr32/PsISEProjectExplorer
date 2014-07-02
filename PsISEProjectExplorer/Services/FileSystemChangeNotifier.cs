@@ -47,18 +47,19 @@ namespace PsISEProjectExplorer.Services
                 {
                     return;
                 }
+                FileSystemChangedInfo changedInfo = null;
                 lock (this)
                 {
                     if (this.ChangePool.Any())
                     {
                         IList<ChangePoolEntry> pathsChanged = RemoveSubdirectories(ChangePool);
-                        var changedInfo = new FileSystemChangedInfo(pathsChanged);
-                        if (this.FileSystemChanged != null)
-                        {
-                            FileSystemChanged(this, changedInfo);
-                        }
+                        changedInfo = new FileSystemChangedInfo(pathsChanged);
                         this.ChangePool.Clear();
                     }
+                }
+                if (changedInfo != null && this.FileSystemChanged != null)
+                {
+                    FileSystemChanged(this, changedInfo);
                 }
             }
         }

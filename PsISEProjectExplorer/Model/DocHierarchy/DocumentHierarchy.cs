@@ -38,6 +38,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
                 throw new ArgumentNullException("node");
             }
             var lockObject = node.Parent == null ? RootLockObject : node.Parent;
+            IList<INode> itemsToBeRemoved;
             lock (lockObject)
             {
                 if (node.Path != this.RootNode.Path)
@@ -46,11 +47,11 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
                     this.FullTextDirectory.DeleteDocument(node.Path);
                     node.Remove();
                 }
-                var itemsToBeRemoved = new List<INode>(node.Children);
-                foreach (INode child in itemsToBeRemoved)
-                {
-                    this.RemoveNode(child);
-                }
+                itemsToBeRemoved = new List<INode>(node.Children);
+            }
+            foreach (INode child in itemsToBeRemoved)
+            {
+                this.RemoveNode(child);
             }
         }
 

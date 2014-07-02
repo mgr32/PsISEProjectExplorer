@@ -538,6 +538,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 return;
             }
             var lockObject = item.Parent == null ? TreeViewEntryItemModel.RootLockObject : item.Parent;
+            IList<TreeViewEntryItemModel> children;
             lock (lockObject)
             {
                 this.ItemsMap.Remove(item.Path);
@@ -548,14 +549,15 @@ namespace PsISEProjectExplorer.UI.ViewModel
                         this.NumberOfFiles--;
                     }
                 }
-                foreach (var child in item.Children)
-                {
-                    this.DeleteTreeViewEntryItemModel(child, false);
-                }
-                if (first)
-                {
-                    item.Delete();
-                }
+                children = new List<TreeViewEntryItemModel>(item.Children);
+            }
+            foreach (var child in children)
+            {
+                this.DeleteTreeViewEntryItemModel(child, false);
+            }
+            if (first)
+            {
+                item.Delete();
             }
         }
     }
