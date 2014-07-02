@@ -105,7 +105,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void SanitizeWorkspaceDirectories()
         {
-            var itemsToRemove = this.WorkspaceDirectories.Where(wd => !Directory.Exists(wd));
+            var itemsToRemove = this.WorkspaceDirectories.Where(wd => !Directory.Exists(wd)).ToList();
             foreach (var item in itemsToRemove)
             {
                 this.WorkspaceDirectories.Remove(item);
