@@ -3,6 +3,7 @@ using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI.Helpers;
 using System;
+using System.Collections.Generic;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
@@ -76,35 +77,34 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public TreeViewEntryItemModel Parent { get; private set; }
 
-        private bool isExpanded;
+        private TreeViewEntryItemModelState State { get; set; }
 
         public bool IsExpanded
         {
             get
             {
-                return this.isExpanded;
+                return this.State.IsExpanded;
             }
             set
             {
-                this.isExpanded = value;
+                this.State.IsExpanded = value;
                 this.OnPropertyChanged();
             }
         }
-
-        private bool isSelected;
 
         public bool IsSelected
         {
             get
             {
-                return this.isSelected;
+                return this.State.IsSelected;
             }
             set
             {
-                this.isSelected = value;
+                this.State.IsSelected = value;
                 this.OnPropertyChanged();
             }
         }
+        
 
         private bool isBeingEdited;
 
@@ -155,6 +155,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             var lockObject = this.Parent == null ? RootLockObject : this.Parent;
             lock (lockObject)
             {
+                this.State = new TreeViewEntryItemModelState(false, isSelected);
                 this.DocumentHierarchyNode = node;
                 this.Parent = parent;
                 this.Children = new TreeViewEntryItemObservableSet();
@@ -162,7 +163,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 {
                     this.Parent.Children.Add(this);
                 }
-                this.IsSelected = isSelected;
             }
         }
 
@@ -183,7 +183,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public void UpdateNode(INode node)
         {
-            this.DocumentHierarchyNode = node;
+            if (this.DocumentHierarchyNode != node)
+            {
+                this.DocumentHierarchyNode = node;
+                this.OnPropertyChanged(String.Empty);
+            }
         }
 
         public override bool Equals(object obj)

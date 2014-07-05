@@ -109,12 +109,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
             TreeViewEntryItemModel treeViewEntryItem = this.FindTreeViewEntryItemByPath(node.Path);
             if (treeViewEntryItem == null)
             {
-                bool isSelected = node.Path == PathOfItemToSelectOnRefresh;
+                bool isSelected = node.Path == this.PathOfItemToSelectOnRefresh;
                 treeViewEntryItem = this.CreateTreeViewEntryItemModelWithNodeParents(node, isSelected, expandAllNodes);
             }
             else
             {
-                treeViewEntryItem.UpdateNode(node);
+                this.UpdateNode(treeViewEntryItem, node);
             }
             if (expandAllNodes)
             {
@@ -122,6 +122,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
             this.RefreshFromIntermediateNode(node, treeViewEntryItem, expandAllNodes);
             this.OnPropertyChanged("TreeViewItems");
+        }
+
+        private void UpdateNode(TreeViewEntryItemModel treeViewEntryItem, INode node)
+        {
+            treeViewEntryItem.UpdateNode(node);
         }
 
         private void HandleNoResultsFound(string path)
@@ -164,12 +169,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
                         .FirstOrDefault(treeViewChild => treeViewChild.Node.Equals(docHierarchyChild));
                     if (newTreeViewItem == null)
                     {
-                        bool isSelected = docHierarchyChild.Path == PathOfItemToSelectOnRefresh;
+                        bool isSelected = docHierarchyChild.Path == this.PathOfItemToSelectOnRefresh;
                         newTreeViewItem = this.CreateTreeViewEntryItemModel(docHierarchyChild, treeViewEntryItem, isSelected);
                     }
                     else
                     {
-                        newTreeViewItem.UpdateNode(docHierarchyChild);
+                        this.UpdateNode(newTreeViewItem, docHierarchyChild);
                     }
                     if (expandAllNodes)
                     {

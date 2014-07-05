@@ -88,18 +88,26 @@ namespace PsISEProjectExplorer.Services
             foreach (string path in pathsToUpdate)
             {
                 INode node = this.DocumentHierarchy.GetNode(path);
-                if (node != null)
+                bool nodeShouldBeRemoved = node != null;
+                var fileSystemEntryList = this.GetFileList(path, filesPatternProvider, worker);
+                
+                foreach (PowershellFileParser fileSystemEntry in fileSystemEntryList)
+                {
+                    // this is to prevent from reporting progress after deletion if the node is only updated
+                    if (fileSystemEntry.Path == path && node != null)
+                    {
+                        this.DocumentHierarchy.RemoveNode(node);
+                        nodeShouldBeRemoved = false;
+                    }
+                    documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
+                    changed = true;
+                }
+                if (nodeShouldBeRemoved)
                 {
                     this.DocumentHierarchy.RemoveNode(node);
                     changed = true;
                     this.ReportProgress(worker, path);
                 }
-                var fileSystemEntryList = this.GetFileList(path, filesPatternProvider, worker);
-                foreach (PowershellFileParser fileSystemEntry in fileSystemEntryList)
-                {
-                    documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
-                    changed = true;
-                }    
             }
             return changed;
             

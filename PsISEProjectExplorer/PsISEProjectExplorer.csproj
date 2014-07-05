@@ -118,6 +118,7 @@
     <Compile Include="UI\ViewModel\DefaultTreeViewEntryItemComparer.cs" />
     <Compile Include="UI\ViewModel\IndexingSearchingModel.cs" />
     <Compile Include="UI\ViewModel\MainViewModel.cs" />
+    <Compile Include="UI\ViewModel\TreeViewEntryItemModelState.cs" />
     <Compile Include="UI\ViewModel\TreeViewEntryItemObservableSet.cs" />
     <Compile Include="UI\Helpers\TreeViewHelper.cs" />
     <Compile Include="UI\ViewModel\TreeViewModel.cs" />
