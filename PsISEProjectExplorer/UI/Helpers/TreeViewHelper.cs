@@ -1,4 +1,7 @@
-﻿using System;
+﻿using PsISEProjectExplorer.UI.ViewModel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -62,7 +65,7 @@ namespace PsISEProjectExplorer.UI.Helpers
         /// </summary>
         /// <param name="treeView">The TreeView containing the item</param>
         /// <param name="item">The item to search and select</param>
-        public static void ExpandAndSelectItem(this TreeView treeView, object item)
+        public static void ExpandAndSelectItem(this TreeView treeView, TreeViewEntryItemModel item)
         {
             ExpandAndSelectItemContainer(treeView, item);
         }
@@ -123,30 +126,37 @@ namespace PsISEProjectExplorer.UI.Helpers
         /// <param name="parentContainer">The parent container whose children will be searched for the selected item</param>
         /// <param name="itemToSelect">The item to select</param>
         /// <returns>True if the item is found and selected, false otherwise</returns>
-        private static bool ExpandAndSelectItemContainer(ItemsControl parentContainer, object itemToSelect)
+        private static bool ExpandAndSelectItemContainer(ItemsControl parentContainer, TreeViewEntryItemModel itemToSelect)
         {
+            IList<TreeViewItem> applicableParents = new List<TreeViewItem>();
             //check all items at the current level
-            foreach (Object item in parentContainer.Items)
+            foreach (TreeViewEntryItemModel item in parentContainer.Items)
             {
-                var currentContainer = parentContainer.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
-
-                //if the data item matches the item we want to select, set the corresponding
-                //TreeViewItem IsSelected to true
-                if (item == itemToSelect && currentContainer != null)
+                if (itemToSelect.Path.StartsWith(item.Path))
                 {
-                    currentContainer.IsSelected = true;
-                    currentContainer.BringIntoView();
+                    var currentContainer = parentContainer.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
+                    //if the data item matches the item we want to select, set the corresponding
+                    //TreeViewItem IsSelected to true
+                    if (item == itemToSelect && currentContainer != null)
+                    {
+                        currentContainer.IsSelected = true;
+                        currentContainer.BringIntoView();
 
-                    //the item was found
-                    return true;
+                        //the item was found
+                        return true;
+                    }
+                    else
+                    {
+                        applicableParents.Add(currentContainer);
+                    }
                 }
+
+                
             }
 
             //if we get to this point, the selected item was not found at the current level, so we must check the children
-            foreach (Object item in parentContainer.Items)
+            foreach (TreeViewItem currentContainer in applicableParents)
             {
-                var currentContainer = parentContainer.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
-
                 //if children exist
                 if (currentContainer != null && currentContainer.Items.Count > 0)
                 {

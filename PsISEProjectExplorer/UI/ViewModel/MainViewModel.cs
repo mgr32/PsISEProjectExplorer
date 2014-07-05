@@ -342,10 +342,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 {
                     this.TreeViewModel.RefreshFromNode(result.ResultNode, result.Path, expandNewNodes);
                     // when 'Sync with active document' is enabled and search results changed, we need to try to locate current document in the new search results
-                    if (string.IsNullOrEmpty(result.Path))
-                    {
-                        this.ActiveDocumentPotentiallyChanged();
-                    }
+                    this.ActiveDocumentPotentiallyChanged();
                 });
             }
             finally
