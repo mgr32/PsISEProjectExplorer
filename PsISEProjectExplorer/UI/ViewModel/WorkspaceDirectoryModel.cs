@@ -73,11 +73,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public void SetWorkspaceDirectory(string path)
         {
-            if (!Directory.Exists(path))
-            {
-                MessageBoxHelper.ShowError(String.Format("Directory {0} does not exist.", path));
-                return;
-            }
             var posInList = this.WorkspaceDirectories.IndexOf(path);
 
             if (posInList != -1)
@@ -88,6 +83,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     return;
                 }
                 this.WorkspaceDirectories.RemoveAt(posInList);
+            }
+            if (!Directory.Exists(path))
+            {
+                MessageBoxHelper.ShowError(String.Format("Directory {0} does not exist.", path));
+                this.OnPropertyChanged("WorkspaceDirectories");
+                this.OnPropertyChanged("CurrentWorkspaceDirectory");
+                return;
             }
             this.WorkspaceDirectories.Insert(0, path);
             var cnt = this.WorkspaceDirectories.Count;
