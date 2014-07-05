@@ -128,7 +128,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 return false;
             }
             string newRootDirectoryToSearch = RootDirectoryProvider.GetRootDirectoryToSearch(currentPath);
-            if (newRootDirectoryToSearch == null || newRootDirectoryToSearch == this.CurrentWorkspaceDirectory || FileSystemOperationsService.IsSubdirectory(this.CurrentWorkspaceDirectory, newRootDirectoryToSearch))
+            if (newRootDirectoryToSearch == null || newRootDirectoryToSearch == this.CurrentWorkspaceDirectory || 
+                FileSystemOperationsService.IsSubdirectory(this.CurrentWorkspaceDirectory, newRootDirectoryToSearch) ||
+                !Directory.Exists(newRootDirectoryToSearch))
             {
                 return false;
             }

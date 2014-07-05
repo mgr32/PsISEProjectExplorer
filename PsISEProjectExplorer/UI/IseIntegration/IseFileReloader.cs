@@ -60,7 +60,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                     if (e.OldItems == null || !e.OldItems.Contains(newItem))
                     {
                         var path = newItem.FullPath;
-                        if (!this.IseFileWatchers.ContainsKey(path))
+                        if (File.Exists(path) && !this.IseFileWatchers.ContainsKey(path))
                         {
                             this.IseFileWatchers.Add(path, new IseFileWatcher(this.FileSystemChangeNotifier, path, newItem));
                         }
