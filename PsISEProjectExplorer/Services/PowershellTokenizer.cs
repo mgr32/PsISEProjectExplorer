@@ -8,17 +8,17 @@ namespace PsISEProjectExplorer.Services
 {
     public static class PowershellTokenizer
     {
-        public static IEnumerable<PowershellFunction> GetFunctions(string contents)
+        public static IEnumerable<PowershellItem> GetFunctions(string contents)
         {
             Collection<PSParseError> errors;
             IEnumerable<PSToken> tokens = PSParser.Tokenize(contents, out errors);
-            IList<PowershellFunction> functions = new List<PowershellFunction>();
+            IList<PowershellItem> functions = new List<PowershellItem>();
             bool nextTokenIsFunction = false;
             foreach (PSToken token in tokens)
             {
                 if (nextTokenIsFunction)
                 {
-                    functions.Add(new PowershellFunction(token.Content, token.StartLine, token.StartColumn));
+                    functions.Add(new PowershellItem(token.Content, token.StartLine, token.StartColumn));
                     nextTokenIsFunction = false;
                 }
                 if (token.Type == PSTokenType.Keyword)
@@ -39,6 +39,8 @@ namespace PsISEProjectExplorer.Services
             IEnumerable<PSToken> tokens = PSParser.Tokenize(line, out errors);
             return tokens.Where(token => token.StartColumn <= column && token.EndColumn >= column).Select(token => token.Content).FirstOrDefault();
         }
+
+
 
     }
 }

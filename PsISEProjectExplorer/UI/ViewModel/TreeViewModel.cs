@@ -227,9 +227,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
             else if (item.Node.NodeType == NodeType.Function)
             {
-                var node = ((PowershellFunctionNode)item.Node);
+                var node = ((PowershellItemNode)item.Node);
                 this.IseIntegrator.GoToFile(node.FilePath);
-                this.IseIntegrator.SelectText(node.PowershellFunction.StartLine, node.PowershellFunction.StartColumn, node.Name.Length);
+                this.IseIntegrator.SelectText(node.PowershellItem.StartLine, node.PowershellItem.StartColumn, node.Name.Length);
             }
             else if (item.Node.NodeType == NodeType.Directory)
             {

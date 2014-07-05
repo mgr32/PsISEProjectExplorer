@@ -1,7 +1,7 @@
 ﻿
 namespace PsISEProjectExplorer.Model
 {
-    public class PowershellFunction
+    public class PowershellItem
     {
         public string Name { get; private set; }
 
@@ -9,7 +9,7 @@ namespace PsISEProjectExplorer.Model
 
         public int StartColumn { get; private set; }
 
-        public PowershellFunction(string name, int startLine, int startColumn)
+        public PowershellItem(string name, int startLine, int startColumn)
         {
             this.Name = name;
             this.StartLine = startLine;

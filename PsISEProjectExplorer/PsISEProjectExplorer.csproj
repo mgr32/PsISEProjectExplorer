@@ -90,10 +90,10 @@
     <Compile Include="FullText\DocumentFactory.cs" />
     <Compile Include="Model\DocHierarchy\Nodes\DefaultNodeComparer.cs" />
     <Compile Include="Model\DocHierarchy\Nodes\INode.cs" />
-    <Compile Include="Model\DocHierarchy\Nodes\PowershellFunctionNode.cs" />
+    <Compile Include="Model\DocHierarchy\Nodes\PowershellItemNode.cs" />
     <Compile Include="Model\DocHierarchy\Nodes\RootNode.cs" />
     <Compile Include="Model\DocHierarchy\Nodes\ViewNode.cs" />
-    <Compile Include="Model\PowershellFunction.cs" />
+    <Compile Include="Model\PowershellItem.cs" />
     <Compile Include="Enums\NodeType.cs" />
     <Compile Include="Services\PowershellTokenizer.cs" />
     <Compile Include="Services\TokenLocator.cs" />

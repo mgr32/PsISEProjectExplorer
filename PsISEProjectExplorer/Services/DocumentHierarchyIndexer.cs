@@ -34,7 +34,7 @@ namespace PsISEProjectExplorer.Services
             if (!parser.IsDirectory)
             {
                 INode fileNode = this.DocumentHierarchy.CreateNewFileNode(parser.Path, parser.FileContents, lastDirNode, parser.ErrorMessage);
-                foreach (PowershellFunction func in parser.PowershellFunctions)
+                foreach (PowershellItem func in parser.PowershellItems)
                 {
                     this.DocumentHierarchy.CreateNewFunctionNode(parser.Path, func, fileNode);
                 }

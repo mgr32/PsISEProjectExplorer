@@ -83,12 +83,12 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             }
         }
 
-        public INode CreateNewFunctionNode(string path, PowershellFunction func, INode parent)
+        public INode CreateNewFunctionNode(string path, PowershellItem func, INode parent)
         {
             var lockObject = parent == null ? RootLockObject : parent;
             lock (lockObject)
             {
-                INode functionNode = new PowershellFunctionNode(path, func, parent);
+                INode functionNode = new PowershellItemNode(path, func, parent);
                 this.NodeMap.Add(functionNode.Path, functionNode);
                 this.FullTextDirectory.DocumentCreator.AddFunctionEntry(functionNode.Path, func.Name);
                 return functionNode;

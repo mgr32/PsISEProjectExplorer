@@ -194,13 +194,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 return;
             }
-            var node = (PowershellFunctionNode)this.DocumentHierarchySearcher.GetFunctionNodeByName(funcName);
+            var node = (PowershellItemNode)this.DocumentHierarchySearcher.GetFunctionNodeByName(funcName);
             if (node == null)
             {
                 return;
             }
             this.IseIntegrator.GoToFile(node.FilePath);
-            this.IseIntegrator.SetCursor(node.PowershellFunction.StartLine, node.PowershellFunction.StartColumn);
+            this.IseIntegrator.SetCursor(node.PowershellItem.StartLine, node.PowershellItem.StartColumn);
             
         }
 
