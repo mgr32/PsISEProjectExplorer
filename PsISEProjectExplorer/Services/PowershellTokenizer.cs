@@ -1,4 +1,5 @@
-﻿using PsISEProjectExplorer.Model;
+﻿using PsISEProjectExplorer.Enums;
+using PsISEProjectExplorer.Model;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,29 +9,61 @@ namespace PsISEProjectExplorer.Services
 {
     public static class PowershellTokenizer
     {
-        public static IEnumerable<PowershellItem> GetFunctions(string contents)
+        public static PowershellItem GetPowershellItems(string contents)
         {
             Collection<PSParseError> errors;
             IEnumerable<PSToken> tokens = PSParser.Tokenize(contents, out errors);
-            IList<PowershellItem> functions = new List<PowershellItem>();
-            bool nextTokenIsFunction = false;
+            PowershellItem rootItem = new PowershellItem(PowershellItemType.Root, null, 0, 0, 0, null);   
+            PowershellItem currentItem = rootItem;
+
+            bool nextTokenIsFunctionName = false;
+            PSToken commandToken = null;
+
+            int nestingLevel = 0;
             foreach (PSToken token in tokens)
             {
-                if (nextTokenIsFunction)
+                if (nextTokenIsFunctionName)
                 {
-                    functions.Add(new PowershellItem(token.Content, token.StartLine, token.StartColumn));
-                    nextTokenIsFunction = false;
+                    var item = new PowershellItem(PowershellItemType.Function, token.Content, token.StartLine, token.StartColumn, nestingLevel, currentItem);
+                    // currentItem = item;
+                    nextTokenIsFunctionName = false;
                 }
-                if (token.Type == PSTokenType.Keyword)
+                /*else if (commandToken != null)
+                {
+                    var item = new PowershellItem(PowershellItemType.Command, commandToken.Content, commandToken.StartLine, commandToken.StartColumn, nestingLevel, currentItem);
+                    currentItem = item;
+                    commandToken = null;
+                    continue;
+                }
+                else if (token.Type == PSTokenType.NewLine)
+                {
+                    if (currentItem != null && nestingLevel <= currentItem.NestingLevel)
+                    {
+                        currentItem = currentItem.Parent ?? rootItem;
+                    }
+                }
+                else if (token.Type == PSTokenType.GroupStart && token.Content.Contains("{"))
+                {
+                    nestingLevel++;
+                }
+                else if (token.Type == PSTokenType.GroupEnd && token.Content.Contains("}"))
+                {
+                    nestingLevel--;
+                }
+                else if (token.Type == PSTokenType.Command)
+                {
+                    commandToken = token;                   
+                }*/
+                else if (token.Type == PSTokenType.Keyword)
                 {
                     string tokenContent = token.Content.ToLowerInvariant();
                     if (tokenContent == "function" || tokenContent == "filter")
                     {
-                        nextTokenIsFunction = true;
+                        nextTokenIsFunctionName = true;
                     }
                 }
             }
-            return functions;
+            return rootItem;
         }
 
         public static string GetTokenAtColumn(string line, int column)

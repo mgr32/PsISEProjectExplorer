@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="Config\ConfigHandler.cs" />
     <Compile Include="Model\ChangePoolEntry.cs" />
+    <Compile Include="Enums\PowershellItemType.cs" />
     <Compile Include="Services\FilesPatternProvider.cs" />
     <Compile Include="Model\FileSystemChangedInfo.cs" />
     <Compile Include="Model\LineInfo.cs" />

@@ -12,25 +12,25 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 
         public PowershellItem PowershellItem { get; private set; }
 
-        public PowershellItemNode(string filePath, PowershellItem func, INode parent)
-            : base(GetNodePath(filePath, func), func.Name, parent)
+        public PowershellItemNode(string filePath, PowershellItem item, INode parent)
+            : base(GetNodePath(filePath, item), item.Name, parent)
         {
             this.FilePath = filePath;
-            this.PowershellItem = func;
+            this.PowershellItem = item;
         }
 
-        private static string GetNodePath(string filePath, PowershellItem func)
+        private static string GetNodePath(string filePath, PowershellItem item)
         {
             if (filePath == null)
             {
                 throw new ArgumentNullException("filePath");
             }
-            if (func == null)
+            if (item == null)
             {
-                throw new ArgumentNullException("func");
+                throw new ArgumentNullException("item");
             }
 
-            return System.IO.Path.Combine(filePath, func.StartLine.ToString(CultureInfo.InvariantCulture));
+            return System.IO.Path.Combine(filePath, item.StartLine.ToString() + "_" + item.StartColumn.ToString());
         }
     }
 }

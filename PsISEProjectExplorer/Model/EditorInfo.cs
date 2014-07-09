@@ -18,11 +18,6 @@ namespace PsISEProjectExplorer.Model
             this.CurrentColumn = currentColumn;
         }
 
-        public string GetFunctionInCurrentLine()
-        {
-            return PowershellTokenizer.GetFunctions(this.CurrentLine).Select(f => f.Name).FirstOrDefault();
-        }
-
         public string GetTokenFromCurrentPosition()
         {
             return PowershellTokenizer.GetTokenAtColumn(this.CurrentLine, this.CurrentColumn);

@@ -102,7 +102,7 @@ namespace PsISEProjectExplorer
                     return;
                 }
                 var selectedItem = this.SearchResults.SelectedItem as TreeViewEntryItemModel;
-                if (selectedItem != null && selectedItem.Path == path)
+                if (selectedItem != null && selectedItem.Path.StartsWith(path))
                 {
                     return;
                 }

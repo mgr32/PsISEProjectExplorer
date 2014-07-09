@@ -11,7 +11,7 @@ namespace PsISEProjectExplorer.Services
 
         public string FileContents { get; private set; }
 
-        public IEnumerable<PowershellItem> PowershellItems { get; private set; }
+        public PowershellItem RootPowershellItem { get; private set; }
 
         public bool IsDirectory { get; private set; }
 
@@ -44,7 +44,6 @@ namespace PsISEProjectExplorer.Services
             this.Path = path;
             this.IsDirectory = isDirectory;
             this.ErrorMessage = errorMessage;
-            this.PowershellItems = new List<PowershellItem>();
             if (!this.IsDirectory && FilesPatternProvider.IsPowershellFile(path))
             {
                 this.ParseFile();
@@ -68,7 +67,7 @@ namespace PsISEProjectExplorer.Services
             }
             if (this.FileContents != null)
             {
-               this.PowershellItems = PowershellTokenizer.GetFunctions(this.FileContents);
+               this.RootPowershellItem = PowershellTokenizer.GetPowershellItems(this.FileContents);
             }
         }
     }

@@ -23,7 +23,7 @@ namespace PsISEProjectExplorer.FullText
             this.CreateDocument(path, fileName, fileContents);
         }
 
-        public void AddFunctionEntry(string path, string name)
+        public void AddPowershellItemEntry(string path, string name)
         {
             this.CreateDocument(path, name, string.Empty);
         }

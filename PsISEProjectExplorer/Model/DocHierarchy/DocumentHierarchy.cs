@@ -83,16 +83,23 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             }
         }
 
-        public INode CreateNewFunctionNode(string path, PowershellItem func, INode parent)
+        public INode CreateNewPowershellItemNode(string filePath, PowershellItem item, INode parent)
         {
-            var lockObject = parent == null ? RootLockObject : parent;
-            lock (lockObject)
+            if (item.Type != PowershellItemType.Root)
             {
-                INode functionNode = new PowershellItemNode(path, func, parent);
-                this.NodeMap.Add(functionNode.Path, functionNode);
-                this.FullTextDirectory.DocumentCreator.AddFunctionEntry(functionNode.Path, func.Name);
-                return functionNode;
+                var lockObject = parent == null ? RootLockObject : parent;
+                lock (lockObject)
+                {
+                    parent = new PowershellItemNode(filePath, item, parent);
+                    this.NodeMap.Add(parent.Path, parent);
+                    this.FullTextDirectory.DocumentCreator.AddPowershellItemEntry(parent.Path, item.Name);
+                }
             }
+            foreach (var itemChild in item.Children)
+            {
+                this.CreateNewPowershellItemNode(filePath, itemChild, parent);
+            }
+            return parent;
         }
 
         public INode UpdateDirectoryNodePath(INode node, string newPath, string errorMessage)
