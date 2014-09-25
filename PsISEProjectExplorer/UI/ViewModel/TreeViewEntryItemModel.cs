@@ -20,6 +20,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
             set
             {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("node");
+                }
                 this.documentHierarchyNode = value;
                 this.OnPropertyChanged("IsExpanded");
             }
@@ -148,10 +152,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public TreeViewEntryItemModel(INode node, TreeViewEntryItemModel parent, bool isSelected)
         {
-            if (node == null) 
-            {
-                throw new ArgumentNullException("node");
-            }
             var lockObject = this.Parent == null ? RootLockObject : this.Parent;
             lock (lockObject)
             {
@@ -175,8 +175,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 {
                     this.Parent.Children.Remove(this);
                 }
-                this.DocumentHierarchyNode = null;
-                this.Children = null;
+                this.Children.Clear();
                 this.Parent = null;
             }
         }
@@ -192,7 +191,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public void RefreshNode()
         {
-            this.OnPropertyChanged(String.Empty);
+                this.OnPropertyChanged(String.Empty);
         }
 
         public override bool Equals(object obj)
@@ -207,7 +206,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public override int GetHashCode()
         {
-            return (this.Node == null ? 0 : this.Node.GetHashCode());
+            return this.Node.GetHashCode();
         }
 
     }
