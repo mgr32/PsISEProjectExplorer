@@ -89,7 +89,7 @@ namespace PsISEProjectExplorer
             }
             else
             {
-                msg.AppendLine("Note this information comes from PsISEProjectExplorer, but the exception have been probably thrown from another module or from ISE itself.");
+                msg.AppendLine("Note this information comes from PsISEProjectExplorer, but the exception has been probably thrown from another module or from ISE itself.");
             }
             msg.AppendLine();
             msg.AppendLine("Exception: " + e.Message);
