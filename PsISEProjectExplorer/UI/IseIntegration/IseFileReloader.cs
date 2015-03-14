@@ -29,7 +29,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             this.IseIntegrator = iseIntegrator;
             this.IseFileWatchers = new Dictionary<string, IseFileWatcher>();
             this.PathsToIgnore = new HashSet<string>();
-            this.FileSystemChangeNotifier = new FileSystemChangeNotifier();
+            this.FileSystemChangeNotifier = new FileSystemChangeNotifier("PsISEPE-FileSystemNotifierIseReloader");
             this.FileSystemChangeNotifier.FileSystemChanged += OnIseFileChangedBatch;
             this.IseIntegrator.AttachFileCollectionChangedHandler(this.OnIseFilesCollectionChanged);
         }

@@ -5,19 +5,25 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using NLog;
 
 namespace PsISEProjectExplorer.Services
 {
     public class FileSystemChangeNotifier
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         public event EventHandler<FileSystemChangedInfo> FileSystemChanged;
         
         private readonly ISet<ChangePoolEntry> ChangePool = new HashSet<ChangePoolEntry>();
 
         private readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
-        public FileSystemChangeNotifier()
+        private string Name;
+
+        public FileSystemChangeNotifier(string name)
         {
+            this.Name = name;
             Task.Factory.StartNew(ChangeNotifier);
         }
 
@@ -42,7 +48,7 @@ namespace PsISEProjectExplorer.Services
         {
             if (Thread.CurrentThread.Name == null)
             {
-                Thread.CurrentThread.Name = "PsISEPE-FileSystemChangeNotifier";
+                Thread.CurrentThread.Name = this.Name;
             }
             while (true)
             {

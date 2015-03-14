@@ -166,7 +166,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 lock (treeViewEntryItem)
                 {
                      newTreeViewItem = treeViewEntryItem.Children
-                        .FirstOrDefault(treeViewChild => treeViewChild.Node.Equals(docHierarchyChild));
+                        .FirstOrDefault(treeViewChild => docHierarchyChild.Equals(treeViewChild.Node));
                     if (newTreeViewItem == null)
                     {
                         bool isSelected = docHierarchyChild.Path == this.PathOfItemToSelectOnRefresh;

@@ -1,5 +1,6 @@
 ﻿using NLog;
 using PsISEProjectExplorer.Model;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -36,9 +37,9 @@ namespace PsISEProjectExplorer.Services
                 bs = new BufferedStream(fs);
                 sr = new StreamReader(bs);
             }
-            catch (IOException)
+            catch (IOException e)
             {
-                Logger.Error("Cannot open file '" + path + "'");
+                Logger.Error("Cannot open file '" + path + "'", e);
                 if (sr != null)
                     sr.Dispose();
                 if (bs != null)
@@ -58,9 +59,9 @@ namespace PsISEProjectExplorer.Services
                     line = sr.ReadLine();
                     lineNum++;
                 } 
-                catch 
+                catch (Exception e)
                 {
-                    Logger.Error("Cannot read from file '" + path + "'");
+                    Logger.Error("Cannot read from file '" + path + "'", e);
                     sr.Dispose();
                     bs.Dispose();
                     fs.Dispose();

@@ -27,9 +27,9 @@ namespace PsISEProjectExplorer.Config
             {
                 Config = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Logger.Error("Cannot open configuration file at " + configFilePath);
+                Logger.Error("Cannot open configuration file at " + configFilePath, e);
             }
         }
 

@@ -70,6 +70,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         {
             try
             {
+                Logger.Debug("ISEIntegrator - opening file " + filePath);
                 this.HostObject.CurrentPowerShellTab.Files.Add(filePath);
             }
             catch (Exception e)
@@ -82,6 +83,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         {
             if (this.HostObject.CurrentPowerShellTab.Files.SelectedFile != null)
             {
+                Logger.Debug("ISEIntegrator - setting cursor to line " + line + ", column " + column);
                 var editor = this.HostObject.CurrentPowerShellTab.Files.SelectedFile.Editor;
                 if (editor.LineCount > line)
                 {
@@ -101,6 +103,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         {
             if (this.HostObject.CurrentPowerShellTab.Files.SelectedFile != null)
             {
+                Logger.Debug("IseIntegrator - selecting text at line " + line + ", column " + column + ", length " + length);
                 var editor = this.HostObject.CurrentPowerShellTab.Files.SelectedFile.Editor;
                 if (editor.LineCount > line)
                 {
@@ -128,6 +131,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         public void SetFocusOnCurrentTab()
         {
+            Logger.Debug("IseIntegrator - setting focus on current tab");
             var file = this.HostObject.CurrentPowerShellTab.Files.SelectedFile;
             if (file == null)
             {
@@ -142,6 +146,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             {
                 return;
             }
+            Logger.Debug("IseIntegrator - closing all but this");
             var filesToRemove = new List<ISEFile>(this.HostObject.CurrentPowerShellTab.Files);
             var selectedFile = this.HostObject.CurrentPowerShellTab.Files.SelectedFile;
             foreach (var file in filesToRemove)
@@ -162,6 +167,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         public bool CloseFile(string path)
         {
+            Logger.Debug("IseIntegrator - closing file " + path);
             var file = this.GetIseFile(path);
             if (file != null)
             {

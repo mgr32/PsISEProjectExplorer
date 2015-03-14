@@ -167,8 +167,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public MainViewModel()
         {
-            this.searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles", false);
-            this.showAllFiles = ConfigHandler.ReadConfigBoolValue("ShowAllFiles", false);
+            this.searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles", true);
+            this.showAllFiles = ConfigHandler.ReadConfigBoolValue("ShowAllFiles", true);
             this.FilesPatternProvider = new FilesPatternProvider(this.showAllFiles);
             this.syncWithActiveDocument = ConfigHandler.ReadConfigBoolValue("SyncWithActiveDocument", false);
             var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
@@ -332,7 +332,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             try
             {
-                if (result == null || !result.SearchOptions.Equals(this.SearchOptions))
+                if (result == null || result.SearchOptions == null || !result.SearchOptions.Equals(this.SearchOptions))
                 {
                     // this means that the thread was cancelled or SearchOptions have been changed in the meantime, so we need to ignore the result.
                     return;

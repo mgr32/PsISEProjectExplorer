@@ -1,4 +1,5 @@
-﻿using PsISEProjectExplorer.Model;
+﻿using NLog;
+using PsISEProjectExplorer.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +11,8 @@ namespace PsISEProjectExplorer.Services
 {
     public class FileSystemChangeWatcher
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private FileSystemChangeNotifier FileSystemChangeNotifier { get; set; }
 
         private FileSystemWatcher Watcher { get; set; }
@@ -20,7 +23,7 @@ namespace PsISEProjectExplorer.Services
 
         public FileSystemChangeWatcher(EventHandler<FileSystemChangedInfo> fileSystemChangedEvent)
         {
-            this.FileSystemChangeNotifier = new FileSystemChangeNotifier();
+            this.FileSystemChangeNotifier = new FileSystemChangeNotifier("PsISEPE-FileSystemNotifierReindexWatcher");
             this.FileSystemChangeNotifier.FileSystemChanged += fileSystemChangedEvent;
             this.Watcher = new FileSystemWatcher();
         }
@@ -79,12 +82,14 @@ namespace PsISEProjectExplorer.Services
             {
                 return;
             }
+            Logger.Debug("File changed: " + e.FullPath);
             this.FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.FullPath, RootPath));
         }
 
         // runs on a separate thread (from system)
         private void OnFileRenamed(object source, RenamedEventArgs e)
         {
+            Logger.Debug("File renamed: " + e.OldFullPath + " to " + e.FullPath);
             bool isDir = Directory.Exists(e.FullPath) || Directory.Exists(e.OldFullPath);
             if (isDir || this.FilesPatternProvider.DoesFileMatch(e.OldFullPath))
             {

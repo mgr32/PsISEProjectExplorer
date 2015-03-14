@@ -1,4 +1,5 @@
 ﻿using Microsoft.PowerShell.Host.ISE;
+using NLog;
 using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Services;
 using System;
@@ -12,6 +13,8 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 {
     public class IseFileWatcher
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private FileSystemChangeNotifier FileSystemChangeNotifier { get; set; }
 
         private FileSystemWatcher Watcher { get; set; }
@@ -38,11 +41,13 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         private void OnFileChanged(object source, FileSystemEventArgs e)
         {
+            Logger.Debug("File changed: " + e.FullPath);
             this.FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.FullPath, String.Empty));
         }
 
         private void OnFileRenamed(object source, RenamedEventArgs e)
         {
+            Logger.Debug("File renamed: " + e.OldFullPath + " to " + e.FullPath);
             this.FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.OldFullPath, String.Empty, e.FullPath));
         }
 
