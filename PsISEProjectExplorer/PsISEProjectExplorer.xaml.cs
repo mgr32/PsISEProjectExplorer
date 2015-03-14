@@ -58,10 +58,10 @@ namespace PsISEProjectExplorer
             this.MainViewModel.ActiveDocumentSyncEvent += OnActiveDocumentSyncEvent;
             this.DataContext = this.MainViewModel;
             InitializeComponent();
-            this.Dispatcher.UnhandledExceptionFilter += DispatchUnhandledExceptionFilterHandler;
+            this.Dispatcher.UnhandledException += DispatcherUnhandledExceptionHandler;
         }
 
-        private static void DispatchUnhandledExceptionFilterHandler(object sender, DispatcherUnhandledExceptionFilterEventArgs args)
+        private static void DispatcherUnhandledExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)
         {
             Exception e = (Exception)args.Exception;
             Logger.Error("Unhandled Dispatcher exception", e);
@@ -81,23 +81,31 @@ namespace PsISEProjectExplorer
             }
             Logger.Error(sources.ToString());
             StringBuilder msg = new StringBuilder();
-            msg.AppendLine("An unhandled exception occurred in Powershell ISE: ");
-            msg.AppendLine(e.ToString());
+            msg.AppendLine("An unhandled exception occurred in Powershell ISE - please save your work and restart ISE as soon as possible. ");
             msg.AppendLine();
             if (firstSource != null && firstSource.ToLowerInvariant().Equals("psiseprojectexplorer"))
             {
-                msg.AppendLine("This is most likely PsISEProjectExplorer error. Please create an issue at https://github.com/mgr32/PsISEProjectExplorer and attach file " + LogFileName);
+                msg.AppendLine("This is most likely PsISEProjectExplorer error. Please create an issue at https://github.com/mgr32/PsISEProjectExplorer.");
             }
             else
             {
-                msg.AppendLine("Note this information comes from PsISEProjectExplorer, but the exception might have been thrown from ISE itself or another module (source: '" + firstSource +
-                "'). If you believe it's PsISEProjectExplorer error, please create an issue at https://github.com/mgr32/PsISEProjectExplorer and attach file " + LogFileName);
+                msg.AppendLine("Note this information comes from PsISEProjectExplorer, but the exception have been probably thrown from another module or from ISE itself.");
             }
+            msg.AppendLine();
+            msg.AppendLine("Exception: " + e.Message);
+            if (e.InnerException != null)
+            {
+                msg.AppendLine("Inner exception source: " + e.InnerException.Source);
+                msg.AppendLine("Inner exception message: " + e.InnerException.Message);
+                msg.AppendLine("Inner exception site: " + e.InnerException.TargetSite);
+            }
+            msg.AppendLine();
+            msg.AppendLine("More details can be found in log file at: " + LogFileName);
             Application.Current.Dispatcher.Invoke(() =>
             {
                 MessageBox.Show(Application.Current.MainWindow, msg.ToString(), "Powershell ISE error", MessageBoxButton.OK, MessageBoxImage.Error);
             });
-            args.RequestCatch = false;
+            args.Handled = true;
         }
 
         private void OnActiveDocumentSyncEvent(object sender, IseEventArgs args)
