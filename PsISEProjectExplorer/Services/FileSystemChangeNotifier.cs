@@ -40,6 +40,10 @@ namespace PsISEProjectExplorer.Services
         // runs on a separate thread (created in constructor)
         private void ChangeNotifier()
         {
+            if (Thread.CurrentThread.Name == null)
+            {
+                Thread.CurrentThread.Name = "PsISEPE-FileSystemChangeNotifier";
+            }
             while (true)
             {
                 Thread.Sleep(200);

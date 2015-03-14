@@ -31,6 +31,10 @@ namespace PsISEProjectExplorer.UI.Workers
 
         private void RunSearching(object sender, DoWorkEventArgs e)
         {
+            if (Thread.CurrentThread.Name == null)
+            {
+                Thread.CurrentThread.Name = "PsISEPE-Searcher";
+            }
             var searcherParams = (BackgroundSearcherParams)e.Argument;
             if (searcherParams.DocumentHierarchySearcher == null) 
             {

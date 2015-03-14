@@ -5,6 +5,7 @@ using PsISEProjectExplorer.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
 
 namespace PsISEProjectExplorer.UI.Workers
 {
@@ -27,6 +28,10 @@ namespace PsISEProjectExplorer.UI.Workers
         // running in Indexing thread
         private void RunIndexing(object sender, DoWorkEventArgs e)
         {
+            if (Thread.CurrentThread.Name == null)
+            {
+                Thread.CurrentThread.Name = "PsISEPE-Indexer";
+            }
             var indexerParams = (BackgroundIndexerParams)e.Argument;
             Logger.Info("Indexing started, rootDir: " + indexerParams.RootDirectory + ", pathsChanged: " + (indexerParams.PathsChanged == null ? "null" : String.Join(", ", indexerParams.PathsChanged)));
             lock (BackgroundIndexerLock)
