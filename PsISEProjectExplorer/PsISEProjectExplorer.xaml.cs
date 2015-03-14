@@ -12,6 +12,8 @@ using PsISEProjectExplorer.UI.ViewModel;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,6 +27,10 @@ namespace PsISEProjectExplorer
     /// </summary>
     public partial class ProjectExplorerWindow : IAddOnToolHostObject
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        private static string LogFileName { get; set; }
+
         private MainViewModel MainViewModel { get; set; }
 
         private Point DragStartPoint;
@@ -52,22 +58,45 @@ namespace PsISEProjectExplorer
             this.MainViewModel.ActiveDocumentSyncEvent += OnActiveDocumentSyncEvent;
             this.DataContext = this.MainViewModel;
             InitializeComponent();
-            // #if !DEBUG
             this.Dispatcher.UnhandledExceptionFilter += DispatchUnhandledExceptionFilterHandler;
-            //#endif
         }
 
         private static void DispatchUnhandledExceptionFilterHandler(object sender, DispatcherUnhandledExceptionFilterEventArgs args)
         {
             Exception e = (Exception)args.Exception;
+            Logger.Error("Unhandled Dispatcher exception", e);
+
+            StringBuilder sources = new StringBuilder().Append("Sources: ");
+            string firstSource = null;
+            var innerException = e.InnerException;
+
+            while (innerException != null)
+            {
+                if (firstSource == null)
+                {
+                    firstSource = innerException.Source;
+                }
+                sources.Append(innerException.Source).Append(",");
+                innerException = innerException.InnerException;
+            }
+            Logger.Error(sources.ToString());
             StringBuilder msg = new StringBuilder();
-            msg.AppendLine("An unhandled exception occurred in PsISEProjectExplorer: ");
+            msg.AppendLine("An unhandled exception occurred in Powershell ISE: ");
             msg.AppendLine(e.ToString());
             msg.AppendLine();
-            var msgClipboard = msg.ToString();
-            msg.AppendLine("Please create an issue at https://github.com/mgr32/PsISEProjectExplorer describing context of your action and pasting information stored in the clipboard.");
-            Clipboard.SetText(msgClipboard.ToString());
-            MessageBoxHelper.ShowError(msg.ToString());
+            if (firstSource != null && firstSource.ToLowerInvariant().Equals("psiseprojectexplorer"))
+            {
+                msg.AppendLine("This is most likely PsISEProjectExplorer error. Please create an issue at https://github.com/mgr32/PsISEProjectExplorer and attach file " + LogFileName);
+            }
+            else
+            {
+                msg.AppendLine("Note this information comes from PsISEProjectExplorer, but the exception might have been thrown from ISE itself or another module (source: '" + firstSource +
+                "'). If you believe it's PsISEProjectExplorer error, please create an issue at https://github.com/mgr32/PsISEProjectExplorer and attach file " + LogFileName);
+            }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                MessageBox.Show(Application.Current.MainWindow, msg.ToString(), "Powershell ISE error", MessageBoxButton.OK, MessageBoxImage.Error);
+            });
             args.RequestCatch = false;
         }
 
@@ -163,17 +192,15 @@ namespace PsISEProjectExplorer
 
         private void ConfigureLogging()
         {
-            #if DEBUG
-            var config = new LoggingConfiguration();
-            var target = new FileTarget
-            {
-                FileName = "C:\\PSIseProjectExplorer.log.txt",
-                Layout = "${longdate}|${level:uppercase=true}|${logger}|${threadid}|${message}"
-            };
-            config.AddTarget("file", target);
-            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, target));
+            string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            LogFileName = Path.Combine(assemblyFolder, "NLog.config");
+            var config = new NLog.Config.XmlLoggingConfiguration(LogFileName);
             LogManager.Configuration = config;
-            #endif
+            var targets = config.AllTargets;
+            if (targets != null && targets.Any() && targets.First() is FileTarget) {
+                LogFileName = ((FileTarget)targets.First()).FileName.Render(new LogEventInfo());
+            }
+
         }
 
         private void SearchResults_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
