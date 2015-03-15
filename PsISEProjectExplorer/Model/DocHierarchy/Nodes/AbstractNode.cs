@@ -9,8 +9,8 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         public abstract NodeType NodeType { get; }
         public virtual string Path { get; private set; }
         public virtual string Name { get; private set; }
-        public virtual bool IsValid { get; private set; }
-        public virtual string Metadata { get; private set; }
+        public virtual bool IsValid { get; protected set; }
+        public virtual string Metadata { get; protected set; }
         public INode Parent { get; private set; }
         public ISet<INode> Children { get; private set; }
 

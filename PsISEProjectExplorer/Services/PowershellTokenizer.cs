@@ -1,19 +1,41 @@
-﻿using PsISEProjectExplorer.Enums;
+﻿using NLog;
+using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Management.Automation;
+using System.Text.RegularExpressions;
 
 namespace PsISEProjectExplorer.Services
 {
     public static class PowershellTokenizer
     {
-        public static PowershellItem GetPowershellItems(string contents)
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        private static readonly Regex importDscRegex = new Regex("Import-DSCResource", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        public static PowershellItem GetPowershellItems(string path, string contents)
         {
+            
             Collection<PSParseError> errors;
+            bool dscParse = false;
+            // this is fix for performance issue in PSParser.Tokenize - when file contains Import-DSCResource pointing to a non-installed resource, 
+            // parsing takes long time and 'Unable to load resource' errors appear
+            if (importDscRegex.IsMatch(contents))
+            {
+                contents = importDscRegex.Replace(contents, "#Import-DSCResource");
+                dscParse = true;
+            }
             IEnumerable<PSToken> tokens = PSParser.Tokenize(contents, out errors);
-            PowershellItem rootItem = new PowershellItem(PowershellItemType.Root, null, 0, 0, 0, null);   
+            var errorsLog = !errors.Any() || dscParse ? null :
+                "Parsing error(s): " + Environment.NewLine + string.Join(Environment.NewLine, errors.OrderBy(err => err.Token.StartLine).Select(err => "Line " + err.Token.StartLine + ": " + err.Message));
+            PowershellItem rootItem = new PowershellItem(PowershellItemType.Root, null, 0, 0, 0, null, errorsLog);
+            if (errorsLog != null) 
+            {
+                Logger.Debug("File " + path + " - " + errorsLog);
+            }
             PowershellItem currentItem = rootItem;
 
             bool nextTokenIsFunctionName = false;
@@ -24,7 +46,7 @@ namespace PsISEProjectExplorer.Services
             {
                 if (nextTokenIsFunctionName)
                 {
-                    var item = new PowershellItem(PowershellItemType.Function, token.Content, token.StartLine, token.StartColumn, nestingLevel, currentItem);
+                    var item = new PowershellItem(PowershellItemType.Function, token.Content, token.StartLine, token.StartColumn, nestingLevel, currentItem, null);
                     // currentItem = item;
                     nextTokenIsFunctionName = false;
                 }
@@ -57,7 +79,7 @@ namespace PsISEProjectExplorer.Services
                 else if (token.Type == PSTokenType.Keyword)
                 {
                     string tokenContent = token.Content.ToLowerInvariant();
-                    if (tokenContent == "function" || tokenContent == "filter")
+                    if (tokenContent == "function" || tokenContent == "filter" || tokenContent == "configuration")
                     {
                         nextTokenIsFunctionName = true;
                     }

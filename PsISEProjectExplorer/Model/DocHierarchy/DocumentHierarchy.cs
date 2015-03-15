@@ -70,13 +70,13 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             }
         }
 
-        public INode CreateNewFileNode(string absolutePath, string fileContents, INode parent, string errorMessage)
+        public FileNode CreateNewFileNode(string absolutePath, string fileContents, INode parent, string errorMessage)
         {
             var lockObject = parent == null ? RootLockObject : parent;
             lock (lockObject)
             {
                 string fileName = Path.GetFileName(absolutePath);
-                INode fileNode = new FileNode(absolutePath, fileName, parent, errorMessage);
+                FileNode fileNode = new FileNode(absolutePath, fileName, parent, errorMessage);
                 this.NodeMap.Add(absolutePath, fileNode);
                 this.FullTextDirectory.DocumentCreator.AddFileEntry(absolutePath, fileName, fileContents);
                 return fileNode;

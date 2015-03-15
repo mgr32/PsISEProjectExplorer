@@ -16,9 +16,11 @@ namespace PsISEProjectExplorer.Model
 
         public PowershellItem Parent { get; private set; }
 
+        public string ParsingErrors { get; private set; }
+
         public IList<PowershellItem> Children { get; private set; }
 
-        public PowershellItem(PowershellItemType type, string name, int startLine, int startColumn, int nestingLevel, PowershellItem parent)
+        public PowershellItem(PowershellItemType type, string name, int startLine, int startColumn, int nestingLevel, PowershellItem parent, string parsingErrors)
         {
             this.Type = type;
             this.Name = name;
@@ -26,6 +28,7 @@ namespace PsISEProjectExplorer.Model
             this.StartColumn = startColumn;
             this.NestingLevel = nestingLevel;
             this.Parent = parent;
+            this.ParsingErrors = parsingErrors;
             this.Children = new List<PowershellItem>();
             if (parent != null)
             {

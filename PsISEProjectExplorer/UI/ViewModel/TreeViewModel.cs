@@ -115,6 +115,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
             else
             {
                 this.UpdateNode(treeViewEntryItem, node);
+                // also refresh parents (icons can change)
+                var parent = treeViewEntryItem.Parent;
+                while (parent != null)
+                {
+                    parent.RefreshNode();
+                    parent = parent.Parent;
+                }
             }
             if (expandAllNodes)
             {

@@ -33,10 +33,23 @@ namespace PsISEProjectExplorer.Services
             INode lastDirNode = this.FillHierarchyWithIntermediateDirectories(parser.Path, parser.IsDirectory, parser.ErrorMessage);
             if (!parser.IsDirectory)
             {
-                INode fileNode = this.DocumentHierarchy.CreateNewFileNode(parser.Path, parser.FileContents, lastDirNode, parser.ErrorMessage);
+                FileNode fileNode = this.DocumentHierarchy.CreateNewFileNode(parser.Path, parser.FileContents, lastDirNode, parser.ErrorMessage);
                 if (parser.RootPowershellItem != null)
                 {
                     this.DocumentHierarchy.CreateNewPowershellItemNode(parser.Path, parser.RootPowershellItem, fileNode);
+                    var parent = fileNode.Parent;
+                    while (parent != null && parent is DirectoryNode)
+                    {
+                        if (parser.RootPowershellItem.ParsingErrors != null)
+                        {
+                            ((DirectoryNode)parent).AddFileError(fileNode.Name);
+                        }
+                        else
+                        {
+                            ((DirectoryNode)parent).RemoveFileError(fileNode.Name);
+                        }
+                        parent = parent.Parent;
+                    }
                 }
             }
             return true;

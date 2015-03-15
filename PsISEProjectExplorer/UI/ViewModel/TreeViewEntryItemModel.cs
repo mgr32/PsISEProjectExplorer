@@ -186,8 +186,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
             if (this.DocumentHierarchyNode != node)
             {
                 this.DocumentHierarchyNode = node;
-                this.OnPropertyChanged(String.Empty);
+                this.RefreshNode();
             }
+        }
+
+        public void RefreshNode()
+        {
+            this.OnPropertyChanged(String.Empty);
         }
 
         public override bool Equals(object obj)
