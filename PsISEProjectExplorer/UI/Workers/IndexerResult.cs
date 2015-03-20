@@ -10,8 +10,8 @@ namespace PsISEProjectExplorer.UI.Workers
 
         public IndexerResult(DateTime startTimestamp, bool isChanged)
         {
-            this.StartTimestamp = startTimestamp;
-            this.IsChanged = isChanged;
+			StartTimestamp = startTimestamp;
+			IsChanged = isChanged;
         }
     }
 }

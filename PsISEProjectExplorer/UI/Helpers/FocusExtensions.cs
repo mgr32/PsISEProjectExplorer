@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 
 namespace PsISEProjectExplorer.UI.Helpers
 {
-    // http://stackoverflow.com/questions/5152324/transfer-focus-on-a-controls-sub-part-in-its-template-in-wpf
-    public static class FocusExtensions
+	// http://stackoverflow.com/questions/5152324/transfer-focus-on-a-controls-sub-part-in-its-template-in-wpf
+	public static class FocusExtensions
     {
         public static bool GetIsDefaultFocusElement(DependencyObject obj)
         {

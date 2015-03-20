@@ -1,6 +1,5 @@
 ﻿using PsISEProjectExplorer.Model;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace PsISEProjectExplorer.Services
@@ -41,16 +40,16 @@ namespace PsISEProjectExplorer.Services
         
         public PowershellFileParser(string path, bool isDirectory, string errorMessage)
         {
-            this.Path = path;
-            this.IsDirectory = isDirectory;
-            this.ErrorMessage = errorMessage;
-            if (!this.IsDirectory && FilesPatternProvider.IsPowershellFile(path))
+			Path = path;
+			IsDirectory = isDirectory;
+			ErrorMessage = errorMessage;
+            if (!IsDirectory && FilesPatternProvider.IsPowershellFile(path))
             {
-                this.ParseFile();
+				ParseFile();
             }
             else
             {
-                this.FileContents = string.Empty;
+				FileContents = string.Empty;
             }
         }
 
@@ -58,17 +57,17 @@ namespace PsISEProjectExplorer.Services
         {
             try
             {
-                this.FileContents = FileReader.ReadFileAsString(this.Path);
+				FileContents = FileReader.ReadFileAsString(Path);
             }
             catch (Exception e)
             {
-                this.ErrorMessage = e.Message;
+				ErrorMessage = e.Message;
                 return;
             }
-            if (this.FileContents != null)
+            if (FileContents != null)
             {
-               this.RootPowershellItem = PowershellTokenizer.GetPowershellItems(this.Path, this.FileContents);
-               this.ErrorMessage = this.RootPowershellItem.ParsingErrors;
+				RootPowershellItem = PowershellTokenizer.GetPowershellItems(Path, FileContents);
+				ErrorMessage = RootPowershellItem.ParsingErrors;
             }
         }
     }

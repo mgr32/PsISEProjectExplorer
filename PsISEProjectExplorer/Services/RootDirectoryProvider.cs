@@ -1,12 +1,11 @@
-﻿using PsISEProjectExplorer.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace PsISEProjectExplorer.Services
 {
-    public static class RootDirectoryProvider
+	public static class RootDirectoryProvider
     {
         public static string GetRootDirectoryToSearch(string filePath)
         {

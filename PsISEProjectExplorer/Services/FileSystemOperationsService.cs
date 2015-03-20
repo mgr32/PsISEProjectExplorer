@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Services
 {
-    public static class FileSystemOperationsService
+	public static class FileSystemOperationsService
     {
         public static void RenameFileOrDirectory(string filePath, string newFilePath)
         {

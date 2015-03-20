@@ -1,20 +1,15 @@
 ﻿using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace PsISEProjectExplorer.UI.Helpers
 {
-    /// <summary>
-    /// Implements an attached property used for styling TreeViewItems when
-    /// they're a possible drop target.
-    /// </summary>
-    /// http://stackoverflow.com/questions/639884/highlight-treeview-item-being-dragged-over
-    public static class TreeViewDropHighlighter
+	/// <summary>
+	/// Implements an attached property used for styling TreeViewItems when
+	/// they're a possible drop target.
+	/// </summary>
+	/// http://stackoverflow.com/questions/639884/highlight-treeview-item-being-dragged-over
+	public static class TreeViewDropHighlighter
     {
         #region private variables
 

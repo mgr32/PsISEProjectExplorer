@@ -11,9 +11,9 @@ namespace PsISEProjectExplorer.UI.Workers
 
         public BackgroundSearcherParams(DocumentHierarchySearcher documentHierarchySearcher, SearchOptions searchOptions, string path)
         {
-            this.DocumentHierarchySearcher = documentHierarchySearcher;
-            this.SearchOptions = new SearchOptions(searchOptions);
-            this.Path = path;
+			DocumentHierarchySearcher = documentHierarchySearcher;
+			SearchOptions = new SearchOptions(searchOptions);
+			Path = path;
         }
         
     }

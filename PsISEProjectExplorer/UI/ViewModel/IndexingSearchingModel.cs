@@ -1,19 +1,12 @@
 ﻿using NLog;
-using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
-using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI.Workers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
-    public class IndexingSearchingModel : BaseViewModel
+	public class IndexingSearchingModel : BaseViewModel
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -29,11 +22,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public IndexingSearchingModel(EventHandler<SearcherResult> searcherResultHandler, EventHandler<IndexerResult> indexerResultHandler, EventHandler<string> indexerProgressHandler)
         {
-            this.SearcherResultHandler = searcherResultHandler;
-            this.IndexerResultHandler = indexerResultHandler;
-            this.IndexerProgressHandler = indexerProgressHandler;
-            this.BackgroundIndexers = new List<BackgroundIndexer>();
-            this.BackgroundSearchers = new List<BackgroundSearcher>();
+			SearcherResultHandler = searcherResultHandler;
+			IndexerResultHandler = indexerResultHandler;
+			IndexerProgressHandler = indexerProgressHandler;
+			BackgroundIndexers = new List<BackgroundIndexer>();
+			BackgroundSearchers = new List<BackgroundSearcher>();
         }
 
         // running in UI thread
@@ -41,23 +34,23 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             if (indexerParams.PathsChanged == null)
             {
-                lock (this.BackgroundIndexers)
+                lock (BackgroundIndexers)
                 {
-                    foreach (var ind in this.BackgroundIndexers)
+                    foreach (var ind in BackgroundIndexers)
                     {
                         ind.CancelAsync();
                     }
-                    this.BackgroundIndexers.Clear();
+					BackgroundIndexers.Clear();
                 }
             }
 
             var indexer = new BackgroundIndexer();
-            indexer.RunWorkerCompleted += this.BackgroundIndexerWorkCompleted;
-            indexer.ProgressChanged += this.BackgroundIndexerProgressChanged;
+            indexer.RunWorkerCompleted += BackgroundIndexerWorkCompleted;
+            indexer.ProgressChanged += BackgroundIndexerProgressChanged;
             indexer.RunWorkerAsync(indexerParams);
-            lock (this.BackgroundIndexers)
+            lock (BackgroundIndexers)
             {
-                this.BackgroundIndexers.Add(indexer);
+				BackgroundIndexers.Add(indexer);
             }
         }
 
@@ -66,17 +59,17 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             if (searcherParams.Path == null)
             {
-                lock (this.BackgroundSearchers)
+                lock (BackgroundSearchers)
                 {
-                    foreach (var sear in this.BackgroundSearchers)
+                    foreach (var sear in BackgroundSearchers)
                     {
                         sear.CancelAsync();
                     }
-                    this.BackgroundSearchers.Clear();
+					BackgroundSearchers.Clear();
                 }
             }
             var searcher = new BackgroundSearcher();
-            searcher.RunWorkerCompleted += this.BackgroundSearcherWorkCompleted;
+            searcher.RunWorkerCompleted += BackgroundSearcherWorkCompleted;
             if (searcherParams.Path != null)
             {
                 searcher.RunWorkerSync(searcherParams);
@@ -84,9 +77,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
             else
             {
                 searcher.RunWorkerAsync(searcherParams);
-                lock (this.BackgroundSearchers)
+                lock (BackgroundSearchers)
                 {
-                    this.BackgroundSearchers.Add(searcher);
+					BackgroundSearchers.Add(searcher);
                 }
             }
         }
@@ -97,33 +90,33 @@ namespace PsISEProjectExplorer.UI.ViewModel
             var indexer = sender as BackgroundIndexer;
             if (indexer != null)
             {
-                lock (this.BackgroundIndexers)
+                lock (BackgroundIndexers)
                 {
-                    this.BackgroundIndexers.Remove(indexer);
+					BackgroundIndexers.Remove(indexer);
                 }
             }
             if (e.Cancelled)
             {
-                this.IndexerResultHandler(this, null);
+				IndexerResultHandler(this, null);
                 return;
             }
             var result = (IndexerResult)e.Result;
             if (result == null || !result.IsChanged)
             {
-                this.IndexerResultHandler(this, null);
+				IndexerResultHandler(this, null);
                 return;
             }
             Logger.Debug("Indexing ended");
-            this.IndexerResultHandler(this, result);
+			IndexerResultHandler(this, result);
         }
 
         // running in Indexing thread
         private void BackgroundIndexerProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            if (this.IndexerProgressHandler != null)
+            if (IndexerProgressHandler != null)
             {
                 Logger.Debug(String.Format("Indexer progress, path: {0}", (string)e.UserState));
-                this.IndexerProgressHandler(this, (string)e.UserState);
+				IndexerProgressHandler(this, (string)e.UserState);
             }
         }
 
@@ -133,24 +126,24 @@ namespace PsISEProjectExplorer.UI.ViewModel
             var searcher = sender as BackgroundSearcher;
             if (searcher != null)
             {
-                lock (this.BackgroundSearchers)
+                lock (BackgroundSearchers)
                 {
-                    this.BackgroundSearchers.Remove(searcher);
+					BackgroundSearchers.Remove(searcher);
                 }
             }
             if (e.Cancelled)
             {
-                this.SearcherResultHandler(this, null);
+				SearcherResultHandler(this, null);
                 return;
             }
             var result = (SearcherResult)e.Result;
             if (result == null)
             {
-                this.SearcherResultHandler(this, null);
+				SearcherResultHandler(this, null);
                 return;
             }
             Logger.Debug(String.Format("Searching ended, path: {0}", result.Path ?? "null"));
-            this.SearcherResultHandler(this, result);
+			SearcherResultHandler(this, result);
         }
     }
 }

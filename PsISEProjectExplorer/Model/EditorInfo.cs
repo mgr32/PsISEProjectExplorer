@@ -1,9 +1,8 @@
 ﻿using PsISEProjectExplorer.Services;
-using System.Linq;
 
 namespace PsISEProjectExplorer.Model
 {
-    public class EditorInfo
+	public class EditorInfo
     {
         public string CurrentLine { get; private set; }
 
@@ -13,14 +12,14 @@ namespace PsISEProjectExplorer.Model
 
         public EditorInfo(string currentLine, int currentLineNum, int currentColumn)
         {
-            this.CurrentLine = currentLine;
-            this.CurrentLineNum = currentLineNum;
-            this.CurrentColumn = currentColumn;
+			CurrentLine = currentLine;
+			CurrentLineNum = currentLineNum;
+			CurrentColumn = currentColumn;
         }
 
         public string GetTokenFromCurrentPosition()
         {
-            return PowershellTokenizer.GetTokenAtColumn(this.CurrentLine, this.CurrentColumn);
+            return PowershellTokenizer.GetTokenAtColumn(CurrentLine, CurrentColumn);
         }
     }
 }

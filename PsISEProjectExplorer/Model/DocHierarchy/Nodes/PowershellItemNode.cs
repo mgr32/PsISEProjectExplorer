@@ -1,10 +1,9 @@
-﻿using System.Globalization;
-using PsISEProjectExplorer.Enums;
+﻿using PsISEProjectExplorer.Enums;
 using System;
 
 namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 {
-    public class PowershellItemNode : AbstractNode
+	public class PowershellItemNode : AbstractNode
     {
         public override NodeType NodeType { get { return NodeType.Function; } }
 
@@ -15,8 +14,8 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         public PowershellItemNode(string filePath, PowershellItem item, INode parent)
             : base(GetNodePath(filePath, item), item.Name, parent)
         {
-            this.FilePath = filePath;
-            this.PowershellItem = item;
+			FilePath = filePath;
+			PowershellItem = item;
         }
 
         private static string GetNodePath(string filePath, PowershellItem item)

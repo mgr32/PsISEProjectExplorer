@@ -1,7 +1,4 @@
 ﻿using NLog;
-using PsISEProjectExplorer.Model;
-using PsISEProjectExplorer.Model.DocHierarchy;
-using PsISEProjectExplorer.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +6,7 @@ using System.Threading;
 
 namespace PsISEProjectExplorer.UI.Workers
 {
-    public class BackgroundIndexer : BackgroundWorker
+	public class BackgroundIndexer : BackgroundWorker
     {
         private static object BackgroundIndexerLock = new Object();
 
@@ -19,10 +16,10 @@ namespace PsISEProjectExplorer.UI.Workers
 
         public BackgroundIndexer()
         {
-            this.StartTimestamp = DateTime.Now;
-            this.DoWork += RunIndexing;
-            this.WorkerReportsProgress = true;
-            this.WorkerSupportsCancellation = true;
+			StartTimestamp = DateTime.Now;
+			DoWork += RunIndexing;
+			WorkerReportsProgress = true;
+			WorkerSupportsCancellation = true;
         }
 
         // running in Indexing thread
@@ -36,7 +33,7 @@ namespace PsISEProjectExplorer.UI.Workers
             Logger.Info("Indexing started, rootDir: " + indexerParams.RootDirectory + ", pathsChanged: " + (indexerParams.PathsChanged == null ? "null" : String.Join(", ", indexerParams.PathsChanged)));
             lock (BackgroundIndexerLock)
             {
-                if (this.CancellationPending)
+                if (CancellationPending)
                 {
                     e.Cancel = true;
                     return;
@@ -53,7 +50,7 @@ namespace PsISEProjectExplorer.UI.Workers
                         paths = indexerParams.PathsChanged;
                     }
                     var isChanged = indexerParams.DocumentHierarchyFactory.UpdateDocumentHierarchy(paths, indexerParams.FilesPatternProvider, this);
-                    e.Result = new IndexerResult(this.StartTimestamp, isChanged);
+                    e.Result = new IndexerResult(StartTimestamp, isChanged);
                 }
                 catch (OperationCanceledException)
                 {
@@ -65,7 +62,7 @@ namespace PsISEProjectExplorer.UI.Workers
         // running in Indexing thread
         public void ReportProgressInCurrentThread(string path)
         {
-            this.OnProgressChanged(new ProgressChangedEventArgs(0, path));
+			OnProgressChanged(new ProgressChangedEventArgs(0, path));
         }
     }
 }

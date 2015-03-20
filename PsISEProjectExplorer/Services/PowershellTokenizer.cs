@@ -50,32 +50,6 @@ namespace PsISEProjectExplorer.Services
                     // currentItem = item;
                     nextTokenIsFunctionName = false;
                 }
-                /*else if (commandToken != null)
-                {
-                    var item = new PowershellItem(PowershellItemType.Command, commandToken.Content, commandToken.StartLine, commandToken.StartColumn, nestingLevel, currentItem);
-                    currentItem = item;
-                    commandToken = null;
-                    continue;
-                }
-                else if (token.Type == PSTokenType.NewLine)
-                {
-                    if (currentItem != null && nestingLevel <= currentItem.NestingLevel)
-                    {
-                        currentItem = currentItem.Parent ?? rootItem;
-                    }
-                }
-                else if (token.Type == PSTokenType.GroupStart && token.Content.Contains("{"))
-                {
-                    nestingLevel++;
-                }
-                else if (token.Type == PSTokenType.GroupEnd && token.Content.Contains("}"))
-                {
-                    nestingLevel--;
-                }
-                else if (token.Type == PSTokenType.Command)
-                {
-                    commandToken = token;                   
-                }*/
                 else if (token.Type == PSTokenType.Keyword)
                 {
                     string tokenContent = token.Content.ToLowerInvariant();

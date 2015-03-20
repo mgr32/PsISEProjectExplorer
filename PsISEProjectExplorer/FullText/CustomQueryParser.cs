@@ -18,7 +18,7 @@ namespace PsISEProjectExplorer.FullText
             {
                 return null;
             }
-            var tokens = this.Tokenize(text).ToList();
+            var tokens = Tokenize(text).ToList();
             if (!tokens.Any())
             {
                 return null;

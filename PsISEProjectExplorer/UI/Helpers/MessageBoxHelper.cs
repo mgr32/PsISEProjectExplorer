@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 
 namespace PsISEProjectExplorer.UI.Helpers
 {
-    public static class MessageBoxHelper
+	public static class MessageBoxHelper
     {
         public static void ShowError(string message)
         {

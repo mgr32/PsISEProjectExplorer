@@ -22,17 +22,17 @@ namespace PsISEProjectExplorer.Model
 
         public PowershellItem(PowershellItemType type, string name, int startLine, int startColumn, int nestingLevel, PowershellItem parent, string parsingErrors)
         {
-            this.Type = type;
-            this.Name = name;
-            this.StartLine = startLine;
-            this.StartColumn = startColumn;
-            this.NestingLevel = nestingLevel;
-            this.Parent = parent;
-            this.ParsingErrors = parsingErrors;
-            this.Children = new List<PowershellItem>();
+			Type = type;
+			Name = name;
+			StartLine = startLine;
+			StartColumn = startColumn;
+			NestingLevel = nestingLevel;
+			Parent = parent;
+			ParsingErrors = parsingErrors;
+			Children = new List<PowershellItem>();
             if (parent != null)
             {
-                this.Parent.Children.Add(this);
+				Parent.Children.Add(this);
             }
         }
     }

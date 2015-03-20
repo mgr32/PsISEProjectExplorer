@@ -1,7 +1,6 @@
 ﻿using PsISEProjectExplorer.UI.ViewModel;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -9,8 +8,8 @@ using System.Windows.Media;
 
 namespace PsISEProjectExplorer.UI.Helpers
 {
-    // http://blog.quantumbitdesigns.com/2008/07/22/programmatically-selecting-an-item-in-a-treeview/
-    public static class TreeViewHelper
+	// http://blog.quantumbitdesigns.com/2008/07/22/programmatically-selecting-an-item-in-a-treeview/
+	public static class TreeViewHelper
     {
         /// <summary>
         /// Expands all children of a TreeView

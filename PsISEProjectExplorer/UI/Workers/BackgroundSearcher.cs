@@ -17,16 +17,16 @@ namespace PsISEProjectExplorer.UI.Workers
 
         public BackgroundSearcher()
         {
-            this.StartTimestamp = DateTime.Now;
-            this.DoWork += RunSearching;
-            this.WorkerSupportsCancellation = true;
+			StartTimestamp = DateTime.Now;
+			DoWork += RunSearching;
+			WorkerSupportsCancellation = true;
         }
 
         public void RunWorkerSync(BackgroundSearcherParams argument)
         {
             var args = new DoWorkEventArgs(argument);
-            this.RunSearching(this, args);
-            this.OnRunWorkerCompleted(new RunWorkerCompletedEventArgs(args.Result, null, args.Cancel));
+			RunSearching(this, args);
+			OnRunWorkerCompleted(new RunWorkerCompletedEventArgs(args.Result, null, args.Cancel));
         }
 
         private void RunSearching(object sender, DoWorkEventArgs e)
@@ -58,7 +58,7 @@ namespace PsISEProjectExplorer.UI.Workers
 
         private void RunActualSearch(BackgroundSearcherParams searcherParams, DoWorkEventArgs e)
         {
-            if (this.CancellationPending)
+            if (CancellationPending)
             {
                 e.Cancel = true;
                 return;
@@ -67,7 +67,7 @@ namespace PsISEProjectExplorer.UI.Workers
             try
             {
                 INode result = searcherParams.DocumentHierarchySearcher.GetDocumentHierarchyViewNodeProjection(searcherParams.Path, searcherParams.SearchOptions, this);
-                e.Result = new SearcherResult(this.StartTimestamp, result, searcherParams.Path, searcherParams.SearchOptions);
+                e.Result = new SearcherResult(StartTimestamp, result, searcherParams.Path, searcherParams.SearchOptions);
             }
             catch (OperationCanceledException)
             {

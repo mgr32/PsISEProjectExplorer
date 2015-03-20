@@ -7,25 +7,23 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
-    public class WorkspaceDirectoryModel : BaseViewModel
+	public class WorkspaceDirectoryModel : BaseViewModel
     {
         public string CurrentWorkspaceDirectory
         {
             get 
             {
-                return this.WorkspaceDirectories.FirstOrDefault();
+                return WorkspaceDirectories.FirstOrDefault();
             }
 
             set
             {
                 if (!String.IsNullOrEmpty(value))
                 {
-                    this.SetWorkspaceDirectory(value);
+					SetWorkspaceDirectory(value);
                 }
             }
         }
@@ -38,13 +36,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get 
             { 
-                return this.autoUpdateRootDirectory; 
+                return autoUpdateRootDirectory; 
             }
             set
             {
-                this.autoUpdateRootDirectory = value;
-                this.OnPropertyChanged();
-                this.ResetWorkspaceDirectoryIfRequired();
+				autoUpdateRootDirectory = value;
+				OnPropertyChanged();
+				ResetWorkspaceDirectoryIfRequired();
                 ConfigHandler.SaveConfigValue("AutoUpdateRootDirectory", value.ToString());
             }
         }
@@ -54,26 +52,26 @@ namespace PsISEProjectExplorer.UI.ViewModel
         public IseIntegrator IseIntegrator { get; set; }
 
         public WorkspaceDirectoryModel()
-        {          
-            this.MaxNumOfWorkspaceDirectories = ConfigHandler.ReadConfigIntValue("MaxNumOfWorkspaceDirectories", 5);
+        {
+			MaxNumOfWorkspaceDirectories = ConfigHandler.ReadConfigIntValue("MaxNumOfWorkspaceDirectories", 5);
             var workspaceDirs = ConfigHandler.ReadConfigStringEnumerableValue("WorkspaceDirectories");
-            this.WorkspaceDirectories = new ObservableCollection<string>(workspaceDirs);
-            this.autoUpdateRootDirectory = ConfigHandler.ReadConfigBoolValue("AutoUpdateRootDirectory", true);
+			WorkspaceDirectories = new ObservableCollection<string>(workspaceDirs);
+			autoUpdateRootDirectory = ConfigHandler.ReadConfigBoolValue("AutoUpdateRootDirectory", true);
 
             // handle old config value -> to be removed in future
             var oldRootDirectoryToSearch = ConfigHandler.ReadConfigStringValue("RootDirectory");
-            if (!this.WorkspaceDirectories.Any() && !String.IsNullOrEmpty(oldRootDirectoryToSearch))
+            if (!WorkspaceDirectories.Any() && !String.IsNullOrEmpty(oldRootDirectoryToSearch))
             {
-                this.WorkspaceDirectories = new ObservableCollection<string>(new List<string>() { oldRootDirectoryToSearch });
+				WorkspaceDirectories = new ObservableCollection<string>(new List<string>() { oldRootDirectoryToSearch });
             }
-            // ~
+			// ~
 
-            this.SanitizeWorkspaceDirectories();
+			SanitizeWorkspaceDirectories();
         }
 
         public void SetWorkspaceDirectory(string path)
         {
-            var posInList = this.WorkspaceDirectories.IndexOf(path);
+            var posInList = WorkspaceDirectories.IndexOf(path);
 
             if (posInList != -1)
             {
@@ -82,61 +80,61 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 {
                     return;
                 }
-                this.WorkspaceDirectories.RemoveAt(posInList);
+				WorkspaceDirectories.RemoveAt(posInList);
             }
             if (!Directory.Exists(path))
             {
                 MessageBoxHelper.ShowError(String.Format("Directory {0} does not exist.", path));
-                this.OnPropertyChanged("WorkspaceDirectories");
-                this.OnPropertyChanged("CurrentWorkspaceDirectory");
+				OnPropertyChanged("WorkspaceDirectories");
+				OnPropertyChanged("CurrentWorkspaceDirectory");
                 return;
             }
-            this.WorkspaceDirectories.Insert(0, path);
-            var cnt = this.WorkspaceDirectories.Count;
-            while (cnt > this.MaxNumOfWorkspaceDirectories)
+			WorkspaceDirectories.Insert(0, path);
+            var cnt = WorkspaceDirectories.Count;
+            while (cnt > MaxNumOfWorkspaceDirectories)
             {
-                this.WorkspaceDirectories.RemoveAt(cnt - 1);
-                cnt = this.WorkspaceDirectories.Count;
+				WorkspaceDirectories.RemoveAt(cnt - 1);
+                cnt = WorkspaceDirectories.Count;
             }
 
-            ConfigHandler.SaveConfigEnumerableValue("WorkspaceDirectories", this.WorkspaceDirectories);
-            
-            this.OnPropertyChanged("WorkspaceDirectories");
-            this.OnPropertyChanged("CurrentWorkspaceDirectory");
+            ConfigHandler.SaveConfigEnumerableValue("WorkspaceDirectories", WorkspaceDirectories);
+
+			OnPropertyChanged("WorkspaceDirectories");
+			OnPropertyChanged("CurrentWorkspaceDirectory");
         }
 
         private void SanitizeWorkspaceDirectories()
         {
-            var itemsToRemove = this.WorkspaceDirectories.Where(wd => !Directory.Exists(wd)).ToList();
+            var itemsToRemove = WorkspaceDirectories.Where(wd => !Directory.Exists(wd)).ToList();
             foreach (var item in itemsToRemove)
             {
-                this.WorkspaceDirectories.Remove(item);
+				WorkspaceDirectories.Remove(item);
             }
         }
 
         public bool ResetWorkspaceDirectoryIfRequired()
         {
-            if (this.IseIntegrator == null)
+            if (IseIntegrator == null)
             {
                 return false;
             }
-            var currentPath = this.IseIntegrator.SelectedFilePath;
-            if (String.IsNullOrEmpty(currentPath) || currentPath == this.CurrentWorkspaceDirectory)
+            var currentPath = IseIntegrator.SelectedFilePath;
+            if (String.IsNullOrEmpty(currentPath) || currentPath == CurrentWorkspaceDirectory)
             {
                 return false;
             }
-            if (!this.AutoUpdateRootDirectory && this.CurrentWorkspaceDirectory != null)
+            if (!AutoUpdateRootDirectory && CurrentWorkspaceDirectory != null)
             {
                 return false;
             }
             string newRootDirectoryToSearch = RootDirectoryProvider.GetRootDirectoryToSearch(currentPath);
-            if (newRootDirectoryToSearch == null || newRootDirectoryToSearch == this.CurrentWorkspaceDirectory || 
-                FileSystemOperationsService.IsSubdirectory(this.CurrentWorkspaceDirectory, newRootDirectoryToSearch) ||
+            if (newRootDirectoryToSearch == null || newRootDirectoryToSearch == CurrentWorkspaceDirectory || 
+                FileSystemOperationsService.IsSubdirectory(CurrentWorkspaceDirectory, newRootDirectoryToSearch) ||
                 !Directory.Exists(newRootDirectoryToSearch))
             {
                 return false;
             }
-            this.SetWorkspaceDirectory(newRootDirectoryToSearch);
+			SetWorkspaceDirectory(newRootDirectoryToSearch);
             return true;
         }
 

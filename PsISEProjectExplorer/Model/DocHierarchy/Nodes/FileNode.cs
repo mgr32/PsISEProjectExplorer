@@ -14,14 +14,14 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 
         public void MakeInvalid(string errorMessage)
         {
-            this.IsValid = false;
-            if (this.Metadata == null)
+			IsValid = false;
+            if (Metadata == null)
             {
-                this.Metadata = errorMessage;
+				Metadata = errorMessage;
             }
             else
             {
-                this.Metadata += Environment.NewLine + errorMessage;
+				Metadata += Environment.NewLine + errorMessage;
             }
         }
 

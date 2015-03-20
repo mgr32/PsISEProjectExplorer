@@ -16,10 +16,10 @@ namespace PsISEProjectExplorer.UI.Workers
 
         public SearcherResult(DateTime startTimeStamp, INode resultNode, string path, SearchOptions searchOptions)
         {
-            this.StartTimestamp = startTimeStamp;
-            this.ResultNode = resultNode;
-            this.Path = path;
-            this.SearchOptions = searchOptions;
+			StartTimestamp = startTimeStamp;
+			ResultNode = resultNode;
+			Path = path;
+			SearchOptions = searchOptions;
         }
     }
 }

@@ -1,15 +1,11 @@
 ﻿using NLog;
 using PsISEProjectExplorer.Model;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Services
 {
-    public class FileSystemChangeWatcher
+	public class FileSystemChangeWatcher
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -23,18 +19,18 @@ namespace PsISEProjectExplorer.Services
 
         public FileSystemChangeWatcher(EventHandler<FileSystemChangedInfo> fileSystemChangedEvent)
         {
-            this.FileSystemChangeNotifier = new FileSystemChangeNotifier("PsISEPE-FileSystemNotifierReindexWatcher");
-            this.FileSystemChangeNotifier.FileSystemChanged += fileSystemChangedEvent;
-            this.Watcher = new FileSystemWatcher();
+			FileSystemChangeNotifier = new FileSystemChangeNotifier("PsISEPE-FileSystemNotifierReindexWatcher");
+			FileSystemChangeNotifier.FileSystemChanged += fileSystemChangedEvent;
+			Watcher = new FileSystemWatcher();
         }
 
         public void StopWatching()
         {
             lock (FileSystemChangeNotifier)
             {
-                this.Watcher.EnableRaisingEvents = false;
-                this.FileSystemChangeNotifier.ClearChangePool();
-                this.RootPath = null;
+				Watcher.EnableRaisingEvents = false;
+				FileSystemChangeNotifier.ClearChangePool();
+				RootPath = null;
             }
         }
 
@@ -42,26 +38,26 @@ namespace PsISEProjectExplorer.Services
         {
             lock (FileSystemChangeNotifier)
             {
-                this.Watcher.EnableRaisingEvents = false;
+				Watcher.EnableRaisingEvents = false;
                 if (path != RootPath)
                 {
-                    this.FileSystemChangeNotifier.ClearChangePool();
+					FileSystemChangeNotifier.ClearChangePool();
                 }
-                this.RootPath = path;
+				RootPath = path;
                 if (String.IsNullOrEmpty(path) || !Directory.Exists(path))
                 {
                     return;
                 }
-                this.FilesPatternProvider = filesPatternProvider;
-                this.Watcher.Path = path;
-                this.Watcher.InternalBufferSize = 65536;
-                this.Watcher.NotifyFilter = NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Security;
-                this.Watcher.IncludeSubdirectories = true;
-                this.Watcher.Changed += OnFileChanged;
-                this.Watcher.Created += OnFileChanged;
-                this.Watcher.Deleted += OnFileChanged;
-                this.Watcher.Renamed += OnFileRenamed;
-                this.Watcher.EnableRaisingEvents = true;
+				FilesPatternProvider = filesPatternProvider;
+				Watcher.Path = path;
+				Watcher.InternalBufferSize = 65536;
+				Watcher.NotifyFilter = NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Security;
+				Watcher.IncludeSubdirectories = true;
+				Watcher.Changed += OnFileChanged;
+				Watcher.Created += OnFileChanged;
+				Watcher.Deleted += OnFileChanged;
+				Watcher.Renamed += OnFileRenamed;
+				Watcher.EnableRaisingEvents = true;
             }
         }
 
@@ -69,7 +65,7 @@ namespace PsISEProjectExplorer.Services
         private void OnFileChanged(object source, FileSystemEventArgs e)
         {
             bool isDir = Directory.Exists(e.FullPath);
-            if (isDir && !this.FilesPatternProvider.DoesDirectoryMatch(e.FullPath))
+            if (isDir && !FilesPatternProvider.DoesDirectoryMatch(e.FullPath))
             {
                 return;
             }
@@ -78,12 +74,12 @@ namespace PsISEProjectExplorer.Services
                 return;
             }
             // if !isDir, it can be either a file, or a deleted directory
-            if (!isDir && e.ChangeType != WatcherChangeTypes.Deleted && !this.FilesPatternProvider.DoesFileMatch(e.FullPath))
+            if (!isDir && e.ChangeType != WatcherChangeTypes.Deleted && !FilesPatternProvider.DoesFileMatch(e.FullPath))
             {
                 return;
             }
             Logger.Debug("File changed: " + e.FullPath);
-            this.FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.FullPath, RootPath));
+			FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.FullPath, RootPath));
         }
 
         // runs on a separate thread (from system)
@@ -91,14 +87,14 @@ namespace PsISEProjectExplorer.Services
         {
             Logger.Debug("File renamed: " + e.OldFullPath + " to " + e.FullPath);
             bool isDir = Directory.Exists(e.FullPath) || Directory.Exists(e.OldFullPath);
-            if (isDir || this.FilesPatternProvider.DoesFileMatch(e.OldFullPath))
+            if (isDir || FilesPatternProvider.DoesFileMatch(e.OldFullPath))
             {
-                this.FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.OldFullPath, RootPath));
+				FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.OldFullPath, RootPath));
             }
-            if ((isDir || this.FilesPatternProvider.DoesFileMatch(e.FullPath)) &&
+            if ((isDir || FilesPatternProvider.DoesFileMatch(e.FullPath)) &&
                 e.FullPath.ToLowerInvariant() != e.OldFullPath.ToLowerInvariant())
             {
-                this.FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.FullPath, RootPath));
+				FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.FullPath, RootPath));
             }
         }
     }

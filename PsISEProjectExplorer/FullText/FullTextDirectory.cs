@@ -26,30 +26,30 @@ namespace PsISEProjectExplorer.FullText
 
         public FullTextDirectory()
         {
-            this.Analyzer = new CustomAnalyzer();
-            this.LuceneDirectory = new RAMDirectory();
-            this.IndexWriter = new IndexWriter(this.LuceneDirectory, this.Analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
-            this.IndexReader = this.IndexWriter.GetReader();
-            this.CustomQueryParser = new CustomQueryParser();
-            this.DocumentCreator = new DocumentFactory(this.IndexWriter);
+			Analyzer = new CustomAnalyzer();
+			LuceneDirectory = new RAMDirectory();
+			IndexWriter = new IndexWriter(LuceneDirectory, Analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
+			IndexReader = IndexWriter.GetReader();
+			CustomQueryParser = new CustomQueryParser();
+			DocumentCreator = new DocumentFactory(IndexWriter);
         }
 
         public IList<SearchResult> SearchTerm(string searchTerm, FullTextFieldType field)
         {
             Query query = new TermQuery(new Term(field.ToString(), searchTerm));
-            return this.RunQuery(query);   
+            return RunQuery(query);   
         }
 
         public IList<SearchResult> Search(string searchText, FullTextFieldType field)
         {
-            Query query = this.CustomQueryParser.Parse(searchText, field.ToString());
-            return this.RunQuery(query);
+            Query query = CustomQueryParser.Parse(searchText, field.ToString());
+            return RunQuery(query);
             
         }
 
         public void DeleteDocument(string path)
         {
-            this.IndexWriter.DeleteDocuments(new Term(FullTextFieldType.Path.ToString(), path));
+			IndexWriter.DeleteDocuments(new Term(FullTextFieldType.Path.ToString(), path));
         }
 
         private IList<SearchResult> RunQuery(Query query)
@@ -58,11 +58,11 @@ namespace PsISEProjectExplorer.FullText
             // Alternatively, there could be one RAMDirectory per filesystem directory.
             lock (this)
             {
-                IndexReader newReader = this.IndexReader.Reopen();
-                if (newReader != this.IndexReader)
+                IndexReader newReader = IndexReader.Reopen();
+                if (newReader != IndexReader)
                 {
-                    this.IndexReader.Dispose();
-                    this.IndexReader = newReader;
+					IndexReader.Dispose();
+					IndexReader = newReader;
                 }
 
                 IndexSearcher searcher; searcher = new IndexSearcher(newReader);

@@ -6,7 +6,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 {
     public class ViewNode : INode
     {
-        public NodeType NodeType { get { return this.Node.NodeType; } }
+        public NodeType NodeType { get { return Node.NodeType; } }
 
         public INode Node { get; private set; }
 
@@ -14,7 +14,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         {
             get
             {
-                return this.Node.Path;
+                return Node.Path;
             }
         }
 
@@ -22,7 +22,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         {
             get
             {
-                return this.Node.Name;
+                return Node.Name;
             }
         }
 
@@ -30,7 +30,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         {
             get
             {
-                return this.Node.IsValid;
+                return Node.IsValid;
             }
         }
 
@@ -38,7 +38,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         {
             get
             {
-                return this.Node.Metadata;
+                return Node.Metadata;
             }
         }
 
@@ -53,12 +53,12 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             {
                 throw new ArgumentNullException("viewedNode");
             }
-            this.Node = viewedNode;
-            this.Parent = parent;
-            this.Children = new SortedSet<INode>(DefaultNodeComparer.NodeComparer);
-            if (this.Parent != null)
+			Node = viewedNode;
+			Parent = parent;
+			Children = new SortedSet<INode>(DefaultNodeComparer.NodeComparer);
+            if (Parent != null)
             {
-                this.Parent.Children.Add(this);
+				Parent.Children.Add(this);
             }
         }
 
@@ -69,19 +69,19 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
                 return false;
             }
             var node = (INode)obj;
-            return (node.Path == this.Path);
+            return (node.Path == Path);
         }
 
         public override int GetHashCode()
         {
-            return this.Path.GetHashCode();
+            return Path.GetHashCode();
         }
 
         public void Remove()
         {
-            if (this.Parent != null)
+            if (Parent != null)
             {
-                this.Parent.Children.Remove(this);
+				Parent.Children.Remove(this);
             }
         }
     }

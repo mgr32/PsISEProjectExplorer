@@ -18,11 +18,11 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             get
             {
                 var filesErrors = String.Join(Environment.NewLine, filesWithErrors.Select(file => "Error(s) in file " + file));
-                return (String.IsNullOrEmpty(this.metadata) ? String.Empty : this.metadata + Environment.NewLine) + filesErrors;
+                return (String.IsNullOrEmpty(metadata) ? String.Empty : metadata + Environment.NewLine) + filesErrors;
             }
             protected set
             {
-                this.metadata = value;
+				metadata = value;
             }
         }
 
@@ -33,14 +33,14 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 
         public void AddFileError(string fileName)
         {
-            this.IsValid = false;
-            this.filesWithErrors.Add(fileName);
+			IsValid = false;
+			filesWithErrors.Add(fileName);
         }
 
         public void RemoveFileError(string fileName)
         {
-            this.filesWithErrors.Remove(fileName);
-            this.IsValid = !this.filesWithErrors.Any();
+			filesWithErrors.Remove(fileName);
+			IsValid = !filesWithErrors.Any();
         }
     }
 }
