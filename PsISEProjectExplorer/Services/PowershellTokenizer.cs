@@ -79,7 +79,7 @@ namespace PsISEProjectExplorer.Services
                 else if (token.Type == PSTokenType.Keyword)
                 {
                     string tokenContent = token.Content.ToLowerInvariant();
-                    if (tokenContent == "function" || tokenContent == "filter" || tokenContent == "configuration")
+                    if (tokenContent == "function" || tokenContent == "filter" || tokenContent == "configuration" || tokenContent == "workflow")
                     {
                         nextTokenIsFunctionName = true;
                     }
