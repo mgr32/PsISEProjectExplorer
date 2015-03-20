@@ -11,9 +11,9 @@ namespace PsISEProjectExplorer.Model
 
         public TokenPosition(int matchLength, int line, int column)
         {
-            this.MatchLength = matchLength;
-            this.Line = line;
-            this.Column = column;
+			MatchLength = matchLength;
+			Line = line;
+			Column = column;
         }
     }
 }

@@ -1,13 +1,10 @@
 ﻿using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
-using PsISEProjectExplorer.Services;
-using PsISEProjectExplorer.UI.Helpers;
 using System;
-using System.Collections.Generic;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
-    public class TreeViewEntryItemModel : BaseViewModel
+	public class TreeViewEntryItemModel : BaseViewModel
     {
         public static object RootLockObject = new object();
 
@@ -16,12 +13,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private INode DocumentHierarchyNode { 
             get
             {
-                return this.documentHierarchyNode;
+                return documentHierarchyNode;
             }
             set
             {
-                this.documentHierarchyNode = value;
-                this.OnPropertyChanged("IsExpanded");
+				documentHierarchyNode = value;
+				OnPropertyChanged("IsExpanded");
             }
         }
 
@@ -29,12 +26,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                var node = this.DocumentHierarchyNode as ViewNode;
+                var node = DocumentHierarchyNode as ViewNode;
                 if (node != null)
                 {
                     return node.Node;
                 }
-                return this.DocumentHierarchyNode;
+                return DocumentHierarchyNode;
             }
         }
 
@@ -42,8 +39,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                string fileName = this.NodeType.ToString().ToLowerInvariant();
-                if (!this.Node.IsValid)
+                string fileName = NodeType.ToString().ToLowerInvariant();
+                if (!Node.IsValid)
                 {
                     fileName += "_invalid";
                 }
@@ -55,7 +52,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return this.Node.Name;
+                return Node.Name;
             }
         }
 
@@ -63,7 +60,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return this.Node.Path;
+                return Node.Path;
             }
         }
 
@@ -71,7 +68,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return this.Node.Metadata;
+                return Node.Metadata;
             }
         }
 
@@ -83,12 +80,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return this.State.IsExpanded;
+                return State.IsExpanded;
             }
             set
             {
-                this.State.IsExpanded = value;
-                this.OnPropertyChanged();
+				State.IsExpanded = value;
+				OnPropertyChanged();
             }
         }
 
@@ -96,12 +93,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return this.State.IsSelected;
+                return State.IsSelected;
             }
             set
             {
-                this.State.IsSelected = value;
-                this.OnPropertyChanged();
+				State.IsSelected = value;
+				OnPropertyChanged();
             }
         }
         
@@ -112,12 +109,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return this.isBeingEdited;
+                return isBeingEdited;
             }
             set
             {
-                this.isBeingEdited = value;
-                this.OnPropertyChanged();
+				isBeingEdited = value;
+				OnPropertyChanged();
             }
         }
 
@@ -127,12 +124,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return this.isBeingAdded;
+                return isBeingAdded;
             }
             set
             {
-                this.isBeingAdded = value;
-                this.OnPropertyChanged();
+				isBeingAdded = value;
+				OnPropertyChanged();
             }
         }
 
@@ -140,7 +137,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return this.Node.NodeType;
+                return Node.NodeType;
             }
         }
 
@@ -152,62 +149,62 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 throw new ArgumentNullException("node");
             }
-            var lockObject = this.Parent == null ? RootLockObject : this.Parent;
+            var lockObject = Parent == null ? RootLockObject : Parent;
             lock (lockObject)
             {
-                this.State = new TreeViewEntryItemModelState(false, isSelected);
-                this.DocumentHierarchyNode = node;
-                this.Parent = parent;
-                this.Children = new TreeViewEntryItemObservableSet();
-                if (this.Parent != null)
+				State = new TreeViewEntryItemModelState(false, isSelected);
+				DocumentHierarchyNode = node;
+				Parent = parent;
+				Children = new TreeViewEntryItemObservableSet();
+                if (Parent != null)
                 {
-                    this.Parent.Children.Add(this);
+					Parent.Children.Add(this);
                 }
             }
         }
 
         public void Delete()
         {
-            var lockObject = this.Parent == null ? RootLockObject : this.Parent;
+            var lockObject = Parent == null ? RootLockObject : Parent;
             lock (lockObject)
             {
-                if (this.Parent != null)
+                if (Parent != null)
                 {
-                    this.Parent.Children.Remove(this);
+					Parent.Children.Remove(this);
                 }
-                this.DocumentHierarchyNode = null;
-                this.Children = null;
-                this.Parent = null;
+				DocumentHierarchyNode = null;
+				Children = null;
+				Parent = null;
             }
         }
 
         public void UpdateNode(INode node)
         {
-            if (this.DocumentHierarchyNode != node)
+            if (DocumentHierarchyNode != node)
             {
-                this.DocumentHierarchyNode = node;
-                this.RefreshNode();
+				DocumentHierarchyNode = node;
+				RefreshNode();
             }
         }
 
         public void RefreshNode()
         {
-            this.OnPropertyChanged(String.Empty);
+			OnPropertyChanged(String.Empty);
         }
 
         public override bool Equals(object obj)
         {
-            if (obj == null || this.GetType() != obj.GetType() || !(obj is TreeViewEntryItemModel))
+            if (obj == null || GetType() != obj.GetType() || !(obj is TreeViewEntryItemModel))
             {
                 return false;
             }
             var item = (TreeViewEntryItemModel)obj;
-            return (this.Node == item.Node);
+            return (Node == item.Node);
         }
 
         public override int GetHashCode()
         {
-            return (this.Node == null ? 0 : this.Node.GetHashCode());
+            return (Node == null ? 0 : Node.GetHashCode());
         }
 
     }

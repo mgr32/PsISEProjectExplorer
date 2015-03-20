@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PsISEProjectExplorer.Model
+﻿namespace PsISEProjectExplorer.Model
 {
-    public class ChangePoolEntry
+	public class ChangePoolEntry
     {
         public string PathChanged { get; set; }
 
@@ -16,9 +10,9 @@ namespace PsISEProjectExplorer.Model
 
         public ChangePoolEntry(string pathChanged, string rootPath, string pathAfterRename)
         {
-            this.PathChanged = pathChanged;
-            this.RootPath = rootPath;
-            this.PathAfterRename = pathAfterRename;
+			PathChanged = pathChanged;
+			RootPath = rootPath;
+			PathAfterRename = pathAfterRename;
         }
 
         public ChangePoolEntry(string pathChanged, string rootPath)
@@ -34,12 +28,12 @@ namespace PsISEProjectExplorer.Model
                 return false;
             }
             var other = (ChangePoolEntry)obj;
-            return (other.PathChanged == this.PathChanged && other.RootPath == this.RootPath && other.PathAfterRename == this.PathAfterRename);
+            return (other.PathChanged == PathChanged && other.RootPath == RootPath && other.PathAfterRename == PathAfterRename);
         }
 
         public override int GetHashCode()
         {
-            return ((this.PathChanged ?? "") + (this.RootPath ?? "") + (this.PathAfterRename ?? "")).GetHashCode();
+            return ((PathChanged ?? "") + (RootPath ?? "") + (PathAfterRename ?? "")).GetHashCode();
         }
     }
 }

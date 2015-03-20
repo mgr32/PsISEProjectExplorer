@@ -1,9 +1,8 @@
 ﻿using Lucene.Net.Analysis;
-using Lucene.Net.Util;
 
 namespace PsISEProjectExplorer.FullText
 {
-    public class CustomTokenizer : CharTokenizer
+	public class CustomTokenizer : CharTokenizer
     {
         
         /// <summary>Construct a new CustomTokenizer. </summary>

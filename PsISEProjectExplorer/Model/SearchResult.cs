@@ -10,7 +10,7 @@ namespace PsISEProjectExplorer.Model
 
         public SearchResult(string path)
         {
-            this.Path = path;
+			Path = path;
         }
     }
 }

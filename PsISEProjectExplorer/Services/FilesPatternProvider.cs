@@ -20,8 +20,8 @@ namespace PsISEProjectExplorer.Services
 
         public FilesPatternProvider(bool includeAllFiles)
         {
-            this.IncludeAllFiles = includeAllFiles;
-            this.AdditionalPaths = new HashSet<string>();
+			IncludeAllFiles = includeAllFiles;
+			AdditionalPaths = new HashSet<string>();
         }
 
         public static bool IsPowershellFile(string fileName)
@@ -31,7 +31,7 @@ namespace PsISEProjectExplorer.Services
 
         public bool DoesFileMatch(string fileName)
         {
-            return (this.IncludeAllFiles || PowershellFilesRegex.IsMatch(fileName)) && !ExcludeRegex.IsMatch(fileName) && !IsReparsePointOrHiddenSystem(fileName);
+            return (IncludeAllFiles || PowershellFilesRegex.IsMatch(fileName)) && !ExcludeRegex.IsMatch(fileName) && !IsReparsePointOrHiddenSystem(fileName);
         }
 
         public bool DoesDirectoryMatch(string dirName)
@@ -41,27 +41,27 @@ namespace PsISEProjectExplorer.Services
 
         public string GetFilesPattern()
         {
-            return this.IncludeAllFiles ? AllFilesPattern : PowershellFilesPattern;
+            return IncludeAllFiles ? AllFilesPattern : PowershellFilesPattern;
         }
 
         public void AddAdditionalPath(string path)
         {
-            this.AdditionalPaths.Add(path);
+			AdditionalPaths.Add(path);
         }
 
         public void RemoveAdditionalPath(string path)
         {
-            this.AdditionalPaths.Remove(path);
+			AdditionalPaths.Remove(path);
         }
 
         public bool IsInAdditonalPaths(string path)
         {
-            return this.AdditionalPaths.Contains(path);
+            return AdditionalPaths.Contains(path);
         }
 
         public void ClearAdditionalPaths()
         {
-            this.AdditionalPaths.Clear();
+			AdditionalPaths.Clear();
         }
 
         private bool IsReparsePointOrHiddenSystem(string path)

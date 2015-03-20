@@ -2,14 +2,13 @@
 using PsISEProjectExplorer.Model;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using NLog;
 
 namespace PsISEProjectExplorer.Services
 {
-    public class FileSystemChangeNotifier
+	public class FileSystemChangeNotifier
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -23,7 +22,7 @@ namespace PsISEProjectExplorer.Services
 
         public FileSystemChangeNotifier(string name)
         {
-            this.Name = name;
+			Name = name;
             Task.Factory.StartNew(ChangeNotifier);
         }
 
@@ -31,7 +30,7 @@ namespace PsISEProjectExplorer.Services
         {
             lock (this)
             {
-                this.ChangePool.Add(changePoolEntry);
+				ChangePool.Add(changePoolEntry);
             }
         }
 
@@ -39,7 +38,7 @@ namespace PsISEProjectExplorer.Services
         {
             lock (this)
             {
-                this.ChangePool.Clear();
+				ChangePool.Clear();
             }
         }
 
@@ -48,7 +47,7 @@ namespace PsISEProjectExplorer.Services
         {
             if (Thread.CurrentThread.Name == null)
             {
-                Thread.CurrentThread.Name = this.Name;
+                Thread.CurrentThread.Name = Name;
             }
             while (true)
             {
@@ -60,14 +59,14 @@ namespace PsISEProjectExplorer.Services
                 FileSystemChangedInfo changedInfo = null;
                 lock (this)
                 {
-                    if (this.ChangePool.Any())
+                    if (ChangePool.Any())
                     {
                         IList<ChangePoolEntry> pathsChanged = RemoveSubdirectories(ChangePool);
                         changedInfo = new FileSystemChangedInfo(pathsChanged);
-                        this.ChangePool.Clear();
+						ChangePool.Clear();
                     }
                 }
-                if (changedInfo != null && this.FileSystemChanged != null)
+                if (changedInfo != null && FileSystemChanged != null)
                 {
                     FileSystemChanged(this, changedInfo);
                 }

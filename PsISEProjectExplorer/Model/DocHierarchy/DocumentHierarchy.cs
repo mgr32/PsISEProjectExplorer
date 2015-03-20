@@ -19,15 +19,15 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
 
         public DocumentHierarchy(INode rootNode)
         {
-            this.RootNode = rootNode;
-            this.FullTextDirectory = new FullTextDirectory();
-            this.NodeMap = new Dictionary<string, INode> {{rootNode.Path, rootNode}};
+			RootNode = rootNode;
+			FullTextDirectory = new FullTextDirectory();
+			NodeMap = new Dictionary<string, INode> {{rootNode.Path, rootNode}};
         }
 
         public INode GetNode(string path)
         {
             INode value;
-            this.NodeMap.TryGetValue(path, out value);
+			NodeMap.TryGetValue(path, out value);
             return value;
         }
 
@@ -41,17 +41,17 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             IList<INode> itemsToBeRemoved;
             lock (lockObject)
             {
-                if (node.Path != this.RootNode.Path)
+                if (node.Path != RootNode.Path)
                 {
-                    this.NodeMap.Remove(node.Path);
-                    this.FullTextDirectory.DeleteDocument(node.Path);
+					NodeMap.Remove(node.Path);
+					FullTextDirectory.DeleteDocument(node.Path);
                     node.Remove();
                 }
                 itemsToBeRemoved = new List<INode>(node.Children);
             }
             foreach (INode child in itemsToBeRemoved)
             {
-                this.RemoveNode(child);
+				RemoveNode(child);
             }
         }
 
@@ -64,8 +64,8 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
                 string name = absolutePath.Substring(absolutePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
                 INode node;
                 node = new DirectoryNode(absolutePath, name, parent, errorMessage);
-                this.NodeMap.Add(absolutePath, node);
-                this.FullTextDirectory.DocumentCreator.AddDirectoryEntry(absolutePath, name);
+				NodeMap.Add(absolutePath, node);
+				FullTextDirectory.DocumentCreator.AddDirectoryEntry(absolutePath, name);
                 return node;
             }
         }
@@ -77,8 +77,8 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             {
                 string fileName = Path.GetFileName(absolutePath);
                 FileNode fileNode = new FileNode(absolutePath, fileName, parent, errorMessage);
-                this.NodeMap.Add(absolutePath, fileNode);
-                this.FullTextDirectory.DocumentCreator.AddFileEntry(absolutePath, fileName, fileContents);
+				NodeMap.Add(absolutePath, fileNode);
+				FullTextDirectory.DocumentCreator.AddFileEntry(absolutePath, fileName, fileContents);
                 return fileNode;
             }
         }
@@ -91,13 +91,13 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
                 lock (lockObject)
                 {
                     parent = new PowershellItemNode(filePath, item, parent);
-                    this.NodeMap.Add(parent.Path, parent);
-                    this.FullTextDirectory.DocumentCreator.AddPowershellItemEntry(parent.Path, item.Name);
+					NodeMap.Add(parent.Path, parent);
+					FullTextDirectory.DocumentCreator.AddPowershellItemEntry(parent.Path, item.Name);
                 }
             }
             foreach (var itemChild in item.Children)
             {
-                this.CreateNewPowershellItemNode(filePath, itemChild, parent);
+				CreateNewPowershellItemNode(filePath, itemChild, parent);
             }
             return parent;
         }
@@ -111,8 +111,8 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             var lockObject = node.Parent == null ? RootLockObject : node.Parent;
             lock (lockObject)
             {
-                this.RemoveNode(node);
-                return this.CreateNewDirectoryNode(newPath, node.Parent, errorMessage);
+				RemoveNode(node);
+                return CreateNewDirectoryNode(newPath, node.Parent, errorMessage);
             }
         }
 
@@ -125,22 +125,22 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             var lockObject = node.Parent == null ? RootLockObject : node.Parent;
             lock (lockObject)
             {
-                this.RemoveNode(node);
-                return this.CreateNewFileNode(newPath, string.Empty, node.Parent, errorMessage);
+				RemoveNode(node);
+                return CreateNewFileNode(newPath, string.Empty, node.Parent, errorMessage);
             }
         }
 
         public IEnumerable<SearchResult> SearchNodesFullText(string filter, FullTextFieldType fieldType)
         {
-            IList<SearchResult> searchResults = this.FullTextDirectory.Search(filter, fieldType);
-            this.AddNodesToSearchResults(searchResults);
+            IList<SearchResult> searchResults = FullTextDirectory.Search(filter, fieldType);
+			AddNodesToSearchResults(searchResults);
             return searchResults;
         }
 
         public IEnumerable<SearchResult> SearchNodesByTerm(string filter, FullTextFieldType fieldType)
         {
-            IList<SearchResult> searchResults = this.FullTextDirectory.SearchTerm(filter, fieldType);
-            this.AddNodesToSearchResults(searchResults);
+            IList<SearchResult> searchResults = FullTextDirectory.SearchTerm(filter, fieldType);
+			AddNodesToSearchResults(searchResults);
             return searchResults;
         }
 
@@ -148,7 +148,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
         {
             foreach (SearchResult searchResult in searchResults)
             {
-                searchResult.Node = this.GetNode(searchResult.Path);
+                searchResult.Node = GetNode(searchResult.Path);
             }
         }
 

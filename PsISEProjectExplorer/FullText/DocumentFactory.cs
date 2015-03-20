@@ -10,22 +10,22 @@ namespace PsISEProjectExplorer.FullText
 
         public DocumentFactory(IndexWriter indexWriter)
         {
-            this.IndexWriter = indexWriter;
+			IndexWriter = indexWriter;
         }
 
         public void AddDirectoryEntry(string path, string segment)
         {
-            this.CreateDocument(path, segment, string.Empty);
+			CreateDocument(path, segment, string.Empty);
         }
 
         public void AddFileEntry(string path, string fileName, string fileContents)
         {
-            this.CreateDocument(path, fileName, fileContents);
+			CreateDocument(path, fileName, fileContents);
         }
 
         public void AddPowershellItemEntry(string path, string name)
         {
-            this.CreateDocument(path, name, string.Empty);
+			CreateDocument(path, name, string.Empty);
         }
 
         private void CreateDocument(string path, string name, string contents)
@@ -45,8 +45,8 @@ namespace PsISEProjectExplorer.FullText
             doc.Add(field);
             field = new Field(FullTextFieldType.CatchAll.ToString(), name + " " + contents, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS);
             doc.Add(field);
-            this.IndexWriter.AddDocument(doc);
-            this.IndexWriter.Commit();
+			IndexWriter.AddDocument(doc);
+			IndexWriter.Commit();
         }
     }
 }

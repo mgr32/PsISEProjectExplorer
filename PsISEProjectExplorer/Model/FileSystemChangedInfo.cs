@@ -8,7 +8,7 @@ namespace PsISEProjectExplorer.Model
 
         public FileSystemChangedInfo(IEnumerable<ChangePoolEntry> pathsChanged)
         {
-            this.PathsChanged = pathsChanged;
+			PathsChanged = pathsChanged;
         }
     }
 }

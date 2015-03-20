@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace PsISEProjectExplorer.UI.Helpers
 {
 
-    // http://blogs.msdn.com/b/mikehillberg/archive/2006/09/21/mytreeviewhelperismousedirectlyoveritem.aspx
-    public static class TreeViewMouseHelper
+	// http://blogs.msdn.com/b/mikehillberg/archive/2006/09/21/mytreeviewhelperismousedirectlyoveritem.aspx
+	public static class TreeViewMouseHelper
     {
         //
         // The TreeViewItem that the mouse is currently directly over (or null).

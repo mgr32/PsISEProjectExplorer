@@ -9,8 +9,8 @@ namespace PsISEProjectExplorer.Model
 
         public LineInfo(string lineText, int lineNumber)
         {
-            this.LineText = lineText;
-            this.LineNumber = lineNumber;
+			LineText = lineText;
+			LineNumber = lineNumber;
         }
     }
 }

@@ -23,15 +23,15 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             if (path == null) {
                 throw new ArgumentNullException("path");
             }
-            this.Path = path;
-            this.Name = name;
-            this.IsValid = isValid;
-            this.Metadata = metadata;
-            this.Parent = parent;
-            this.Children = new SortedSet<INode>(DefaultNodeComparer.NodeComparer);
-            if (this.Parent != null)
+			Path = path;
+			Name = name;
+			IsValid = isValid;
+			Metadata = metadata;
+			Parent = parent;
+			Children = new SortedSet<INode>(DefaultNodeComparer.NodeComparer);
+            if (Parent != null)
             {
-                if (!this.Parent.Children.Add(this))
+                if (!Parent.Children.Add(this))
                 {
                     throw new InvalidOperationException(String.Format("Adding element '{0}' failed", path));
                 }
@@ -45,19 +45,19 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
                 return false;
             }
             var node = (INode)obj;
-            return (node.Path == this.Path);
+            return (node.Path == Path);
         }
 
         public override int GetHashCode()
         {
-            return this.Path.GetHashCode();
+            return Path.GetHashCode();
         }
 
         public void Remove()
         {
-            if (this.Parent != null)
+            if (Parent != null)
             {
-                this.Parent.Children.Remove(this);
+				Parent.Children.Remove(this);
             }
         }
     }

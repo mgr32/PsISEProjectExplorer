@@ -1,6 +1,5 @@
 ﻿using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
-using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI.Helpers;
@@ -12,18 +11,18 @@ using System.Linq;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
-    public class TreeViewModel : BaseViewModel
+	public class TreeViewModel : BaseViewModel
     {
 
         public IEnumerable<TreeViewEntryItemModel> TreeViewItems
         {
             get
             {
-                if (this.RootTreeViewEntryItem == null)
+                if (RootTreeViewEntryItem == null)
                 {
                     return new TreeViewEntryItemObservableSet();
                 }
-                return this.RootTreeViewEntryItem.Children;
+                return RootTreeViewEntryItem.Children;
             }
         }
 
@@ -35,13 +34,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return this.rootTreeViewEntryItem;
+                return rootTreeViewEntryItem;
             }
             private set
             {
-                this.rootTreeViewEntryItem = value;
-                this.OnPropertyChanged();
-                this.OnPropertyChanged("TreeViewItems");
+				rootTreeViewEntryItem = value;
+				OnPropertyChanged();
+				OnPropertyChanged("TreeViewItems");
             }
         }
 
@@ -51,12 +50,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
         { 
             get
             {
-                return this.numberOfFiles;
+                return numberOfFiles;
             }
             private set
             {
-                this.numberOfFiles = value;
-                this.OnPropertyChanged();
+				numberOfFiles = value;
+				OnPropertyChanged();
             }   
         }
 
@@ -72,19 +71,19 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public TreeViewModel(FileSystemChangeWatcher fileSystemChangeWatcher, DocumentHierarchyFactory documentHierarchyFactory, FilesPatternProvider filesPatternProvider)
         {
-            this.FileSystemChangeWatcher = fileSystemChangeWatcher;
-            this.DocumentHierarchyFactory = documentHierarchyFactory;
-            this.FilesPatternProvider = filesPatternProvider;
-            this.ItemsMap = new Dictionary<string, TreeViewEntryItemModel>();
+			FileSystemChangeWatcher = fileSystemChangeWatcher;
+			DocumentHierarchyFactory = documentHierarchyFactory;
+			FilesPatternProvider = filesPatternProvider;
+			ItemsMap = new Dictionary<string, TreeViewEntryItemModel>();
         }
 
         public void ReRoot(INode rootNode)
         {
             lock (TreeViewEntryItemModel.RootLockObject)
             {
-                this.ItemsMap.Clear();
-                this.RootTreeViewEntryItem = rootNode == null ? null : this.CreateTreeViewEntryItemModel(rootNode, null, false);
-                this.NumberOfFiles = 0;
+				ItemsMap.Clear();
+				RootTreeViewEntryItem = rootNode == null ? null : CreateTreeViewEntryItemModel(rootNode, null, false);
+				NumberOfFiles = 0;
             }
         }
 
@@ -93,7 +92,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             lock (TreeViewEntryItemModel.RootLockObject)
             {
                 TreeViewEntryItemModel result;
-                this.ItemsMap.TryGetValue(path, out result);
+				ItemsMap.TryGetValue(path, out result);
                 return result;
             }
         }
@@ -103,18 +102,18 @@ namespace PsISEProjectExplorer.UI.ViewModel
             // node == null -> search returned no results at all
             if (node == null)
             {
-                this.HandleNoResultsFound(path);
+				HandleNoResultsFound(path);
                 return;
             }
-            TreeViewEntryItemModel treeViewEntryItem = this.FindTreeViewEntryItemByPath(node.Path);
+            TreeViewEntryItemModel treeViewEntryItem = FindTreeViewEntryItemByPath(node.Path);
             if (treeViewEntryItem == null)
             {
-                bool isSelected = node.Path == this.PathOfItemToSelectOnRefresh;
-                treeViewEntryItem = this.CreateTreeViewEntryItemModelWithNodeParents(node, isSelected, expandAllNodes);
+                bool isSelected = node.Path == PathOfItemToSelectOnRefresh;
+                treeViewEntryItem = CreateTreeViewEntryItemModelWithNodeParents(node, isSelected, expandAllNodes);
             }
             else
             {
-                this.UpdateNode(treeViewEntryItem, node);
+				UpdateNode(treeViewEntryItem, node);
                 // also refresh parents (icons can change)
                 var parent = treeViewEntryItem.Parent;
                 while (parent != null)
@@ -127,8 +126,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 treeViewEntryItem.IsExpanded = true;
             }
-            this.RefreshFromIntermediateNode(node, treeViewEntryItem, expandAllNodes);
-            this.OnPropertyChanged("TreeViewItems");
+			RefreshFromIntermediateNode(node, treeViewEntryItem, expandAllNodes);
+			OnPropertyChanged("TreeViewItems");
         }
 
         private void UpdateNode(TreeViewEntryItemModel treeViewEntryItem, INode node)
@@ -141,15 +140,15 @@ namespace PsISEProjectExplorer.UI.ViewModel
             // path == null -> search was run on whole tree and gave no results -> just clear the tree
             if (path == null)
             {
-                this.ReRoot(this.RootTreeViewEntryItem.Node);
+				ReRoot(RootTreeViewEntryItem.Node);
                 return;
             }
 
             // path != null -> search was run on a subtree and gave no results -> remove the item
-            var item = this.FindTreeViewEntryItemByPath(path);
+            var item = FindTreeViewEntryItemByPath(path);
             if (item != null)
             {
-                this.DeleteTreeViewEntryItemModel(item);
+				DeleteTreeViewEntryItemModel(item);
             }
         }
 
@@ -163,7 +162,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             // delete old items
             IList<TreeViewEntryItemModel> itemsToDelete = treeViewEntryItem.Children.Where(item => !nodeChildren.Contains(item.Node)).ToList();
             foreach (TreeViewEntryItemModel item in itemsToDelete) {
-                this.DeleteTreeViewEntryItemModel(item);
+				DeleteTreeViewEntryItemModel(item);
             }
 
             // add new items            
@@ -176,25 +175,25 @@ namespace PsISEProjectExplorer.UI.ViewModel
                         .FirstOrDefault(treeViewChild => docHierarchyChild.Equals(treeViewChild.Node));
                     if (newTreeViewItem == null)
                     {
-                        bool isSelected = docHierarchyChild.Path == this.PathOfItemToSelectOnRefresh;
-                        newTreeViewItem = this.CreateTreeViewEntryItemModel(docHierarchyChild, treeViewEntryItem, isSelected);
+                        bool isSelected = docHierarchyChild.Path == PathOfItemToSelectOnRefresh;
+                        newTreeViewItem = CreateTreeViewEntryItemModel(docHierarchyChild, treeViewEntryItem, isSelected);
                     }
                     else
                     {
-                        this.UpdateNode(newTreeViewItem, docHierarchyChild);
+						UpdateNode(newTreeViewItem, docHierarchyChild);
                     }
                     if (expandAllNodes)
                     {
                         newTreeViewItem.IsExpanded = true;
                     }
                 }
-                this.RefreshFromIntermediateNode(docHierarchyChild, newTreeViewItem, expandAllNodes);
+				RefreshFromIntermediateNode(docHierarchyChild, newTreeViewItem, expandAllNodes);
             }
         }
 
         public void OpenItem(TreeViewEntryItemModel item, string searchText)
         {
-            if (this.IseIntegrator == null)
+            if (IseIntegrator == null)
             {
                 throw new InvalidOperationException("IseIntegrator has not ben set yet.");
             }
@@ -205,29 +204,29 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
             if (item.Node.NodeType == NodeType.File)
             {
-                bool wasOpen = (this.IseIntegrator.SelectedFilePath == item.Node.Path);
+                bool wasOpen = (IseIntegrator.SelectedFilePath == item.Node.Path);
                 if (!wasOpen)
                 {
-                    this.IseIntegrator.GoToFile(item.Node.Path);
+					IseIntegrator.GoToFile(item.Node.Path);
                 }
                 else
                 {
-                    this.IseIntegrator.SetFocusOnCurrentTab();
+					IseIntegrator.SetFocusOnCurrentTab();
                 }
                 if (searchText != null && searchText.Length > 2)
                 {
-                    EditorInfo editorInfo = (wasOpen ? this.IseIntegrator.GetCurrentLineWithColumnIndex() : null);
+                    EditorInfo editorInfo = (wasOpen ? IseIntegrator.GetCurrentLineWithColumnIndex() : null);
                     TokenPosition tokenPos = TokenLocator.LocateNextToken(item.Node.Path, searchText, editorInfo);
                     if (tokenPos.MatchLength > 2)
                     {
-                        this.IseIntegrator.SelectText(tokenPos.Line, tokenPos.Column, tokenPos.MatchLength);
+						IseIntegrator.SelectText(tokenPos.Line, tokenPos.Column, tokenPos.MatchLength);
                     }
-                    else if (string.IsNullOrEmpty(this.IseIntegrator.SelectedText))
+                    else if (string.IsNullOrEmpty(IseIntegrator.SelectedText))
                     {
                         tokenPos = TokenLocator.LocateSubtoken(item.Node.Path, searchText);
                         if (tokenPos.MatchLength > 2)
                         {
-                            this.IseIntegrator.SelectText(tokenPos.Line, tokenPos.Column, tokenPos.MatchLength);
+							IseIntegrator.SelectText(tokenPos.Line, tokenPos.Column, tokenPos.MatchLength);
                         }
                     }
                 }
@@ -235,8 +234,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
             else if (item.Node.NodeType == NodeType.Function)
             {
                 var node = ((PowershellItemNode)item.Node);
-                this.IseIntegrator.GoToFile(node.FilePath);
-                this.IseIntegrator.SelectText(node.PowershellItem.StartLine, node.PowershellItem.StartColumn, node.Name.Length);
+				IseIntegrator.GoToFile(node.FilePath);
+				IseIntegrator.SelectText(node.PowershellItem.StartLine, node.PowershellItem.StartColumn, node.Name.Length);
             }
             else if (item.Node.NodeType == NodeType.Directory)
             {
@@ -250,7 +249,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 return;
             }
-            if (!this.HandleUnsavedFileManipulation(selectedItem))
+            if (!HandleUnsavedFileManipulation(selectedItem))
             {
                 return;
             }
@@ -270,8 +269,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 try
                 {
-                    this.IseIntegrator.CloseFile(selectedItem.Path);
-                    this.FilesPatternProvider.RemoveAdditionalPath(selectedItem.Path);
+					IseIntegrator.CloseFile(selectedItem.Path);
+					FilesPatternProvider.RemoveAdditionalPath(selectedItem.Path);
                     FileSystemOperationsService.DeleteFileOrDirectory(selectedItem.Path);
                 }
                 catch (Exception e)
@@ -283,28 +282,28 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public void AddNewTreeItem(TreeViewEntryItemModel parent, NodeType nodeType)
         {
-            if (this.DocumentHierarchyFactory == null)
+            if (DocumentHierarchyFactory == null)
             {
                 return;
             }
             if (parent == null)
             {
-                parent = this.RootTreeViewEntryItem;
+                parent = RootTreeViewEntryItem;
             }
             parent.IsExpanded = true;
-            INode newNode = this.DocumentHierarchyFactory.CreateTemporaryNode(parent.Node, nodeType);
+            INode newNode = DocumentHierarchyFactory.CreateTemporaryNode(parent.Node, nodeType);
             if (newNode == null)
             {
                 return;
             }
-            var newItem = this.CreateTreeViewEntryItemModel(newNode, parent, true);
+            var newItem = CreateTreeViewEntryItemModel(newNode, parent, true);
             newItem.IsBeingEdited = true;
             newItem.IsBeingAdded = true;
         }
 
         public void StartEditingTreeItem(TreeViewEntryItemModel item)
         {
-            if (!this.HandleUnsavedFileManipulation(item))
+            if (!HandleUnsavedFileManipulation(item))
             {
                 return;
             }
@@ -317,7 +316,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 return;
             }
-            if (!this.HandleUnsavedFileManipulation(movedItem))
+            if (!HandleUnsavedFileManipulation(movedItem))
             {
                 return;
             }
@@ -332,27 +331,27 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 // moved to the empty place, i.e. to the workspace directory
                 if (destinationItem == null)
                 {
-                    newPath = this.GenerateNewPathForDir(rootDirectory, movedItem.Name);
+                    newPath = GenerateNewPathForDir(rootDirectory, movedItem.Name);
                 }
                 else if (destinationItem.NodeType == NodeType.File)
                 {
-                    newPath = this.GenerateNewPath(destinationItem.Path, movedItem.Name);
+                    newPath = GenerateNewPath(destinationItem.Path, movedItem.Name);
                 }
                 else if (destinationItem.NodeType == NodeType.Directory)
                 {
-                    newPath = this.GenerateNewPathForDir(destinationItem.Path, movedItem.Name);
+                    newPath = GenerateNewPathForDir(destinationItem.Path, movedItem.Name);
                 }
                 else
                 {
                     return;
                 }
-                this.FilesPatternProvider.RemoveAdditionalPath(movedItem.Path);
-                this.FilesPatternProvider.AddAdditionalPath(newPath);
-                bool closed = this.IseIntegrator.CloseFile(movedItem.Path);
+				FilesPatternProvider.RemoveAdditionalPath(movedItem.Path);
+				FilesPatternProvider.AddAdditionalPath(newPath);
+                bool closed = IseIntegrator.CloseFile(movedItem.Path);
                 FileSystemOperationsService.RenameFileOrDirectory(movedItem.Path, newPath);
                 if (closed)
                 {
-                    this.IseIntegrator.GoToFile(newPath);
+					IseIntegrator.GoToFile(newPath);
                 }
                 if (destinationItem != null)
                 {
@@ -361,7 +360,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
             catch (Exception e)
             {
-                this.PathOfItemToSelectOnRefresh = null;
+				PathOfItemToSelectOnRefresh = null;
                 MessageBoxHelper.ShowError("Failed to move: " + e.Message);
             }
         }
@@ -374,18 +373,18 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
             selectedItem.IsBeingEdited = false;
 
-            if (selectedItem.NodeType == NodeType.File && addFileExtension && !String.IsNullOrEmpty(newValue) && !this.FilesPatternProvider.DoesFileMatch(newValue))
+            if (selectedItem.NodeType == NodeType.File && addFileExtension && !String.IsNullOrEmpty(newValue) && !FilesPatternProvider.DoesFileMatch(newValue))
             {
                 newValue += ".ps1";
             }
             if (selectedItem.IsBeingAdded)
             {
                 selectedItem.IsBeingAdded = false;
-                this.EndAddingTreeItem(newValue, save, selectedItem);
+				EndAddingTreeItem(newValue, save, selectedItem);
             }
             else
             {
-                this.EndRenamingTreeItem(newValue, save, selectedItem);
+				EndRenamingTreeItem(newValue, save, selectedItem);
             }
         }
 
@@ -399,17 +398,17 @@ namespace PsISEProjectExplorer.UI.ViewModel
             try
             {
                 string oldPath = selectedItem.Path;
-                string newPath = this.GenerateNewPath(selectedItem.Path, newValue);
-                bool closed = this.IseIntegrator.CloseFile(oldPath);
+                string newPath = GenerateNewPath(selectedItem.Path, newValue);
+                bool closed = IseIntegrator.CloseFile(oldPath);
                 FileSystemOperationsService.RenameFileOrDirectory(oldPath, newPath);
                 if (closed)
                 {
-                    this.IseIntegrator.GoToFile(newPath);
+					IseIntegrator.GoToFile(newPath);
                 }
             }
             catch (Exception e)
             {
-                this.PathOfItemToSelectOnRefresh = null;
+				PathOfItemToSelectOnRefresh = null;
                 MessageBoxHelper.ShowError("Failed to rename: " + e.Message);
             }
 
@@ -419,16 +418,16 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             if (!save || String.IsNullOrEmpty(newValue))
             {
-                this.DocumentHierarchyFactory.RemoveTemporaryNode(selectedItem.Node);
-                this.DeleteTreeViewEntryItemModel(selectedItem);
+				DocumentHierarchyFactory.RemoveTemporaryNode(selectedItem.Node);
+				DeleteTreeViewEntryItemModel(selectedItem);
                 return;
             }
-            var newPath = this.GenerateNewPath(selectedItem.Path, newValue);
+            var newPath = GenerateNewPath(selectedItem.Path, newValue);
             INode newNode = null;
-            if (this.FindTreeViewEntryItemByPath(newPath) != null)
+            if (FindTreeViewEntryItemByPath(newPath) != null)
             {
-                this.DocumentHierarchyFactory.RemoveTemporaryNode(selectedItem.Node);
-                this.DeleteTreeViewEntryItemModel(selectedItem);
+				DocumentHierarchyFactory.RemoveTemporaryNode(selectedItem.Node);
+				DeleteTreeViewEntryItemModel(selectedItem);
                 MessageBoxHelper.ShowError("Item '" + newPath + "' already exists.");
                 return;
             }
@@ -436,11 +435,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 try
                 {
-                    newNode = this.DocumentHierarchyFactory.UpdateTemporaryNode(selectedItem.Node, newPath);
+                    newNode = DocumentHierarchyFactory.UpdateTemporaryNode(selectedItem.Node, newPath);
                     var parent = selectedItem.Parent;
-                    this.DeleteTreeViewEntryItemModel(selectedItem);
-                    selectedItem = this.CreateTreeViewEntryItemModel(newNode, parent, true);
-                    this.FilesPatternProvider.AddAdditionalPath(newPath);
+					DeleteTreeViewEntryItemModel(selectedItem);
+                    selectedItem = CreateTreeViewEntryItemModel(newNode, parent, true);
+					FilesPatternProvider.AddAdditionalPath(newPath);
                     FileSystemOperationsService.CreateDirectory(newPath);
                 }
                 catch (Exception e)
@@ -451,9 +450,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     }
                     if (selectedItem != null)
                     {
-                        this.DeleteTreeViewEntryItemModel(selectedItem);
+						DeleteTreeViewEntryItemModel(selectedItem);
                     }
-                    this.PathOfItemToSelectOnRefresh = null;
+					PathOfItemToSelectOnRefresh = null;
                     MessageBoxHelper.ShowError("Failed to create directory '" + newPath + "': " + e.Message);
                 }
             }
@@ -461,13 +460,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 try
                 {
-                    newNode = this.DocumentHierarchyFactory.UpdateTemporaryNode(selectedItem.Node, newPath);
+                    newNode = DocumentHierarchyFactory.UpdateTemporaryNode(selectedItem.Node, newPath);
                     var parent = selectedItem.Parent;
-                    this.DeleteTreeViewEntryItemModel(selectedItem);
-                    selectedItem = this.CreateTreeViewEntryItemModel(newNode, parent, true);
-                    this.FilesPatternProvider.AddAdditionalPath(newPath);
+					DeleteTreeViewEntryItemModel(selectedItem);
+                    selectedItem = CreateTreeViewEntryItemModel(newNode, parent, true);
+					FilesPatternProvider.AddAdditionalPath(newPath);
                     FileSystemOperationsService.CreateFile(newPath);
-                    this.IseIntegrator.GoToFile(newPath);
+					IseIntegrator.GoToFile(newPath);
                 }
                 catch (Exception e)
                 {
@@ -477,9 +476,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     }
                     if (selectedItem != null)
                     {
-                        this.DeleteTreeViewEntryItemModel(selectedItem);
+						DeleteTreeViewEntryItemModel(selectedItem);
                     }
-                    this.PathOfItemToSelectOnRefresh = null;
+					PathOfItemToSelectOnRefresh = null;
                     MessageBoxHelper.ShowError("Failed to create file '" + newPath + "': " + e.Message);
                 }
             }
@@ -488,22 +487,22 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private string GenerateNewPath(string currentPath, string newValue)
         {
             var newPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(currentPath), newValue);
-            this.PathOfItemToSelectOnRefresh = newPath;
+			PathOfItemToSelectOnRefresh = newPath;
             return newPath;
         }
 
         private string GenerateNewPathForDir(string currentPath, string newValue)
         {
             var newPath = System.IO.Path.Combine(currentPath, newValue);
-            this.PathOfItemToSelectOnRefresh = newPath;
+			PathOfItemToSelectOnRefresh = newPath;
             return newPath;
         }
 
         private bool HandleUnsavedFileManipulation(TreeViewEntryItemModel selectedItem)
         {
-            if (selectedItem.NodeType == NodeType.File && this.IseIntegrator.OpenFiles.Contains(selectedItem.Path) && !this.IseIntegrator.IsFileSaved(selectedItem.Path))
+            if (selectedItem.NodeType == NodeType.File && IseIntegrator.OpenFiles.Contains(selectedItem.Path) && !IseIntegrator.IsFileSaved(selectedItem.Path))
             {
-                this.IseIntegrator.GoToFile(selectedItem.Path);
+				IseIntegrator.GoToFile(selectedItem.Path);
                 MessageBoxHelper.ShowInfo("Please save your changes or close the file first.");
                 return false;
             }
@@ -516,12 +515,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
             lock (lockObject)
             {
                 var item = new TreeViewEntryItemModel(node, parent, isSelected);
-                this.ItemsMap[node.Path] = item;
+				ItemsMap[node.Path] = item;
                 if (node.NodeType == NodeType.File)
                 {
                     lock (TreeViewEntryItemModel.RootLockObject)
                     {
-                        this.NumberOfFiles++;
+						NumberOfFiles++;
                     }
                 }
                 return item;
@@ -530,11 +529,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private TreeViewEntryItemModel CreateTreeViewEntryItemModelWithNodeParents(INode node, bool isSelected, bool expandAllNodes)
         {
-            var itemParent = node.Parent == null ? null : this.CreateTreeViewEntryItemModelWithNodeParents(node.Parent, false, expandAllNodes);
-            TreeViewEntryItemModel item = this.FindTreeViewEntryItemByPath(node.Path);
+            var itemParent = node.Parent == null ? null : CreateTreeViewEntryItemModelWithNodeParents(node.Parent, false, expandAllNodes);
+            TreeViewEntryItemModel item = FindTreeViewEntryItemByPath(node.Path);
             if (item == null)
             {
-                item = this.CreateTreeViewEntryItemModel(node, itemParent, isSelected);
+                item = CreateTreeViewEntryItemModel(node, itemParent, isSelected);
             }
             if (expandAllNodes)
             {
@@ -545,7 +544,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void DeleteTreeViewEntryItemModel(TreeViewEntryItemModel item, bool first = true)
         {
-            if (item == this.RootTreeViewEntryItem)
+            if (item == RootTreeViewEntryItem)
             {
                 return;
             }
@@ -553,19 +552,19 @@ namespace PsISEProjectExplorer.UI.ViewModel
             IList<TreeViewEntryItemModel> children;
             lock (lockObject)
             {
-                this.ItemsMap.Remove(item.Path);
+				ItemsMap.Remove(item.Path);
                 if (item.NodeType == NodeType.File)
                 {
                     lock (TreeViewEntryItemModel.RootLockObject)
                     {
-                        this.NumberOfFiles--;
+						NumberOfFiles--;
                     }
                 }
                 children = new List<TreeViewEntryItemModel>(item.Children);
             }
             foreach (var child in children)
             {
-                this.DeleteTreeViewEntryItemModel(child, false);
+				DeleteTreeViewEntryItemModel(child, false);
             }
             if (first)
             {

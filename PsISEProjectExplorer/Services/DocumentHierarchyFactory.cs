@@ -1,17 +1,15 @@
 ﻿using PsISEProjectExplorer.Enums;
-using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.UI.Workers;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
 namespace PsISEProjectExplorer.Services
 {
-    public class DocumentHierarchyFactory
+	public class DocumentHierarchyFactory
     {
 
         private DocumentHierarchy DocumentHierarchy { get; set; }
@@ -20,7 +18,7 @@ namespace PsISEProjectExplorer.Services
         {
             get
             {
-                return this.DocumentHierarchy == null ? null : this.DocumentHierarchy.RootNode.Path;
+                return DocumentHierarchy == null ? null : DocumentHierarchy.RootNode.Path;
             }
         }
 
@@ -30,73 +28,73 @@ namespace PsISEProjectExplorer.Services
             {
                 return null;
             }
-            this.DocumentHierarchy = new DocumentHierarchy(new RootNode(path));
-            return new DocumentHierarchySearcher(this.DocumentHierarchy);           
+			DocumentHierarchy = new DocumentHierarchy(new RootNode(path));
+            return new DocumentHierarchySearcher(DocumentHierarchy);           
         }
 
         public INode CreateTemporaryNode(INode parent, NodeType nodeType)
         {
-            if (this.DocumentHierarchy == null || parent == null)
+            if (DocumentHierarchy == null || parent == null)
             {
                 return null;
             }
             if (nodeType == NodeType.Directory)
             {
-                return this.DocumentHierarchy.CreateNewDirectoryNode(parent.Path + @"\", parent, null);
+                return DocumentHierarchy.CreateNewDirectoryNode(parent.Path + @"\", parent, null);
             }
             if (nodeType == NodeType.File)
             {
-                return this.DocumentHierarchy.CreateNewFileNode(parent.Path + @"\", string.Empty, parent, null);
+                return DocumentHierarchy.CreateNewFileNode(parent.Path + @"\", string.Empty, parent, null);
             }
             return null;
         }
 
         public INode UpdateTemporaryNode(INode node, string newPath)
         {
-            if (this.DocumentHierarchy == null || node == null)
+            if (DocumentHierarchy == null || node == null)
             {
                 return null;
             }
             if (node.NodeType == NodeType.Directory)
             {
-                return this.DocumentHierarchy.UpdateDirectoryNodePath(node, newPath, null);
+                return DocumentHierarchy.UpdateDirectoryNodePath(node, newPath, null);
             }
             if (node.NodeType == NodeType.File)
             {
-                return this.DocumentHierarchy.UpdateFileNodePath(node, newPath, null);
+                return DocumentHierarchy.UpdateFileNodePath(node, newPath, null);
             }
             return null;
         }
 
         public void RemoveTemporaryNode(INode node)
         {
-            if (this.DocumentHierarchy == null)
+            if (DocumentHierarchy == null)
             {
                 return;
             }
-            this.DocumentHierarchy.RemoveNode(node);
+			DocumentHierarchy.RemoveNode(node);
         }
 
         public bool UpdateDocumentHierarchy(IEnumerable<string> pathsToUpdate, FilesPatternProvider filesPatternProvider, BackgroundIndexer worker)
         {
-            if (this.DocumentHierarchy == null)
+            if (DocumentHierarchy == null)
             {
                 return false;
             }
-            var documentHierarchyIndexer = new DocumentHierarchyIndexer(this.DocumentHierarchy);
+            var documentHierarchyIndexer = new DocumentHierarchyIndexer(DocumentHierarchy);
             bool changed = false;
             foreach (string path in pathsToUpdate)
             {
-                INode node = this.DocumentHierarchy.GetNode(path);
+                INode node = DocumentHierarchy.GetNode(path);
                 bool nodeShouldBeRemoved = node != null;
-                var fileSystemEntryList = this.GetFileList(path, filesPatternProvider, worker);
+                var fileSystemEntryList = GetFileList(path, filesPatternProvider, worker);
                 
                 foreach (PowershellFileParser fileSystemEntry in fileSystemEntryList)
                 {
                     // this is to prevent from reporting progress after deletion if the node is only updated
                     if (fileSystemEntry.Path == path && node != null)
                     {
-                        this.DocumentHierarchy.RemoveNode(node);
+						DocumentHierarchy.RemoveNode(node);
                         nodeShouldBeRemoved = false;
                     }
                     documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
@@ -104,9 +102,9 @@ namespace PsISEProjectExplorer.Services
                 }
                 if (nodeShouldBeRemoved)
                 {
-                    this.DocumentHierarchy.RemoveNode(node);
+					DocumentHierarchy.RemoveNode(node);
                     changed = true;
-                    this.ReportProgress(worker, path);
+					ReportProgress(worker, path);
                 }
             }
             return changed;
@@ -131,7 +129,7 @@ namespace PsISEProjectExplorer.Services
             {
                 parser = new PowershellFileParser(path, isDirectory: false);
                 yield return parser;
-                this.ReportProgress(worker, path);
+				ReportProgress(worker, path);
                 yield break;
             }
             if (!Directory.Exists(path) || !filesPatternProvider.DoesDirectoryMatch(path))
@@ -147,7 +145,7 @@ namespace PsISEProjectExplorer.Services
                 parser = null;
                 string currentPath = pathsToEnumerate.Dequeue();
 
-                foreach (var file in this.GetFilesInDirectory(currentPath, filesPatternProvider))
+                foreach (var file in GetFilesInDirectory(currentPath, filesPatternProvider))
                 {
                     yield return file;
                 }
@@ -172,7 +170,7 @@ namespace PsISEProjectExplorer.Services
                     }
                     pathsToEnumerate.Enqueue(dir);
                 }
-                this.ReportProgress(worker, currentPath);
+				ReportProgress(worker, currentPath);
             } while (pathsToEnumerate.Any());
         }
 

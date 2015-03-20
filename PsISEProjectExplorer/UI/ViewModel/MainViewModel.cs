@@ -2,22 +2,19 @@
 using PsISEProjectExplorer.Config;
 using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
-using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.Services;
-using PsISEProjectExplorer.UI.Helpers;
 using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.Workers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Windows;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
-    public class MainViewModel : BaseViewModel
+	public class MainViewModel : BaseViewModel
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -31,13 +28,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public string SearchText
         {
-            get { return this.SearchOptions.SearchText; }
+            get { return SearchOptions.SearchText; }
             set
             {
-                this.SearchOptions.SearchText = value;
-                Logger.Debug("Search text changed to: " + this.SearchOptions.SearchText);
-                this.OnPropertyChanged();
-                this.RunSearch();
+				SearchOptions.SearchText = value;
+                Logger.Debug("Search text changed to: " + SearchOptions.SearchText);
+				OnPropertyChanged();
+				RunSearch();
             }
         }
 
@@ -45,9 +42,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return String.Format("Found {0} files{1}", this.TreeViewModel.NumberOfFiles, 
-                    this.NumOfIndexingThreads > 0 ? ", indexing in progress..." : 
-                    this.NumOfSearchingThreads > 0 ? ", searching in progress..." : ".");
+                return String.Format("Found {0} files{1}", TreeViewModel.NumberOfFiles,
+					NumOfIndexingThreads > 0 ? ", indexing in progress..." :
+					NumOfSearchingThreads > 0 ? ", searching in progress..." : ".");
             }
         }
 
@@ -55,15 +52,15 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public bool SearchInFiles
         {
-            get { return this.searchInFiles; }
+            get { return searchInFiles; }
             set
             {
-                this.searchInFiles = value;
-                this.OnPropertyChanged();
-                this.SearchOptions.SearchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
-                if (!String.IsNullOrEmpty(this.SearchText))
+				searchInFiles = value;
+				OnPropertyChanged();
+				SearchOptions.SearchField = (searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
+                if (!String.IsNullOrEmpty(SearchText))
                 {
-                    this.RunSearch();
+					RunSearch();
                 }
                 ConfigHandler.SaveConfigValue("SearchInFiles", value.ToString());
             }
@@ -73,14 +70,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public bool ShowAllFiles
         {
-            get { return this.showAllFiles; }
+            get { return showAllFiles; }
             set
             {
-                this.showAllFiles = value;
-                this.FilesPatternProvider.IncludeAllFiles = value;
-                this.OnPropertyChanged();
+				showAllFiles = value;
+				FilesPatternProvider.IncludeAllFiles = value;
+				OnPropertyChanged();
                 ConfigHandler.SaveConfigValue("ShowAllFiles", value.ToString());
-                this.ReindexSearchTree();
+				ReindexSearchTree();
             }
         }
 
@@ -88,12 +85,12 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public bool SyncWithActiveDocument
         {
-            get { return this.syncWithActiveDocument; }
+            get { return syncWithActiveDocument; }
             set
             {
-                this.syncWithActiveDocument = value;
-                this.OnPropertyChanged();
-                this.ActiveDocumentPotentiallyChanged();
+				syncWithActiveDocument = value;
+				OnPropertyChanged();
+				ActiveDocumentPotentiallyChanged();
                 ConfigHandler.SaveConfigValue("SyncWithActiveDocument", value.ToString());
             }
         }
@@ -104,13 +101,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return this.numOfSearchingThreads;
+                return numOfSearchingThreads;
             }
             set
             {
-                this.numOfSearchingThreads = value;
-                this.OnPropertyChanged();
-                this.OnPropertyChanged("TreeItemsResultString");
+				numOfSearchingThreads = value;
+				OnPropertyChanged();
+				OnPropertyChanged("TreeItemsResultString");
             }
         }
 
@@ -120,13 +117,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return this.numOfIndexingThreads;
+                return numOfIndexingThreads;
             }
             set
             {
-                this.numOfIndexingThreads = value;
-                this.OnPropertyChanged();
-                this.OnPropertyChanged("TreeItemsResultString");
+				numOfIndexingThreads = value;
+				OnPropertyChanged();
+				OnPropertyChanged("TreeItemsResultString");
             }
         }
 
@@ -141,18 +138,18 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return this.iseIntegrator;
+                return iseIntegrator;
             }
             set
             {
-                this.iseIntegrator = value;
-                this.IseFileReloader = new IseFileReloader(this.iseIntegrator);
-                this.TreeViewModel.IseIntegrator = this.iseIntegrator;
-                this.WorkspaceDirectoryModel.IseIntegrator = this.iseIntegrator;
-                this.iseIntegrator.FileTabChanged += OnFileTabChanged;
-                if (!this.WorkspaceDirectoryModel.ResetWorkspaceDirectoryIfRequired())
+				iseIntegrator = value;
+				IseFileReloader = new IseFileReloader(iseIntegrator);
+				TreeViewModel.IseIntegrator = iseIntegrator;
+				WorkspaceDirectoryModel.IseIntegrator = iseIntegrator;
+				iseIntegrator.FileTabChanged += OnFileTabChanged;
+                if (!WorkspaceDirectoryModel.ResetWorkspaceDirectoryIfRequired())
                 {
-                    this.ReindexSearchTree();
+					ReindexSearchTree();
                 }
             }
         }
@@ -167,70 +164,70 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public MainViewModel()
         {
-            this.searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles", true);
-            this.showAllFiles = ConfigHandler.ReadConfigBoolValue("ShowAllFiles", true);
-            this.FilesPatternProvider = new FilesPatternProvider(this.showAllFiles);
-            this.syncWithActiveDocument = ConfigHandler.ReadConfigBoolValue("SyncWithActiveDocument", false);
-            var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
-            this.SearchOptions = new SearchOptions(searchField, string.Empty);
+			searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles", true);
+			showAllFiles = ConfigHandler.ReadConfigBoolValue("ShowAllFiles", true);
+			FilesPatternProvider = new FilesPatternProvider(showAllFiles);
+			syncWithActiveDocument = ConfigHandler.ReadConfigBoolValue("SyncWithActiveDocument", false);
+            var searchField = (searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
+			SearchOptions = new SearchOptions(searchField, string.Empty);
 
-            this.DocumentHierarchyFactory = new DocumentHierarchyFactory();
-            this.FileSystemChangeWatcher = new FileSystemChangeWatcher(this.ReindexOnFileSystemChanged);
-            this.IndexingSearchingModel = new IndexingSearchingModel(this.OnSearchingFinished, this.OnIndexingFinished, this.OnIndexingProgress);
-            this.TreeViewModel = new TreeViewModel(this.FileSystemChangeWatcher, this.DocumentHierarchyFactory, this.FilesPatternProvider);
-            this.TreeViewModel.PropertyChanged += (s, e) => { if (e.PropertyName == "NumberOfFiles") this.OnPropertyChanged("TreeItemsResultString"); };
-            this.WorkspaceDirectoryModel = new WorkspaceDirectoryModel();
-            if (this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory != null)
+			DocumentHierarchyFactory = new DocumentHierarchyFactory();
+			FileSystemChangeWatcher = new FileSystemChangeWatcher(ReindexOnFileSystemChanged);
+			IndexingSearchingModel = new IndexingSearchingModel(OnSearchingFinished, OnIndexingFinished, OnIndexingProgress);
+			TreeViewModel = new TreeViewModel(FileSystemChangeWatcher, DocumentHierarchyFactory, FilesPatternProvider);
+			TreeViewModel.PropertyChanged += (s, e) => { if (e.PropertyName == "NumberOfFiles") OnPropertyChanged("TreeItemsResultString"); };
+			WorkspaceDirectoryModel = new WorkspaceDirectoryModel();
+            if (WorkspaceDirectoryModel.CurrentWorkspaceDirectory != null)
             {
-                this.DocumentHierarchySearcher = this.DocumentHierarchyFactory.CreateDocumentHierarchySearcher(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory);
+				DocumentHierarchySearcher = DocumentHierarchyFactory.CreateDocumentHierarchySearcher(WorkspaceDirectoryModel.CurrentWorkspaceDirectory);
             }
-            this.WorkspaceDirectoryModel.PropertyChanged += this.OnWorkspaceDirectoryChanged;
+			WorkspaceDirectoryModel.PropertyChanged += OnWorkspaceDirectoryChanged;
         }
 
         public void GoToDefinition()
         {
-            string funcName = this.GetFunctionNameAtCurrentPosition();
-            if (funcName == null || this.DocumentHierarchySearcher == null)
+            string funcName = GetFunctionNameAtCurrentPosition();
+            if (funcName == null || DocumentHierarchySearcher == null)
             {
                 return;
             }
-            var node = (PowershellItemNode)this.DocumentHierarchySearcher.GetFunctionNodeByName(funcName);
+            var node = (PowershellItemNode)DocumentHierarchySearcher.GetFunctionNodeByName(funcName);
             if (node == null)
             {
                 return;
             }
-            this.IseIntegrator.GoToFile(node.FilePath);
-            this.IseIntegrator.SetCursor(node.PowershellItem.StartLine, node.PowershellItem.StartColumn);
+			IseIntegrator.GoToFile(node.FilePath);
+			IseIntegrator.SetCursor(node.PowershellItem.StartLine, node.PowershellItem.StartColumn);
             
         }
 
         public void FindAllOccurrences()
         {
-            string funcName = this.GetFunctionNameAtCurrentPosition();
+            string funcName = GetFunctionNameAtCurrentPosition();
             if (funcName == null)
             {
                 return;
             }
-            
-            // TODO: this is hacky...
-            this.SearchOptions.SearchText = string.Empty;
-            this.SearchInFiles = true;
-            this.SearchText = funcName;
+
+			// TODO: this is hacky...
+			SearchOptions.SearchText = string.Empty;
+			SearchInFiles = true;
+			SearchText = funcName;
         }
 
         public void FindInFiles()
         {
-            this.SearchOptions.SearchText = string.Empty;
-            this.SearchInFiles = true;
+			SearchOptions.SearchText = string.Empty;
+			SearchInFiles = true;
         }
 
         private string GetFunctionNameAtCurrentPosition()
         {
-            if (this.DocumentHierarchySearcher == null)
+            if (DocumentHierarchySearcher == null)
             {
                 return null;
             }
-            EditorInfo editorInfo = this.IseIntegrator.GetCurrentLineWithColumnIndex();
+            EditorInfo editorInfo = IseIntegrator.GetCurrentLineWithColumnIndex();
             if (editorInfo == null)
             {
                 return null;
@@ -241,7 +238,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void ReindexOnFileSystemChanged(object sender, FileSystemChangedInfo changedInfo)
         {
-            var workspaceDirectory = this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory;
+            var workspaceDirectory = WorkspaceDirectoryModel.CurrentWorkspaceDirectory;
             var pathsChanged = changedInfo.PathsChanged.Where(p => p.RootPath == workspaceDirectory).Select(p => p.PathChanged).ToList();
             if (!pathsChanged.Any())
             {
@@ -252,43 +249,43 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 pathsChanged = null;
             }
             Logger.Debug("OnFileSystemChanged: " + (pathsChanged == null ? "root" : string.Join(",", pathsChanged)));
-            Application.Current.Dispatcher.Invoke(() => this.ReindexSearchTree(pathsChanged));
+            Application.Current.Dispatcher.Invoke(() => ReindexSearchTree(pathsChanged));
         }
 
         private void OnFileTabChanged(object sender, IseEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                this.WorkspaceDirectoryModel.ResetWorkspaceDirectoryIfRequired();
+				WorkspaceDirectoryModel.ResetWorkspaceDirectoryIfRequired();
             });
-            this.ActiveDocumentPotentiallyChanged();
+			ActiveDocumentPotentiallyChanged();
         }
      
         public void ReindexSearchTree()
         {
             lock (this)
             {
-                this.ClearTreeView();
-                this.ReindexSearchTree(null);
+				ClearTreeView();
+				ReindexSearchTree(null);
             }
         }
 
         private void ClearTreeView()
         {
-            var rootNode = this.DocumentHierarchySearcher == null ? null : this.DocumentHierarchySearcher.RootNode;
-            this.TreeViewModel.ReRoot(rootNode);
-            this.FileSystemChangeWatcher.StopWatching();
+            var rootNode = DocumentHierarchySearcher == null ? null : DocumentHierarchySearcher.RootNode;
+			TreeViewModel.ReRoot(rootNode);
+			FileSystemChangeWatcher.StopWatching();
             if (rootNode != null)
             {
-                this.FileSystemChangeWatcher.Watch(rootNode.Path, this.FilesPatternProvider);
+				FileSystemChangeWatcher.Watch(rootNode.Path, FilesPatternProvider);
             }
         }
 
         private void ActiveDocumentPotentiallyChanged()
         {
-            if (this.ActiveDocumentSyncEvent != null)
+            if (ActiveDocumentSyncEvent != null)
             {
-                this.ActiveDocumentSyncEvent(this, new IseEventArgs());
+				ActiveDocumentSyncEvent(this, new IseEventArgs());
             }
         }
 
@@ -296,8 +293,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             if (e.PropertyName == "CurrentWorkspaceDirectory")
             {
-                this.DocumentHierarchySearcher = this.DocumentHierarchyFactory.CreateDocumentHierarchySearcher(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory);
-                this.ReindexSearchTree();
+				DocumentHierarchySearcher = DocumentHierarchyFactory.CreateDocumentHierarchySearcher(WorkspaceDirectoryModel.CurrentWorkspaceDirectory);
+				ReindexSearchTree();
             }
         }
 
@@ -306,10 +303,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             lock (this)
             {
-                this.NumOfIndexingThreads++;
+				NumOfIndexingThreads++;
             }
-            var indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyFactory, this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, pathsChanged, this.FilesPatternProvider);
-            this.IndexingSearchingModel.ReindexSearchTree(indexerParams);
+            var indexerParams = new BackgroundIndexerParams(DocumentHierarchyFactory, WorkspaceDirectoryModel.CurrentWorkspaceDirectory, pathsChanged, FilesPatternProvider);
+			IndexingSearchingModel.ReindexSearchTree(indexerParams);
         }
 
         // running in Indexing or UI thread
@@ -317,14 +314,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             lock (this)
             {
-                this.NumOfSearchingThreads++;
+				NumOfSearchingThreads++;
             }
             if (path == null)
             {
-                this.ClearTreeView();
+				ClearTreeView();
             }
-            var searcherParams = new BackgroundSearcherParams(this.DocumentHierarchySearcher, this.SearchOptions, path);
-            this.IndexingSearchingModel.RunSearch(searcherParams);
+            var searcherParams = new BackgroundSearcherParams(DocumentHierarchySearcher, SearchOptions, path);
+			IndexingSearchingModel.RunSearch(searcherParams);
         }
 
         // running in Indexing or UI thread
@@ -332,24 +329,24 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             try
             {
-                if (result == null || result.SearchOptions == null || !result.SearchOptions.Equals(this.SearchOptions))
+                if (result == null || result.SearchOptions == null || !result.SearchOptions.Equals(SearchOptions))
                 {
                     // this means that the thread was cancelled or SearchOptions have been changed in the meantime, so we need to ignore the result.
                     return;
                 }
-                bool expandNewNodes = !String.IsNullOrWhiteSpace(this.SearchText);
+                bool expandNewNodes = !String.IsNullOrWhiteSpace(SearchText);
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    this.TreeViewModel.RefreshFromNode(result.ResultNode, result.Path, expandNewNodes);
-                    // when 'Sync with active document' is enabled and search results changed, we need to try to locate current document in the new search results
-                    this.ActiveDocumentPotentiallyChanged();
+					TreeViewModel.RefreshFromNode(result.ResultNode, result.Path, expandNewNodes);
+					// when 'Sync with active document' is enabled and search results changed, we need to try to locate current document in the new search results
+					ActiveDocumentPotentiallyChanged();
                 });
             }
             finally
             {
                 lock (this)
                 {
-                    this.NumOfSearchingThreads--;
+					NumOfSearchingThreads--;
                 }
             }
         }
@@ -357,7 +354,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         // running in Indexing thread
         private void OnIndexingProgress(object sender, string path)
         {
-            this.RunSearch(path);
+			RunSearch(path);
         }
 
         // running in UI thread
@@ -365,7 +362,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             lock (this)
             {
-                this.NumOfIndexingThreads--;
+				NumOfIndexingThreads--;
             }
         }
 

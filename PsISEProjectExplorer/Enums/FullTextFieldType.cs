@@ -1,5 +1,4 @@
-﻿
-namespace PsISEProjectExplorer.Enums 
+﻿namespace PsISEProjectExplorer.Enums 
 {
     public enum FullTextFieldType
     {
