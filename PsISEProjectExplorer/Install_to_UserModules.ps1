@@ -1,3 +1,8 @@
+if ($PSVersionTable.PSVersion.Major -lt 3) {
+	Write-Warning "PsISEProjectExplorer requires Powershell 3.0 or above"
+	return
+}
+
 $currentDir = Split-Path -parent $MyInvocation.MyCommand.Path
 $moduleDir = "$($env:USERPROFILE)\Documents\WindowsPowerShell\Modules\PsISEProjectExplorer"
 $profileFile = "$($env:USERPROFILE)\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1"

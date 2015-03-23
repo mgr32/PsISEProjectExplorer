@@ -49,5 +49,10 @@ if ($host.Name -ne 'Windows PowerShell ISE Host') {
 	return
 }
 
+if ($PSVersionTable.PSVersion.Major -lt 3) {
+	Write-Warning "PsISEProjectExplorer requires Powershell 3.0 or above"
+	return
+}
+
 Register-PsISEProjectExplorer
 Register-PsISEProjectExplorerMenus
