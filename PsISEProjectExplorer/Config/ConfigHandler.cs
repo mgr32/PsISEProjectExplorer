@@ -11,7 +11,9 @@ namespace PsISEProjectExplorer.Config
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private static readonly Configuration Config;
+        private static readonly string ConfigFilePath;
+
+        private static Object ConfigHandlerLock = new Object();
 
         static ConfigHandler()
         {
@@ -21,31 +23,26 @@ namespace PsISEProjectExplorer.Config
             {
                 return;
             }
-            string configFilePath = Path.Combine(currentPath, "PsISEProjectExplorer.config");
-            var map = new ExeConfigurationFileMap { ExeConfigFilename = configFilePath };
-            try
-            {
-                Config = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);
-            }
-            catch (Exception e)
-            {
-                Logger.Error("Cannot open configuration file at " + configFilePath, e);
-            }
+            ConfigFilePath = Path.Combine(currentPath, "PsISEProjectExplorer.config");
         }
 
         public static string ReadConfigStringValue(string key)
         {
-            if (Config == null)
+            lock (ConfigHandlerLock)
             {
-                return null;
-            }
-            try
-            {
-                return Config.AppSettings.Settings[key].Value;
-            }
-            catch (Exception)
-            {
-                return null;
+                var config = OpenConfigFile();
+                if (config == null)
+                {
+                    return null;
+                }
+                try
+                {
+                    return config.AppSettings.Settings[key].Value;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
             }
         }
 
@@ -90,19 +87,23 @@ namespace PsISEProjectExplorer.Config
 
         public static void SaveConfigValue(string key, string value)
         {
-            if (Config == null)
+            lock (ConfigHandlerLock)
             {
-                return;
-            }
-            try
-            {
-                Config.AppSettings.Settings.Remove(key);
-                Config.AppSettings.Settings.Add(key, value);
-                Config.Save(ConfigurationSaveMode.Modified);
-            }
-            catch (Exception e)
-            {
-                Logger.Error("Cannot save config file", e);
+                var config = OpenConfigFile();
+                if (config == null)
+                {
+                    return;
+                }
+                try
+                {
+                    config.AppSettings.Settings.Remove(key);
+                    config.AppSettings.Settings.Add(key, value);
+                    config.Save(ConfigurationSaveMode.Modified);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error("Cannot save config file", e);
+                }
             }
         }
 
@@ -110,6 +111,20 @@ namespace PsISEProjectExplorer.Config
         {
             var str = value == null ? String.Empty : String.Join(",", value);
             SaveConfigValue(key, str);
+        }
+
+        private static Configuration OpenConfigFile()
+        {
+            var map = new ExeConfigurationFileMap { ExeConfigFilename = ConfigFilePath };
+            try
+            {
+                return ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);
+            }
+            catch (Exception e)
+            {
+                Logger.Error("Cannot open configuration file at " + ConfigFilePath, e);
+                return null;
+            }
         }
     }
 }
