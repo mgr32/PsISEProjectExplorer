@@ -80,31 +80,6 @@ namespace PsISEProjectExplorer
                 innerException = innerException.InnerException;
             }
             Logger.Error(sources.ToString());
-            StringBuilder msg = new StringBuilder();
-            msg.AppendLine("An unhandled exception occurred in Powershell ISE - please save your work and restart ISE as soon as possible. ");
-            msg.AppendLine();
-            if (firstSource != null && firstSource.ToLowerInvariant().Equals("psiseprojectexplorer"))
-            {
-                msg.AppendLine("This is most likely PsISEProjectExplorer error. Please create an issue at https://github.com/mgr32/PsISEProjectExplorer.");
-            }
-            else
-            {
-                msg.AppendLine("Note this information comes from PsISEProjectExplorer, but the exception has been probably thrown from another module or from ISE itself.");
-            }
-            msg.AppendLine();
-            msg.AppendLine("Exception: " + e.Message);
-            if (e.InnerException != null)
-            {
-                msg.AppendLine("Inner exception source: " + e.InnerException.Source);
-                msg.AppendLine("Inner exception message: " + e.InnerException.Message);
-                msg.AppendLine("Inner exception site: " + e.InnerException.TargetSite);
-            }
-            msg.AppendLine();
-            msg.AppendLine("More details can be found in log file at: " + LogFileName);
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                MessageBox.Show(Application.Current.MainWindow, msg.ToString(), "Powershell ISE error", MessageBoxButton.OK, MessageBoxImage.Error);
-            });
             args.Handled = true;
         }
 

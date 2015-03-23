@@ -98,6 +98,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        // running in Indexing or UI thread
         public void RefreshFromNode(INode node, string path, bool expandAllNodes)
         {
             // node == null -> search returned no results at all
@@ -153,8 +154,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        // TODO: this seems to suffer from race conditions
         private void RefreshFromIntermediateNode(INode node, TreeViewEntryItemModel treeViewEntryItem, bool expandAllNodes)
         {
+            if (node == null || treeViewEntryItem == null)
+            {
+                return;
+            }
             IList<INode> nodeChildren;
             lock (node)
             {
@@ -313,7 +319,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public void MoveTreeItem(TreeViewEntryItemModel movedItem, TreeViewEntryItemModel destinationItem, string rootDirectory)
         {
-            if (movedItem == destinationItem)
+            if (movedItem == destinationItem || movedItem == null)
             {
                 return;
             }
@@ -391,7 +397,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void EndRenamingTreeItem(string newValue, bool save, TreeViewEntryItemModel selectedItem)
         {
-            if (!save || String.IsNullOrEmpty(newValue))
+            if (!save || String.IsNullOrEmpty(newValue)|| selectedItem == null)
             {
                 return;
             }
@@ -417,6 +423,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void EndAddingTreeItem(string newValue, bool save, TreeViewEntryItemModel selectedItem)
         {
+            if (selectedItem == null)
+            {
+                return;
+            }
             if (!save || String.IsNullOrEmpty(newValue))
             {
                 this.DocumentHierarchyFactory.RemoveTemporaryNode(selectedItem.Node);
@@ -501,7 +511,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private bool HandleUnsavedFileManipulation(TreeViewEntryItemModel selectedItem)
         {
-            if (selectedItem.NodeType == NodeType.File && this.IseIntegrator.OpenFiles.Contains(selectedItem.Path) && !this.IseIntegrator.IsFileSaved(selectedItem.Path))
+            if (selectedItem != null && selectedItem.NodeType == NodeType.File && this.IseIntegrator.OpenFiles.Contains(selectedItem.Path) && !this.IseIntegrator.IsFileSaved(selectedItem.Path))
             {
                 this.IseIntegrator.GoToFile(selectedItem.Path);
                 MessageBoxHelper.ShowInfo("Please save your changes or close the file first.");
@@ -512,6 +522,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private TreeViewEntryItemModel CreateTreeViewEntryItemModel(INode node, TreeViewEntryItemModel parent, bool isSelected)
         {
+            if (node == null)
+            {
+                return null;
+            }
             var lockObject = parent == null ? TreeViewEntryItemModel.RootLockObject : parent;
             lock (lockObject)
             {
@@ -530,6 +544,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private TreeViewEntryItemModel CreateTreeViewEntryItemModelWithNodeParents(INode node, bool isSelected, bool expandAllNodes)
         {
+            if (node == null)
+            {
+                return null;
+            }
             var itemParent = node.Parent == null ? null : this.CreateTreeViewEntryItemModelWithNodeParents(node.Parent, false, expandAllNodes);
             TreeViewEntryItemModel item = this.FindTreeViewEntryItemByPath(node.Path);
             if (item == null)
@@ -545,7 +563,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void DeleteTreeViewEntryItemModel(TreeViewEntryItemModel item, bool first = true)
         {
-            if (item == this.RootTreeViewEntryItem)
+            if (item == this.RootTreeViewEntryItem || item == null)
             {
                 return;
             }
