@@ -4,8 +4,10 @@ if ($PSVersionTable.PSVersion.Major -lt 3) {
 }
 
 $currentDir = Split-Path -parent $MyInvocation.MyCommand.Path
-$moduleDir = "$($env:USERPROFILE)\Documents\WindowsPowerShell\Modules\PsISEProjectExplorer"
-$profileFile = "$($env:USERPROFILE)\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1"
+
+$docDir = [Environment]::getfolderpath("mydocuments")
+$moduleDir = "$docDir\WindowsPowerShell\Modules\PsISEProjectExplorer"
+$profileFile = "$docDir\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1"
 
 $copyToModules = Read-Host 'Install PsISEProjectExplorer to your Modules directory [y/n]?'
 if ($copyToModules -ieq 'y') {
@@ -21,6 +23,8 @@ if ($copyToModules -ieq 'y') {
 	Write-Host "Copying PSISEProjectExplorer files to '$moduleDir'..." -NoNewline
 	Copy-Item -Path (Join-Path $currentDir "PsISEProjectExplorer\*") -Destination $moduleDir -Recurse -Force
     Write-Host "OK"
+} else {
+	return
 }
 
 Write-Host ""
