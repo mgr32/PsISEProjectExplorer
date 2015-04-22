@@ -10,7 +10,7 @@ namespace PsISEProjectExplorer.Services
 
         private const string AllFilesPattern = "*";
 
-        private static readonly Regex PowershellFilesRegex = new Regex(@".*\.ps.*1$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex PowershellFilesRegex = new Regex(@".*\.ps.*1.*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private static readonly Regex PowershellModulesRegex = new Regex(@".*\.ps(d|m)1$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
