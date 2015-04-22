@@ -10,9 +10,11 @@ namespace PsISEProjectExplorer.Services
 
         private const string AllFilesPattern = "*";
 
-        private static readonly Regex PowershellFilesRegex = new Regex(@".*\.ps.*1$", RegexOptions.Compiled);
+        private static readonly Regex PowershellFilesRegex = new Regex(@".*\.ps.*1$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private static readonly Regex ExcludeRegex = new Regex(@"\\(\.git|\.svn)($|\\)");
+        private static readonly Regex PowershellModulesRegex = new Regex(@".*\.ps(d|m)1$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        private static readonly Regex ExcludeRegex = new Regex(@"\\(\.git|\.svn)($|\\)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public bool IncludeAllFiles { get; set; }
 
@@ -32,6 +34,11 @@ namespace PsISEProjectExplorer.Services
         public bool DoesFileMatch(string fileName)
         {
             return (this.IncludeAllFiles || PowershellFilesRegex.IsMatch(fileName)) && !ExcludeRegex.IsMatch(fileName) && !IsReparsePointOrHiddenSystem(fileName);
+        }
+
+        public bool IsModuleFile(string fileName)
+        {
+            return (PowershellModulesRegex.IsMatch(fileName));
         }
 
         public bool DoesDirectoryMatch(string dirName)

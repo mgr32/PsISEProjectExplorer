@@ -27,6 +27,7 @@ namespace PsISEProjectExplorer.Services
                 var currentDirInfo = Directory.GetParent(currentDir);
                 if (currentDirInfo == null || currentDirInfo.FullName.ToLowerInvariant() == driveRoot)
                 {
+                    // TODO: why root dir is disallowed?
                     return (rootDir.ToLowerInvariant() == driveRoot ? null : rootDir);
                 }
                 currentDir = currentDirInfo.FullName;
@@ -49,7 +50,13 @@ namespace PsISEProjectExplorer.Services
                     {
                         rootDir = currentDir;
                     }
+                    if (filesPatternProvider.IsModuleFile(file))
+                    {
+                        // TODO: why root dir is disallowed?
+                        return (rootDir.ToLowerInvariant() == driveRoot ? null : rootDir);
+                    }
                 }
+
             }
         }
     }
