@@ -1,11 +1,11 @@
 ﻿<UserControl x:Class="PsISEProjectExplorer.ProjectExplorerWindow"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModel="clr-namespace:PsISEProjectExplorer.UI.ViewModel"
              xmlns:uiHelpers="clr-namespace:PsISEProjectExplorer.UI.Helpers"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -20,21 +20,21 @@
             <DataTemplate x:Key="EditTemplate">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{Binding Path=Image}" />
-                    <TextBox Name="EditItemTextBox" Text="{Binding Path=Name, UpdateSourceTrigger=Explicit, Mode=OneWay}" Margin="5,0,0,0" LostFocus="SearchResults_EndEdit" 
+                    <TextBox Name="EditItemTextBox" Text="{Binding Path=Name, UpdateSourceTrigger=Explicit, Mode=OneWay}" Margin="5,0,0,0" LostFocus="SearchResults_EndEdit"
                              uiHelpers:FocusExtensions.IsDefaultFocusElement="True" KeyDown="SearchResults_EditKeyDown"/>
                 </StackPanel>
             </DataTemplate>
         </ResourceDictionary>
-        
+
     </UserControl.Resources>
     <Grid d:DataContext="{d:DesignInstance viewModel:MainViewModel}">
         <TextBlock HorizontalAlignment="Left" Margin="10,5,0,0" TextWrapping="NoWrap" Text="Workspace:" VerticalAlignment="Top"
                    Visibility="{Binding Path=WorkspaceDirectoryModel.WorkspaceDirectories, Converter={StaticResource EmptyListToVisibilityConverter}}" />
-        <ComboBox HorizontalAlignment="Stretch" Margin="72,1,66,0" ItemsSource="{Binding Path=WorkspaceDirectoryModel.WorkspaceDirectories}" 
+        <ComboBox HorizontalAlignment="Stretch" Margin="72,1,66,0" ItemsSource="{Binding Path=WorkspaceDirectoryModel.WorkspaceDirectories}"
                   SelectedValue="{Binding Path=WorkspaceDirectoryModel.CurrentWorkspaceDirectory}" VerticalAlignment="Top" MaxDropDownHeight="Auto"
                   Visibility="{Binding Path=WorkspaceDirectoryModel.WorkspaceDirectories, Converter={StaticResource EmptyListToVisibilityConverter}}" />
         <TextBlock HorizontalAlignment="Stretch" Margin="10,5,66,0" Text="[Please open a Powershell file or click 'Change' button]"
-                  VerticalAlignment="Top" 
+                  VerticalAlignment="Top"
                   Visibility="{Binding Path=WorkspaceDirectoryModel.WorkspaceDirectories, Converter={StaticResource EmptyListToVisibilityConverter}, ConverterParameter=VisibleOnEmpty}"/>
         <Button Content="Change" HorizontalAlignment="Right" Margin="0,1,10,0" VerticalAlignment="Top" Width="51" Click="ChangeWorkspace_Click"/>
         <TextBox Name="TextBoxSearchText" HorizontalAlignment="Stretch" Height="21" Margin="10,25,36,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged, Delay=150}" MaxLength="100"
@@ -55,16 +55,19 @@
             <Button Margin="0,0,4,0" Click="RefreshDirectoryStructure_Click">
                 <Image Source="Resources\toolbar_refresh.png" ToolTip="Refresh Directory Structure" />
             </Button>
+            <Button Margin="0,0,4,0" Click="CollapseAll_Click">
+                <Image Source="Resources\toolbar_toggle_collapse.png" ToolTip="Collapse All" />
+            </Button>
             <ToggleButton IsChecked="{Binding Path=WorkspaceDirectoryModel.AutoUpdateRootDirectory}">
                 <Image Source="Resources\toolbar_autoUpdateProjectDir.png" ToolTip="Auto-update Workspace Directory"/>
             </ToggleButton>
         </StackPanel>
         <TextBlock HorizontalAlignment="Left" Margin="10,54,0,5" TextWrapping="Wrap" Text="{Binding Path=TreeItemsResultString}" VerticalAlignment="Top" />
-                 
+
         <uiHelpers:StretchingTreeView x:Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewModel.TreeViewItems}" PreviewMouseLeftButtonDown="SearchResults_PreviewMouseLeftButtonDown" PreviewMouseRightButtonDown="SearchResults_PreviewMouseRightButtonDown"
                    x:FieldModifier="private" PreviewMouseMove="SearchResults_PreviewMouseMove" Drop="SearchResults_Drop" DragEnter="SearchResults_DragEnter" AllowDrop="True" KeyDown="SearchResults_KeyDown"
                    Visibility="{Binding Path=TreeViewModel.TreeViewItems, Converter={StaticResource EmptyListToVisibilityConverter}}">
-            
+
             <TreeView.Resources>
                 <ContextMenu x:Key="DirectoryContext" Opened="SearchResults_ContextMenuOpened" Closed="SearchResults_ContextMenuClosed">
                     <MenuItem Header="Open in Explorer" Click="SearchResults_OpenInExplorer">

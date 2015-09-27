@@ -17,14 +17,24 @@ namespace PsISEProjectExplorer.UI.Helpers
         /// <param name="treeView">The TreeView whose children will be expanded</param>
         public static void ExpandAll(this TreeView treeView)
         {
-            ExpandSubContainers(treeView);
+            ExpandSubContainers(treeView, true);
         }
 
         /// <summary>
-        /// Expands all children of a TreeView or TreeViewItem
+        /// Collapse all children of a TreeView
         /// </summary>
-        /// <param name="parentContainer">The TreeView or TreeViewItem containing the children to expand</param>
-        private static void ExpandSubContainers(ItemsControl parentContainer)
+        /// <param name="treeView">The TreeView whose children will be collapsed</param>
+        public static void CollapseAll(this TreeView treeView)
+        {
+            ExpandSubContainers(treeView, false);
+        }
+
+        /// <summary>
+        /// Expands or collapse all children of a TreeView or TreeViewItem
+        /// </summary>
+        /// <param name="parentContainer">The TreeView or TreeViewItem containing the children to expand or collaps</param>
+        /// <param name="isExpanded"><c>true</c> to expand items, <c>false</c> to collapse items.</param>
+        private static void ExpandSubContainers(ItemsControl parentContainer, bool isExpanded)
         {
             foreach (Object item in parentContainer.Items)
             {
@@ -32,7 +42,7 @@ namespace PsISEProjectExplorer.UI.Helpers
                 if (currentContainer != null && currentContainer.Items.Count > 0)
                 {
                     //expand the item
-                    currentContainer.IsExpanded = true;
+                    currentContainer.IsExpanded = isExpanded;
 
                     //if the item's children are not generated, they must be expanded
                     if (currentContainer.ItemContainerGenerator.Status != GeneratorStatus.ContainersGenerated)
@@ -44,7 +54,7 @@ namespace PsISEProjectExplorer.UI.Helpers
                             //once the children have been generated, expand those children's children then remove the event handler
                             if (currentContainer.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
                             {
-                                ExpandSubContainers(currentContainer);
+                                ExpandSubContainers(currentContainer, isExpanded);
                                 currentContainer.ItemContainerGenerator.StatusChanged -= eh;
                             }
                         };
@@ -53,7 +63,7 @@ namespace PsISEProjectExplorer.UI.Helpers
                     }
                     else //otherwise the children have already been generated, so we can now expand those children
                     {
-                        ExpandSubContainers(currentContainer);
+                        ExpandSubContainers(currentContainer, isExpanded);
                     }
                 }
             }

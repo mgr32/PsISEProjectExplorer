@@ -20,47 +20,41 @@ using System.Windows.Threading;
 namespace PsISEProjectExplorer
 {
     /// <summary>
-    /// Interaction logic for UserControl1.xaml
+    /// Interaction logic for ProjectExplorerWindow.xaml
     /// </summary>
     public partial class ProjectExplorerWindow : IAddOnToolHostObject
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static string LogFileName;
+        private readonly MainViewModel mainViewModel;
+        private Point dragStartPoint;
+        private ObjectModelRoot hostObject;
+        private bool isContextMenuOpened;
 
-        private static string LogFileName { get; set; }
-
-        private MainViewModel MainViewModel { get; set; }
-
-        private Point DragStartPoint;
-
-        private ObjectModelRoot hostObject { get; set; }
-
-        private bool IsContextMenuOpened { get; set; }
-
-         // Entry point to the ISE object model.
+        // Entry point to the ISE object model.
         public ObjectModelRoot HostObject
         {
-            get { throw new InvalidOperationException("Should not use HostObject in user control - please use IseIntegrator class.");  }
-            set { this.hostObject = value; OnHostObjectSet(); }
-        }
-
-        private void OnHostObjectSet()
-        {
-            this.MainViewModel.IseIntegrator = new IseIntegrator(this.hostObject);
+            get { throw new InvalidOperationException("Should not use HostObject in user control - please use IseIntegrator class."); }
+            set
+            {
+                this.hostObject = value;
+                this.mainViewModel.IseIntegrator = new IseIntegrator(this.hostObject);
+            }
         }
 
         public ProjectExplorerWindow()
         {
             this.ConfigureLogging();
-            this.MainViewModel = new MainViewModel();
-            this.MainViewModel.ActiveDocumentSyncEvent += OnActiveDocumentSyncEvent;
-            this.DataContext = this.MainViewModel;
+            this.mainViewModel = new MainViewModel();
+            this.mainViewModel.ActiveDocumentSyncEvent += OnActiveDocumentSyncEvent;
+            this.DataContext = this.mainViewModel;
             InitializeComponent();
             this.Dispatcher.UnhandledException += DispatcherUnhandledExceptionHandler;
         }
 
         private static void DispatcherUnhandledExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)
         {
-            Exception e = (Exception)args.Exception;
+            Exception e = args.Exception;
             Logger.Error("Unhandled Dispatcher exception", e);
 
             StringBuilder sources = new StringBuilder().Append("Sources: ");
@@ -73,9 +67,11 @@ namespace PsISEProjectExplorer
                 {
                     firstSource = innerException.Source;
                 }
+
                 sources.Append(innerException.Source).Append(",");
                 innerException = innerException.InnerException;
             }
+
             Logger.Error(sources.ToString());
             args.Handled = true;
         }
@@ -84,7 +80,7 @@ namespace PsISEProjectExplorer
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                if (this.MainViewModel.SyncWithActiveDocument)
+                if (this.mainViewModel.SyncWithActiveDocument)
                 {
                     this.LocateFileInTree();
                 }
@@ -93,29 +89,31 @@ namespace PsISEProjectExplorer
 
         public void GoToDefinition()
         {
-            Application.Current.Dispatcher.Invoke(() => this.MainViewModel.GoToDefinition());
+            Application.Current.Dispatcher.Invoke(() => this.mainViewModel.GoToDefinition());
         }
 
         public void FindAllOccurrences()
         {
-            Application.Current.Dispatcher.Invoke(() => this.MainViewModel.FindAllOccurrences());
+            Application.Current.Dispatcher.Invoke(() => this.mainViewModel.FindAllOccurrences());
         }
 
         public void LocateFileInTree()
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                string path = this.MainViewModel.IseIntegrator.SelectedFilePath;
+                string path = this.mainViewModel.IseIntegrator.SelectedFilePath;
                 if (path == null)
                 {
                     return;
                 }
+
                 var selectedItem = this.SearchResults.SelectedItem as TreeViewEntryItemModel;
                 if (selectedItem != null && selectedItem.Path.StartsWith(path))
                 {
                     return;
                 }
-                TreeViewEntryItemModel item = this.MainViewModel.TreeViewModel.FindTreeViewEntryItemByPath(path);
+
+                TreeViewEntryItemModel item = this.mainViewModel.TreeViewModel.FindTreeViewEntryItemByPath(path);
                 if (item == null)
                 {
                     return;
@@ -129,7 +127,7 @@ namespace PsISEProjectExplorer
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                this.MainViewModel.FindInFiles();
+                this.mainViewModel.FindInFiles();
                 this.TextBoxSearchText.Focus();
             });
         }
@@ -138,7 +136,7 @@ namespace PsISEProjectExplorer
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                this.MainViewModel.IseIntegrator.CloseAllButThis();
+                this.mainViewModel.IseIntegrator.CloseAllButThis();
             });
         }
 
@@ -146,10 +144,11 @@ namespace PsISEProjectExplorer
         {
             var dialog = new VistaFolderBrowserDialog
             {
-                SelectedPath = this.MainViewModel.WorkspaceDirectoryModel.CurrentWorkspaceDirectory,
+                SelectedPath = this.mainViewModel.WorkspaceDirectoryModel.CurrentWorkspaceDirectory,
                 Description = "Please select the new workspace folder.",
                 UseDescriptionForTitle = true
             };
+
             bool? dialogResult = dialog.ShowDialog();
             if (dialogResult != null && dialogResult.Value)
             {
@@ -159,15 +158,20 @@ namespace PsISEProjectExplorer
                 }
                 else
                 {
-                    this.MainViewModel.WorkspaceDirectoryModel.SetWorkspaceDirectory(dialog.SelectedPath);
-                    this.MainViewModel.WorkspaceDirectoryModel.AutoUpdateRootDirectory = false;
+                    this.mainViewModel.WorkspaceDirectoryModel.SetWorkspaceDirectory(dialog.SelectedPath);
+                    this.mainViewModel.WorkspaceDirectoryModel.AutoUpdateRootDirectory = false;
                 }
             }
         }
 
         private void RefreshDirectoryStructure_Click(object sender, RoutedEventArgs e)
         {
-            this.MainViewModel.ReindexSearchTree();
+            this.mainViewModel.ReindexSearchTree();
+        }
+
+        private void CollapseAll_Click(object sender, RoutedEventArgs e)
+        {
+            this.SearchResults.CollapseAll();
         }
 
         private void ConfigureLogging()
@@ -176,11 +180,12 @@ namespace PsISEProjectExplorer
             LogFileName = Path.Combine(assemblyFolder, "NLog.config");
             var config = new NLog.Config.XmlLoggingConfiguration(LogFileName);
             LogManager.Configuration = config;
+
             var targets = config.AllTargets;
-            if (targets != null && targets.Any() && targets.First() is FileTarget) {
+            if (targets != null && targets.Any() && targets.First() is FileTarget)
+            {
                 LogFileName = ((FileTarget)targets.First()).FileName.Render(new LogEventInfo());
             }
-
         }
 
         private void SearchResults_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -190,10 +195,12 @@ namespace PsISEProjectExplorer
             {
                 ((TreeViewEntryItemModel)this.SearchResults.SelectedItem).IsSelected = false;
             }
-            this.DragStartPoint = e.GetPosition(null);
+
+            this.dragStartPoint = e.GetPosition(null);
+
             if (e.ClickCount > 1)
             {
-                this.MainViewModel.TreeViewModel.OpenItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.MainViewModel.SearchText);
+                this.mainViewModel.TreeViewModel.OpenItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.mainViewModel.SearchText);
                 e.Handled = true;
             }
         }
@@ -204,30 +211,35 @@ namespace PsISEProjectExplorer
             if (!this.SearchResults.SelectItemFromSource((DependencyObject)e.OriginalSource))
             {
                 this.SearchResults.ContextMenu = this.SearchResults.Resources["EmptyContext"] as ContextMenu;
+
                 item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
                 if (item != null)
                 {
                     item.IsSelected = false;
                 }
+
                 return;
             }
+
             item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
             if (item == null)
             {
                 // should not happen
                 this.SearchResults.ContextMenu = null;
-            } else if (item.NodeType == Enums.NodeType.Directory)
-            {
-                this.SearchResults.ContextMenu = this.SearchResults.Resources["DirectoryContext"] as ContextMenu;
-            }
-            else if (item.NodeType == Enums.NodeType.File)
-            {
-                this.SearchResults.ContextMenu = this.SearchResults.Resources["FileContext"] as ContextMenu;
             }
             else
-            {
-                this.SearchResults.ContextMenu = null;
-            }
+                switch (item.NodeType)
+                {
+                    case NodeType.Directory:
+                        this.SearchResults.ContextMenu = this.SearchResults.Resources["DirectoryContext"] as ContextMenu;
+                        break;
+                    case NodeType.File:
+                        this.SearchResults.ContextMenu = this.SearchResults.Resources["FileContext"] as ContextMenu;
+                        break;
+                    default:
+                        this.SearchResults.ContextMenu = null;
+                        break;
+                }
         }
 
         private void SearchResults_KeyUp(object sender, KeyEventArgs e)
@@ -235,26 +247,25 @@ namespace PsISEProjectExplorer
             var selectedItem = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
             if (e.Key == Key.Enter)
             {
-                this.MainViewModel.TreeViewModel.OpenItem(selectedItem, this.MainViewModel.SearchText);
+                this.mainViewModel.TreeViewModel.OpenItem(selectedItem, this.mainViewModel.SearchText);
             }
         }
 
         private void TextBoxSearchClear_Click(object sender, RoutedEventArgs e)
         {
-            this.MainViewModel.SearchText = string.Empty;
-
+            this.mainViewModel.SearchText = string.Empty;
         }
 
         private void SearchResults_AddDirectory(object sender, RoutedEventArgs e)
         {
             var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
-            this.MainViewModel.TreeViewModel.AddNewTreeItem(item, NodeType.Directory);
+            this.mainViewModel.TreeViewModel.AddNewTreeItem(item, NodeType.Directory);
         }
 
         private void SearchResults_AddFile(object sender, RoutedEventArgs e)
         {
             var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
-            this.MainViewModel.TreeViewModel.AddNewTreeItem(item, NodeType.File);
+            this.mainViewModel.TreeViewModel.AddNewTreeItem(item, NodeType.File);
         }
 
         private void SearchResults_Rename(object sender, RoutedEventArgs e)
@@ -264,7 +275,8 @@ namespace PsISEProjectExplorer
             {
                 return;
             }
-            this.MainViewModel.TreeViewModel.StartEditingTreeItem(item);
+
+            this.mainViewModel.TreeViewModel.StartEditingTreeItem(item);
         }
 
         private void SearchResults_Delete(object sender, RoutedEventArgs e)
@@ -274,7 +286,8 @@ namespace PsISEProjectExplorer
             {
                 return;
             }
-            this.MainViewModel.TreeViewModel.DeleteTreeItem(item);
+
+            this.mainViewModel.TreeViewModel.DeleteTreeItem(item);
         }
 
         private void SearchResults_EditKeyDown(object sender, KeyEventArgs e)
@@ -284,20 +297,20 @@ namespace PsISEProjectExplorer
             {
                 return;
             }
-            var newValue = ((TextBox)sender).Text;
-            if (e.Key == Key.Escape)
-            {
-                this.MainViewModel.TreeViewModel.EndTreeEdit(newValue, false, item, !this.MainViewModel.SearchInFiles);
-                e.Handled = true;
-                return;
-            }
-            if (e.Key == Key.Enter)
-            {
-                this.MainViewModel.TreeViewModel.EndTreeEdit(newValue, true, item, !this.MainViewModel.SearchInFiles);
-                e.Handled = true;
-                return;
-            }
 
+            var newValue = ((TextBox)sender).Text;
+
+            switch (e.Key)
+            {
+                case Key.Escape:
+                    this.mainViewModel.TreeViewModel.EndTreeEdit(newValue, false, item, !this.mainViewModel.SearchInFiles);
+                    e.Handled = true;
+                    return;
+                case Key.Enter:
+                    this.mainViewModel.TreeViewModel.EndTreeEdit(newValue, true, item, !this.mainViewModel.SearchInFiles);
+                    e.Handled = true;
+                    return;
+            }
         }
 
         private void SearchResults_KeyDown(object sender, KeyEventArgs e)
@@ -307,23 +320,21 @@ namespace PsISEProjectExplorer
             {
                 return;
             }
-            if (e.Key == Key.Delete)
+
+            switch (e.Key)
             {
-                this.MainViewModel.TreeViewModel.DeleteTreeItem(item);
-                e.Handled = true;
-                return;
-            }
-            if (e.Key == Key.F2)
-            {
-                this.MainViewModel.TreeViewModel.StartEditingTreeItem(item);
-                e.Handled = true;
-                return;
-            }
-            if (e.Key == Key.Enter)
-            {
-                this.MainViewModel.TreeViewModel.OpenItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.MainViewModel.SearchText);
-                e.Handled = true;
-                return;
+                case Key.Delete:
+                    this.mainViewModel.TreeViewModel.DeleteTreeItem(item);
+                    e.Handled = true;
+                    return;
+                case Key.F2:
+                    this.mainViewModel.TreeViewModel.StartEditingTreeItem(item);
+                    e.Handled = true;
+                    return;
+                case Key.Enter:
+                    this.mainViewModel.TreeViewModel.OpenItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.mainViewModel.SearchText);
+                    e.Handled = true;
+                    return;
             }
         }
 
@@ -334,8 +345,9 @@ namespace PsISEProjectExplorer
             {
                 return;
             }
+
             var newValue = ((TextBox)sender).Text;
-            this.MainViewModel.TreeViewModel.EndTreeEdit(newValue, true, item, !this.MainViewModel.SearchInFiles);
+            this.mainViewModel.TreeViewModel.EndTreeEdit(newValue, true, item, !this.mainViewModel.SearchInFiles);
         }
 
         private void SearchResults_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -343,12 +355,13 @@ namespace PsISEProjectExplorer
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 var selectedItem = this.SearchResults.SelectedItem as TreeViewEntryItemModel;
-                if ((selectedItem != null && selectedItem.IsBeingEdited) || this.IsContextMenuOpened)
+                if ((selectedItem != null && selectedItem.IsBeingEdited) || this.isContextMenuOpened)
                 {
                     return;
                 }
+
                 var mousePos = e.GetPosition(null);
-                var diff = this.DragStartPoint - mousePos;
+                var diff = this.dragStartPoint - mousePos;
 
                 if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance
                     || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
@@ -358,6 +371,7 @@ namespace PsISEProjectExplorer
                     {
                         return;
                     }
+
                     var treeViewItem = treeView.FindItemFromSource((DependencyObject)e.OriginalSource);
                     if (treeViewItem == null)
                     {
@@ -369,7 +383,7 @@ namespace PsISEProjectExplorer
                     {
                         return;
                     }
-                    
+
                     var dragData = new DataObject(item);
                     DragDrop.DoDragDrop(treeViewItem, dragData, DragDropEffects.Move);
                 }
@@ -382,12 +396,16 @@ namespace PsISEProjectExplorer
             {
                 var item = e.Data.GetData(typeof(TreeViewEntryItemModel)) as TreeViewEntryItemModel;
                 var treeView = sender as TreeView;
+
                 if (treeView == null || item == null)
                 {
                     return;
                 }
+
                 var treeViewItem = treeView.FindItemFromSource((DependencyObject)e.OriginalSource);
+
                 TreeViewEntryItemModel dropTarget = null;
+
                 if (treeViewItem != null)
                 {
                     dropTarget = treeViewItem.Header as TreeViewEntryItemModel;
@@ -396,9 +414,10 @@ namespace PsISEProjectExplorer
                         return;
                     }
                 }
+
                 if (item != dropTarget)
                 {
-                    this.MainViewModel.TreeViewModel.MoveTreeItem(item, dropTarget, this.MainViewModel.WorkspaceDirectoryModel.CurrentWorkspaceDirectory);
+                    this.mainViewModel.TreeViewModel.MoveTreeItem(item, dropTarget, this.mainViewModel.WorkspaceDirectoryModel.CurrentWorkspaceDirectory);
                 }
             }
         }
@@ -413,12 +432,12 @@ namespace PsISEProjectExplorer
 
         private void SearchResults_ContextMenuClosed(object sender, RoutedEventArgs e)
         {
-            this.IsContextMenuOpened = false;
+            this.isContextMenuOpened = false;
         }
 
         private void SearchResults_ContextMenuOpened(object sender, RoutedEventArgs e)
         {
-            this.IsContextMenuOpened = true;
+            this.isContextMenuOpened = true;
         }
 
         private void SearchResults_OpenInExplorer(object sender, RoutedEventArgs e)
@@ -428,23 +447,24 @@ namespace PsISEProjectExplorer
             {
                 return;
             }
+
             try
             {
-                if (item.NodeType == NodeType.Directory)
+                switch (item.NodeType)
                 {
-                    Process.Start(item.Path);
+                    case NodeType.Directory:
+                        Process.Start(item.Path);
+                        break;
+                    case NodeType.File:
+                        Process.Start("explorer.exe", "/select, \"" + item.Path + "\"");
+                        break;
                 }
-                else if (item.NodeType == NodeType.File)
-                {
-                    Process.Start("explorer.exe", "/select, \"" + item.Path + "\"");
-                }
-                
+
             }
             catch (Exception ex)
             {
-                MessageBoxHelper.ShowError(String.Format("Cannot open path: '{0}' - {1}.", item.Path, ex.Message));
+                MessageBoxHelper.ShowError(string.Format("Cannot open path: '{0}' - {1}.", item.Path, ex.Message));
             }
         }
-
-   }
+    }
 }
