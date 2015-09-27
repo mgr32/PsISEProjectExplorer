@@ -1,4 +1,3 @@
-
 namespace Ookii.Dialogs.Wpf.Interop
 {
     internal enum HRESULT : long

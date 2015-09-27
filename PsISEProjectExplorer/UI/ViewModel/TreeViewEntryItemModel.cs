@@ -10,7 +10,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private INode documentHierarchyNode;
 
-        private INode DocumentHierarchyNode { 
+        private INode DocumentHierarchyNode
+        {
             get
             {
                 return this.documentHierarchyNode;
@@ -105,7 +106,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.OnPropertyChanged();
             }
         }
-        
 
         private bool isBeingEdited;
 
@@ -188,7 +188,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public void RefreshNode()
         {
-                this.OnPropertyChanged(String.Empty);
+            this.OnPropertyChanged(String.Empty);
         }
 
         public override bool Equals(object obj)
@@ -205,6 +205,5 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             return this.Node.GetHashCode();
         }
-
     }
 }

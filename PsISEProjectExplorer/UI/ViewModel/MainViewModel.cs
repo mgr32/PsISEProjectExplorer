@@ -42,8 +42,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return String.Format("Found {0} files{1}", this.TreeViewModel.NumberOfFiles, 
-                    this.NumOfIndexingThreads > 0 ? ", indexing in progress..." : 
+                return String.Format("Found {0} files{1}", this.TreeViewModel.NumberOfFiles,
+                    this.NumOfIndexingThreads > 0 ? ", indexing in progress..." :
                     this.NumOfSearchingThreads > 0 ? ", searching in progress..." : ".");
             }
         }
@@ -198,7 +198,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
             this.IseIntegrator.GoToFile(node.FilePath);
             this.IseIntegrator.SetCursor(node.PowershellItem.StartLine, node.PowershellItem.StartColumn);
-            
         }
 
         public void FindAllOccurrences()
@@ -208,7 +207,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 return;
             }
-            
+
             // TODO: this is hacky...
             this.SearchOptions.SearchText = string.Empty;
             this.SearchInFiles = true;
@@ -260,7 +259,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             });
             this.ActiveDocumentPotentiallyChanged();
         }
-     
+
         public void ReindexSearchTree()
         {
             lock (this)
@@ -365,6 +364,5 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.NumOfIndexingThreads--;
             }
         }
-
     }
 }

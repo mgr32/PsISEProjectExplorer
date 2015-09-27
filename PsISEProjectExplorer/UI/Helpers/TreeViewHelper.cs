@@ -149,8 +149,6 @@ namespace PsISEProjectExplorer.UI.Helpers
                         applicableParents.Add(currentContainer);
                     }
                 }
-
-                
             }
 
             //if we get to this point, the selected item was not found at the current level, so we must check the children

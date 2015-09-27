@@ -4,7 +4,6 @@ using System.Windows.Input;
 
 namespace PsISEProjectExplorer.UI.Helpers
 {
-
     // http://blogs.msdn.com/b/mikehillberg/archive/2006/09/21/mytreeviewhelperismousedirectlyoveritem.aspx
     public static class TreeViewMouseHelper
     {

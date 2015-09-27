@@ -46,6 +46,5 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             Logger.Debug("File renamed: " + e.OldFullPath + " to " + e.FullPath);
             this.FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.OldFullPath, String.Empty, e.FullPath));
         }
-
     }
 }

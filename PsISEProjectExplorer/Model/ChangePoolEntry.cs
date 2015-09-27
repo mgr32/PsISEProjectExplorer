@@ -19,7 +19,6 @@
             : this(pathChanged, rootPath, null)
         {
         }
-        
 
         public override bool Equals(object obj)
         {

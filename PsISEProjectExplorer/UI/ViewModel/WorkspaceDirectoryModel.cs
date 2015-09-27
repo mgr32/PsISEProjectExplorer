@@ -14,7 +14,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
     {
         public string CurrentWorkspaceDirectory
         {
-            get 
+            get
             {
                 return this.WorkspaceDirectories.FirstOrDefault();
             }
@@ -34,9 +34,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public bool AutoUpdateRootDirectory
         {
-            get 
-            { 
-                return this.autoUpdateRootDirectory; 
+            get
+            {
+                return this.autoUpdateRootDirectory;
             }
             set
             {
@@ -52,7 +52,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         public IseIntegrator IseIntegrator { get; set; }
 
         public WorkspaceDirectoryModel()
-        {          
+        {
             this.MaxNumOfWorkspaceDirectories = ConfigHandler.ReadConfigIntValue("MaxNumOfWorkspaceDirectories", 5);
             var workspaceDirs = ConfigHandler.ReadConfigStringEnumerableValue("WorkspaceDirectories");
             this.WorkspaceDirectories = new ObservableCollection<string>(workspaceDirs);
@@ -98,7 +98,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
 
             ConfigHandler.SaveConfigEnumerableValue("WorkspaceDirectories", this.WorkspaceDirectories);
-            
+
             this.OnPropertyChanged("WorkspaceDirectories");
             this.OnPropertyChanged("CurrentWorkspaceDirectory");
         }

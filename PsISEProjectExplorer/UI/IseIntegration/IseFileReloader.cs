@@ -106,6 +106,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                 this.RefreshWatchers();
             }
         }
+
         private void OnIseFileChangedBatch(object sender, FileSystemChangedInfo changedInfo)
         {
             foreach (var changePoolEntry in changedInfo.PathsChanged)
@@ -194,7 +195,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             try
             {
                 fileText = File.ReadAllText(path);
-            } 
+            }
             catch (Exception)
             {
                 return false;
