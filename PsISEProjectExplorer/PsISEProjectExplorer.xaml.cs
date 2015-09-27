@@ -1,11 +1,8 @@
 ﻿using Microsoft.PowerShell.Host.ISE;
 using NLog;
-using NLog.Config;
 using NLog.Targets;
 using Ookii.Dialogs.Wpf;
 using PsISEProjectExplorer.Enums;
-using PsISEProjectExplorer.Services;
-using PsISEProjectExplorer.UI;
 using PsISEProjectExplorer.UI.Helpers;
 using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.ViewModel;

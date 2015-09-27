@@ -1,6 +1,5 @@
 ﻿using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
-using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI.Helpers;

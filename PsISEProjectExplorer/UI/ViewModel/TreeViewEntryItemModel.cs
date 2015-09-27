@@ -1,9 +1,6 @@
 ﻿using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
-using PsISEProjectExplorer.Services;
-using PsISEProjectExplorer.UI.Helpers;
 using System;
-using System.Collections.Generic;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {

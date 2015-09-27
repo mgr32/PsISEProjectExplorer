@@ -1,5 +1,4 @@
-﻿using PsISEProjectExplorer.Model;
-using PsISEProjectExplorer.Services;
+﻿using PsISEProjectExplorer.Services;
 using System.Collections.Generic;
 
 namespace PsISEProjectExplorer.UI.Workers
