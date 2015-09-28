@@ -1,7 +1,4 @@
 ﻿using NLog;
-using PsISEProjectExplorer.Model;
-using PsISEProjectExplorer.Model.DocHierarchy;
-using PsISEProjectExplorer.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -8,8 +8,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.UI.IseIntegration
 {
@@ -108,6 +106,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                 this.RefreshWatchers();
             }
         }
+
         private void OnIseFileChangedBatch(object sender, FileSystemChangedInfo changedInfo)
         {
             foreach (var changePoolEntry in changedInfo.PathsChanged)
@@ -196,7 +195,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             try
             {
                 fileText = File.ReadAllText(path);
-            } 
+            }
             catch (Exception)
             {
                 return false;

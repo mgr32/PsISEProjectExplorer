@@ -8,9 +8,8 @@ namespace PsISEProjectExplorer.UI.Workers
 {
     public class BackgroundSearcher : BackgroundWorker
     {
-
         private static object BackgroundSearcherLock = new Object();
-    
+
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public DateTime StartTimestamp { get; private set; }
@@ -36,7 +35,7 @@ namespace PsISEProjectExplorer.UI.Workers
                 Thread.CurrentThread.Name = "PsISEPE-Searcher";
             }
             var searcherParams = (BackgroundSearcherParams)e.Argument;
-            if (searcherParams.DocumentHierarchySearcher == null) 
+            if (searcherParams.DocumentHierarchySearcher == null)
             {
                 e.Result = null;
                 return;
@@ -53,7 +52,6 @@ namespace PsISEProjectExplorer.UI.Workers
             {
                 RunActualSearch(searcherParams, e);
             }
-            
         }
 
         private void RunActualSearch(BackgroundSearcherParams searcherParams, DoWorkEventArgs e)
@@ -63,7 +61,7 @@ namespace PsISEProjectExplorer.UI.Workers
                 e.Cancel = true;
                 return;
             }
-            Logger.Info(String.Format("Searching started, path: {0}, text: {1} ", searcherParams.Path ?? "null", searcherParams.SearchOptions.SearchText));
+            Logger.Info("Searching started, path: {0}, text: {1} ", searcherParams.Path ?? "null", searcherParams.SearchOptions.SearchText);
             try
             {
                 INode result = searcherParams.DocumentHierarchySearcher.GetDocumentHierarchyViewNodeProjection(searcherParams.Path, searcherParams.SearchOptions, this);
@@ -75,5 +73,4 @@ namespace PsISEProjectExplorer.UI.Workers
             }
         }
     }
-
 }

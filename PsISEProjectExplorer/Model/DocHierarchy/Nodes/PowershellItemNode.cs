@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using PsISEProjectExplorer.Enums;
+﻿using PsISEProjectExplorer.Enums;
 using System;
 
 namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes

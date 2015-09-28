@@ -1,5 +1,4 @@
 ﻿using Lucene.Net.Analysis;
-using Lucene.Net.Util;
 
 namespace PsISEProjectExplorer.FullText
 {
