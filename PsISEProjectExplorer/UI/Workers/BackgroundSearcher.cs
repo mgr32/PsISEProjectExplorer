@@ -61,7 +61,7 @@ namespace PsISEProjectExplorer.UI.Workers
                 e.Cancel = true;
                 return;
             }
-            Logger.Info("Searching started, path: {0}, text: {1} ", searcherParams.Path ?? "null", searcherParams.SearchOptions.SearchText);
+            Logger.Info(string.Format("Searching started, path: {0}, text: {1} ", searcherParams.Path ?? "null", searcherParams.SearchOptions.SearchText));
             try
             {
                 INode result = searcherParams.DocumentHierarchySearcher.GetDocumentHierarchyViewNodeProjection(searcherParams.Path, searcherParams.SearchOptions, this);
