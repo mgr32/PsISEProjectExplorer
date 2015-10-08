@@ -3,11 +3,7 @@ using NLog;
 using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Services;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.UI.IseIntegration
 {
@@ -50,6 +46,5 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             Logger.Debug("File renamed: " + e.OldFullPath + " to " + e.FullPath);
             this.FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.OldFullPath, String.Empty, e.FullPath));
         }
-
     }
 }

@@ -14,7 +14,7 @@ namespace PsISEProjectExplorer.Services
 
         private static readonly Regex PowershellModulesRegex = new Regex(@".*\.ps(d|m)1$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private static readonly Regex ExcludeRegex = new Regex(@"\\(\.git|\.svn)($|\\)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex ExcludeRegex = new Regex(@"\\(\.git|\.svn|\.vs)($|\\)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public bool IncludeAllFiles { get; set; }
 

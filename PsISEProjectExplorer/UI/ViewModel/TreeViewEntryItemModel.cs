@@ -1,9 +1,6 @@
 ﻿using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
-using PsISEProjectExplorer.Services;
-using PsISEProjectExplorer.UI.Helpers;
 using System;
-using System.Collections.Generic;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
@@ -13,13 +10,18 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private INode documentHierarchyNode;
 
-        private INode DocumentHierarchyNode { 
+        private INode DocumentHierarchyNode
+        {
             get
             {
                 return this.documentHierarchyNode;
             }
             set
             {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("node");
+                }
                 this.documentHierarchyNode = value;
                 this.OnPropertyChanged("IsExpanded");
             }
@@ -104,7 +106,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.OnPropertyChanged();
             }
         }
-        
 
         private bool isBeingEdited;
 
@@ -148,10 +149,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public TreeViewEntryItemModel(INode node, TreeViewEntryItemModel parent, bool isSelected)
         {
-            if (node == null) 
-            {
-                throw new ArgumentNullException("node");
-            }
             var lockObject = this.Parent == null ? RootLockObject : this.Parent;
             lock (lockObject)
             {
@@ -175,8 +172,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 {
                     this.Parent.Children.Remove(this);
                 }
-                this.DocumentHierarchyNode = null;
-                this.Children = null;
+                this.Children.Clear();
                 this.Parent = null;
             }
         }
@@ -207,8 +203,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public override int GetHashCode()
         {
-            return (this.Node == null ? 0 : this.Node.GetHashCode());
+            return this.Node.GetHashCode();
         }
-
     }
 }

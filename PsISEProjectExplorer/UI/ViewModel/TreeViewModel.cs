@@ -1,6 +1,5 @@
 ﻿using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
-using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI.Helpers;
@@ -14,7 +13,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
 {
     public class TreeViewModel : BaseViewModel
     {
-
         public IEnumerable<TreeViewEntryItemModel> TreeViewItems
         {
             get
@@ -48,7 +46,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private int numberOfFiles;
 
         public int NumberOfFiles
-        { 
+        {
             get
             {
                 return this.numberOfFiles;
@@ -57,7 +55,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.numberOfFiles = value;
                 this.OnPropertyChanged();
-            }   
+            }
         }
 
         private string PathOfItemToSelectOnRefresh { get; set; }
@@ -172,7 +170,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.DeleteTreeViewEntryItemModel(item);
             }
 
-            // add new items            
+            // add new items
             foreach (INode docHierarchyChild in nodeChildren)
             {
                 TreeViewEntryItemModel newTreeViewItem;
@@ -559,7 +557,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 item.IsExpanded = true;
             }
             return item;
-        }       
+        }
 
         private void DeleteTreeViewEntryItemModel(TreeViewEntryItemModel item, bool first = true)
         {

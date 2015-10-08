@@ -1,8 +1,6 @@
-﻿using PsISEProjectExplorer.UI.Helpers;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {

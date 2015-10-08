@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PsISEProjectExplorer.Model
+﻿namespace PsISEProjectExplorer.Model
 {
     public class ChangePoolEntry
     {
@@ -25,7 +19,6 @@ namespace PsISEProjectExplorer.Model
             : this(pathChanged, rootPath, null)
         {
         }
-        
 
         public override bool Equals(object obj)
         {

@@ -1,5 +1,4 @@
 ﻿using PsISEProjectExplorer.Services;
-using System.Linq;
 
 namespace PsISEProjectExplorer.Model
 {

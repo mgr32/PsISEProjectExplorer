@@ -17,13 +17,7 @@ namespace PsISEProjectExplorer.Config
 
         static ConfigHandler()
         {
-            var currentLocation = Assembly.GetExecutingAssembly().Location;
-            var currentPath = Path.GetDirectoryName(currentLocation);
-            if (currentPath == null)
-            {
-                return;
-            }
-            ConfigFilePath = Path.Combine(currentPath, "PsISEProjectExplorer.config");
+            ConfigFilePath = Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA"), "PsISEProjectExplorer", "PsISEProjectExplorer.config");
         }
 
         public static string ReadConfigStringValue(string key)
