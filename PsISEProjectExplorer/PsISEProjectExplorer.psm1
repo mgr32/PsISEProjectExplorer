@@ -44,6 +44,18 @@ function Register-PsISEProjectExplorerMenu($root, $name, $scriptblock, $hotkey) 
 	$root.SubMenus.Add($name, $scriptblock, $hotkey)
 }
 
+function Copy-PsISEConfigFile {
+	$OldFile = Join-Path -Path $PSScriptRoot -ChildPath 'PsISEProjectExplorer.config'
+	$NewPath = Join-Path -Path $Env:LOCALAPPDATA -ChildPath 'PsISEProjectExplorer'
+	$NewFile = Join-Path -Path $Env:LOCALAPPDATA -ChildPath 'PsISEProjectExplorer\PsISEProjectExplorer.config'
+
+	if ((Test-Path -Path $OldFile) -and -not (Test-Path -Path $NewFile))
+	{
+		New-Item -Path $NewPath -ItemType Directory -Force | Out-Null
+		Copy-Item -Path $OldFile -Destination $NewFile
+	}
+}
+
 if ($host.Name -ne 'Windows PowerShell ISE Host') {
 	Write-Warning "PsISEProjectExplorer module only runs inside PowerShell ISE"
 	return
@@ -53,6 +65,8 @@ if ($PSVersionTable.PSVersion.Major -lt 3) {
 	Write-Warning "PsISEProjectExplorer requires Powershell 3.0 or above"
 	return
 }
+
+Copy-PsISEConfigFile
 
 Register-PsISEProjectExplorer
 Register-PsISEProjectExplorerMenus
