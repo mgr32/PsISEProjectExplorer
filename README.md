@@ -45,7 +45,7 @@ Because I work on complex Powershell modules with lots of functions, and navigat
 
 ##### Implementation details
 
-Written in C#, .NET 4.5, WPF using Microsoft Visual Studio Express 2012 for Desktop.
+Written in C#, .NET 4.5, WPF using Microsoft Visual Studio 2015.
 
 Uses three background threads:
 * One for indexing directory structure and file contents. Indexes are stored in RAM only (not stored on disk), so they need full refresh after closing Powershell ISE.
