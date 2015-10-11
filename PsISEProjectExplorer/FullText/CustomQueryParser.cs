@@ -11,7 +11,9 @@ namespace PsISEProjectExplorer.FullText
     /// Maybe in future could be replaced with ANTLR.
     /// </summary>
     public class CustomQueryParser
-    {
+    { 
+        private TokenizeRules TokenizeRules = new TokenizeRules();
+    
         public Query Parse(string text, string field)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -23,11 +25,39 @@ namespace PsISEProjectExplorer.FullText
             {
                 return null;
             }
-            var outerQuery = new BooleanQuery();
+            BooleanQuery outerQuery = new BooleanQuery();
+            PhraseQuery phraseQuery = null;
             foreach (string token in tokens)
             {
-                var query = new PrefixQuery(new Term(field, token));
-                outerQuery.Add(query, Occur.MUST);
+                if ("\"".Equals(token))
+                {
+                    if (phraseQuery == null)
+                    {
+                        phraseQuery = new PhraseQuery();
+                    }
+                    else
+                    {
+                        outerQuery.Add(phraseQuery, Occur.MUST);
+                        phraseQuery = null;
+                    }
+                }
+                else
+                {
+                    Term term = new Term(field, token);
+                    if (phraseQuery != null)
+                    {
+                        phraseQuery.Add(term);
+                    }
+                    else
+                    {
+                        var query = new PrefixQuery(term);
+                        outerQuery.Add(query, Occur.MUST);
+                    }
+                }
+            }
+            if (phraseQuery != null)
+            {
+                outerQuery.Add(phraseQuery, Occur.MUST);
             }
             return outerQuery;
         }
@@ -44,26 +74,29 @@ namespace PsISEProjectExplorer.FullText
                 char c = '\x00';
                 if (i != len) 
                 {
-                    c = TokenizeRules.Normalize(text[i]);
-                }
-                if (i != len && TokenizeRules.IsTokenChar(c))
-                {
-                    buf[tokenLen] = c;
-                    tokenLen++;
-                    if (tokenLen > 255)
+                    c = this.TokenizeRules.Normalize(text[i]);
+                    if (this.TokenizeRules.IsTokenChar(c))
                     {
-                        throw new InvalidOperationException("Token longer than 255 characters.");
-                    }
+                        buf[tokenLen] = c;
+                        tokenLen++;
+                        if (tokenLen > 255)
+                        {
+                            throw new InvalidOperationException("Token longer than 255 characters.");
+                        }
+                        continue;
+                    }                    
                 }
-                else
+                
+                // we're not interested in tokens shorter than 3 chars
+                if (tokenLen >= 3)
                 {
-                    // we're not interested in tokens shorter than 3 chars
-                    if (tokenLen >= 3)
-                    {
-                        tokens.Add(new string(buf, 0, tokenLen));
-                    }
-                    tokenLen = 0;
+                    tokens.Add(new string(buf, 0, tokenLen));
                 }
+                tokenLen = 0;
+                if (this.TokenizeRules.IsPhraseChar(c))
+                {
+                    tokens.Add("\"");
+                }                
             }
             return tokens;
         }

@@ -25,6 +25,7 @@ namespace PsISEProjectExplorer.Services
                 startLine = editorInfo.CurrentLineNum;
                 startColumnInFirstLine = editorInfo.CurrentColumn;
             }
+            searchText = searchText.Replace("\"", string.Empty);
             int queryLen = searchText.Length;
             var bestSubtokenPosition = new TokenPosition(-1, 0, 0);
             foreach (LineInfo lineInfo in FileReader.ReadFileAsEnumerableWithWrap(filePath, startLine))

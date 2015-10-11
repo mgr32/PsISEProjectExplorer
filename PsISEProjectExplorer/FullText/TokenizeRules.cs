@@ -2,16 +2,19 @@
 
 namespace PsISEProjectExplorer.FullText
 {
-    public static class TokenizeRules
+    public class TokenizeRules
     {
-        private static readonly char[] TokenSeparators = { '.', ',', ':', '(', ')', '[', ']', '{', '}', '\\', '/', '`', '\'', '"', '$' };
-
-        public static bool IsTokenChar(char c)
+        public bool IsTokenChar(char c)
         {
-            return !System.Char.IsWhiteSpace(c) && !TokenSeparators.Contains(c);
+            return !System.Char.IsWhiteSpace(c) && !this.IsPhraseChar(c);
         }
 
-        public static char Normalize(char c)
+        public bool IsPhraseChar(char c)
+        {
+            return '"'.Equals(c);
+        }
+
+        public char Normalize(char c)
         {
             return System.Char.ToLower(c);
         }

@@ -4,9 +4,11 @@ namespace PsISEProjectExplorer.FullText
 {
     public class CustomTokenizer : CharTokenizer
     {
-        
+
+        private TokenizeRules TokenizeRules = new TokenizeRules();
+
         /// <summary>Construct a new CustomTokenizer. </summary>
-		public CustomTokenizer(System.IO.TextReader @in):base(@in)
+        public CustomTokenizer(System.IO.TextReader @in):base(@in)
 		{
 		}
 
@@ -15,7 +17,7 @@ namespace PsISEProjectExplorer.FullText
         /// </summary>
         protected override bool IsTokenChar(char c)
         {
-            return TokenizeRules.IsTokenChar(c);
+            return this.TokenizeRules.IsTokenChar(c);
         }
 
         /// <summary>Converts char to lower case
@@ -23,7 +25,7 @@ namespace PsISEProjectExplorer.FullText
         /// </summary>
         protected override char Normalize(char c)
         {
-            return TokenizeRules.Normalize(c);
+            return this.TokenizeRules.Normalize(c);
         }
     }
 }
