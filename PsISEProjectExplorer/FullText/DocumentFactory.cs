@@ -8,9 +8,12 @@ namespace PsISEProjectExplorer.FullText
     {
         private IndexWriter IndexWriter { get; set; }
 
-        public DocumentFactory(IndexWriter indexWriter)
+        private bool AnalyzeContents { get; set; }
+
+        public DocumentFactory(IndexWriter indexWriter, bool analyzeContents)
         {
             this.IndexWriter = indexWriter;
+            this.AnalyzeContents = analyzeContents;
         }
 
         public void AddDirectoryEntry(string path, string segment)
@@ -43,7 +46,7 @@ namespace PsISEProjectExplorer.FullText
                 OmitTermFreqAndPositions = true
             };
             doc.Add(field);
-            field = new Field(FullTextFieldType.CatchAll.ToString(), name + " " + contents, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS);
+            field = new Field(FullTextFieldType.CatchAll.ToString(), name + " " + contents, Field.Store.NO, this.AnalyzeContents ? Field.Index.ANALYZED : Field.Index.NOT_ANALYZED);
             doc.Add(field);
             this.IndexWriter.AddDocument(doc);
             this.IndexWriter.Commit();

@@ -200,7 +200,7 @@ namespace PsISEProjectExplorer
 
             if (e.ClickCount > 1)
             {
-                this.mainViewModel.TreeViewModel.OpenItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.mainViewModel.SearchText);
+                this.mainViewModel.TreeViewModel.OpenItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.mainViewModel.SearchOptions);
                 e.Handled = true;
             }
         }
@@ -247,7 +247,7 @@ namespace PsISEProjectExplorer
             var selectedItem = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
             if (e.Key == Key.Enter)
             {
-                this.mainViewModel.TreeViewModel.OpenItem(selectedItem, this.mainViewModel.SearchText);
+                this.mainViewModel.TreeViewModel.OpenItem(selectedItem, this.mainViewModel.SearchOptions);
             }
         }
 
@@ -332,7 +332,7 @@ namespace PsISEProjectExplorer
                     e.Handled = true;
                     return;
                 case Key.Enter:
-                    this.mainViewModel.TreeViewModel.OpenItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.mainViewModel.SearchText);
+                    this.mainViewModel.TreeViewModel.OpenItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.mainViewModel.SearchOptions);
                     e.Handled = true;
                     return;
             }

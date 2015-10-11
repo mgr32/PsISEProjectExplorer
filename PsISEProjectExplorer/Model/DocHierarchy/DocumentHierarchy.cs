@@ -17,10 +17,10 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
 
         private IDictionary<string, INode> NodeMap { get; set; }
 
-        public DocumentHierarchy(INode rootNode)
+        public DocumentHierarchy(INode rootNode, bool analyzeContents)
         {
             this.RootNode = rootNode;
-            this.FullTextDirectory = new FullTextDirectory();
+            this.FullTextDirectory = new FullTextDirectory(analyzeContents);
             this.NodeMap = new Dictionary<string, INode> {{rootNode.Path, rootNode}};
         }
 
@@ -130,9 +130,9 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             }
         }
 
-        public IEnumerable<SearchResult> SearchNodesFullText(string filter, FullTextFieldType fieldType)
+        public IEnumerable<SearchResult> SearchNodesFullText(SearchOptions searchOptions)
         {
-            IList<SearchResult> searchResults = this.FullTextDirectory.Search(filter, fieldType);
+            IList<SearchResult> searchResults = this.FullTextDirectory.Search(searchOptions);
             this.AddNodesToSearchResults(searchResults);
             return searchResults;
         }

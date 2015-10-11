@@ -1,5 +1,7 @@
-﻿using Lucene.Net.Index;
+﻿using Contrib.Regex;
+using Lucene.Net.Index;
 using Lucene.Net.Search;
+using PsISEProjectExplorer.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,13 +16,17 @@ namespace PsISEProjectExplorer.FullText
     { 
         private TokenizeRules TokenizeRules = new TokenizeRules();
     
-        public Query Parse(string text, string field)
+        public Query Parse(SearchOptions searchOptions)
         {
-            if (string.IsNullOrWhiteSpace(text))
+            if (string.IsNullOrWhiteSpace(searchOptions.SearchText) || searchOptions.SearchText.Length <= 2)
             {
                 return null;
             }
-            var tokens = this.Tokenize(text).ToList();
+            if (searchOptions.SearchRegex)
+            {
+                return new RegexQuery(new Term(searchOptions.SearchField.ToString(), searchOptions.SearchText.ToLowerInvariant()));
+            }
+            var tokens = this.Tokenize(searchOptions.SearchText).ToList();
             if (!tokens.Any())
             {
                 return null;
@@ -43,7 +49,7 @@ namespace PsISEProjectExplorer.FullText
                 }
                 else
                 {
-                    Term term = new Term(field, token);
+                    Term term = new Term(searchOptions.SearchField.ToString(), token);
                     if (phraseQuery != null)
                     {
                         phraseQuery.Add(term);

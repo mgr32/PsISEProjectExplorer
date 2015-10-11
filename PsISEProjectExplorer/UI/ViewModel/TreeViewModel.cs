@@ -68,12 +68,15 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private IDictionary<string, TreeViewEntryItemModel> ItemsMap { get; set; }
 
+        private TokenLocator TokenLocator;
+
         public TreeViewModel(FileSystemChangeWatcher fileSystemChangeWatcher, DocumentHierarchyFactory documentHierarchyFactory, FilesPatternProvider filesPatternProvider)
         {
             this.FileSystemChangeWatcher = fileSystemChangeWatcher;
             this.DocumentHierarchyFactory = documentHierarchyFactory;
             this.FilesPatternProvider = filesPatternProvider;
             this.ItemsMap = new Dictionary<string, TreeViewEntryItemModel>();
+            this.TokenLocator = new TokenLocator();
         }
 
         public void ReRoot(INode rootNode)
@@ -196,7 +199,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        public void OpenItem(TreeViewEntryItemModel item, string searchText)
+        public void OpenItem(TreeViewEntryItemModel item, SearchOptions searchOptions)
         {
             if (this.IseIntegrator == null)
             {
@@ -218,17 +221,17 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 {
                     this.IseIntegrator.SetFocusOnCurrentTab();
                 }
-                if (searchText != null && searchText.Length > 2)
+                if (searchOptions.SearchText != null && searchOptions.SearchText.Length > 2)
                 {
                     EditorInfo editorInfo = (wasOpen ? this.IseIntegrator.GetCurrentLineWithColumnIndex() : null);
-                    TokenPosition tokenPos = TokenLocator.LocateNextToken(item.Node.Path, searchText, editorInfo);
+                    TokenPosition tokenPos = this.TokenLocator.LocateNextToken(item.Node.Path, searchOptions, editorInfo);
                     if (tokenPos.MatchLength > 2)
                     {
                         this.IseIntegrator.SelectText(tokenPos.Line, tokenPos.Column, tokenPos.MatchLength);
                     }
                     else if (string.IsNullOrEmpty(this.IseIntegrator.SelectedText))
                     {
-                        tokenPos = TokenLocator.LocateSubtoken(item.Node.Path, searchText);
+                        tokenPos = this.TokenLocator.LocateSubtoken(item.Node.Path, searchOptions);
                         if (tokenPos.MatchLength > 2)
                         {
                             this.IseIntegrator.SelectText(tokenPos.Line, tokenPos.Column, tokenPos.MatchLength);

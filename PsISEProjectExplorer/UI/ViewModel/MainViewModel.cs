@@ -48,6 +48,22 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        private bool searchRegex;
+
+        public bool SearchRegex
+        {
+            get { return this.searchRegex; }
+            set
+            {
+                this.searchRegex = value;
+                this.OnPropertyChanged();
+                this.SearchOptions.SearchRegex = this.searchRegex;
+                ConfigHandler.SaveConfigValue("SearchRegex", value.ToString());
+                this.DocumentHierarchySearcher = this.DocumentHierarchyFactory.CreateDocumentHierarchySearcher(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
+                this.ReindexSearchTree();
+            }
+        }
+
         private bool searchInFiles;
 
         public bool SearchInFiles
@@ -128,7 +144,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         }
 
 
-        private SearchOptions SearchOptions { get; set; }
+        public SearchOptions SearchOptions { get; private set; }
 
         private DocumentHierarchyFactory DocumentHierarchyFactory { get; set; }
 
@@ -162,14 +178,23 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private DocumentHierarchySearcher DocumentHierarchySearcher { get; set; }
 
+        private bool AnalyzeDocumentContents
+        {
+            get
+            {
+                return !this.SearchRegex;
+            }
+        }
+
         public MainViewModel()
         {
+            this.searchRegex = ConfigHandler.ReadConfigBoolValue("SearchRegex", false);
             this.searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles", true);
             this.showAllFiles = ConfigHandler.ReadConfigBoolValue("ShowAllFiles", true);
             this.FilesPatternProvider = new FilesPatternProvider(this.showAllFiles);
             this.syncWithActiveDocument = ConfigHandler.ReadConfigBoolValue("SyncWithActiveDocument", false);
             var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
-            this.SearchOptions = new SearchOptions(searchField, string.Empty);
+            this.SearchOptions = new SearchOptions(searchField, string.Empty, this.searchRegex);
 
             this.DocumentHierarchyFactory = new DocumentHierarchyFactory();
             this.FileSystemChangeWatcher = new FileSystemChangeWatcher(this.ReindexOnFileSystemChanged);
@@ -179,7 +204,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.WorkspaceDirectoryModel = new WorkspaceDirectoryModel();
             if (this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory != null)
             {
-                this.DocumentHierarchySearcher = this.DocumentHierarchyFactory.CreateDocumentHierarchySearcher(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory);
+                this.DocumentHierarchySearcher = this.DocumentHierarchyFactory.CreateDocumentHierarchySearcher(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
             }
             this.WorkspaceDirectoryModel.PropertyChanged += this.OnWorkspaceDirectoryChanged;
         }
@@ -292,7 +317,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             if (e.PropertyName == "CurrentWorkspaceDirectory")
             {
-                this.DocumentHierarchySearcher = this.DocumentHierarchyFactory.CreateDocumentHierarchySearcher(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory);
+                this.DocumentHierarchySearcher = this.DocumentHierarchyFactory.CreateDocumentHierarchySearcher(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
                 this.ReindexSearchTree();
             }
         }

@@ -24,14 +24,14 @@ namespace PsISEProjectExplorer.FullText
 
         public DocumentFactory DocumentCreator { get; private set; }
 
-        public FullTextDirectory()
+        public FullTextDirectory(bool analyzeContents)
         {
             this.Analyzer = new CustomAnalyzer();
             this.LuceneDirectory = new RAMDirectory();
             this.IndexWriter = new IndexWriter(this.LuceneDirectory, this.Analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
             this.IndexReader = this.IndexWriter.GetReader();
             this.CustomQueryParser = new CustomQueryParser();
-            this.DocumentCreator = new DocumentFactory(this.IndexWriter);
+            this.DocumentCreator = new DocumentFactory(this.IndexWriter, analyzeContents);
         }
 
         public IList<SearchResult> SearchTerm(string searchTerm, FullTextFieldType field)
@@ -40,9 +40,9 @@ namespace PsISEProjectExplorer.FullText
             return this.RunQuery(query);   
         }
 
-        public IList<SearchResult> Search(string searchText, FullTextFieldType field)
+        public IList<SearchResult> Search(SearchOptions searchOptions)
         {
-            Query query = this.CustomQueryParser.Parse(searchText, field.ToString());
+            Query query = this.CustomQueryParser.Parse(searchOptions);
             return this.RunQuery(query);
             
         }

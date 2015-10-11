@@ -39,7 +39,7 @@ namespace PsISEProjectExplorer.Services
                 return node;
             }
             IList<INode> filteredNodes = this.DocumentHierarchy
-                .SearchNodesFullText(searchOptions.SearchText, searchOptions.SearchField)
+                .SearchNodesFullText(searchOptions)
                 .Where(result => result.Path.StartsWith(node.Path)) // TODO: filter it earlier for performance
                 .Select(result => result.Node)
                 .ToList();

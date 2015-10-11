@@ -22,13 +22,13 @@ namespace PsISEProjectExplorer.Services
             }
         }
 
-        public DocumentHierarchySearcher CreateDocumentHierarchySearcher(string path)
+        public DocumentHierarchySearcher CreateDocumentHierarchySearcher(string path, bool analyzeContents)
         {
             if (string.IsNullOrEmpty(path))
             {
                 return null;
             }
-            this.DocumentHierarchy = new DocumentHierarchy(new RootNode(path));
+            this.DocumentHierarchy = new DocumentHierarchy(new RootNode(path), analyzeContents);
             return new DocumentHierarchySearcher(this.DocumentHierarchy);           
         }
 

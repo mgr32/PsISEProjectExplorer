@@ -52,6 +52,7 @@ namespace PsISEProjectExplorer.Services
             string line;
             IList<string> wrappedLines = new List<string>(startLine - 1);
             int lineNum = 0;
+            String startLineString = string.Empty;
             do 
             {
                 try 
@@ -71,6 +72,10 @@ namespace PsISEProjectExplorer.Services
                 {
                     if (lineNum >= startLine)
                     {
+                        if (lineNum == startLine)
+                        {
+                            startLineString = line;
+                        }
                         yield return new LineInfo(line, lineNum);
                     }
                     else
@@ -89,6 +94,7 @@ namespace PsISEProjectExplorer.Services
             {
                 yield return new LineInfo(wrappedLine, i++);
             }
+            yield return new LineInfo(startLineString, i);
 
         }
     }

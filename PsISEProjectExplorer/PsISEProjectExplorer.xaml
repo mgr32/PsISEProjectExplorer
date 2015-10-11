@@ -44,6 +44,9 @@
         </Button>
         <ToolBarTray Height="32" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,48,-4,0" IsLocked="True" Background="{DynamicResource {x:Static SystemColors.WindowBrush}}">
             <uiHelpers:LockedToolBar x:Name="ButtonToolbar" AllowDrop="False" Background="{DynamicResource {x:Static SystemColors.WindowBrush}}">
+                <ToggleButton IsChecked="{Binding Path=SearchRegex}">
+                    <Image Source="Resources\toolbar_searchRegex.png" ToolTip="Search using Regex" />
+                </ToggleButton>
                 <ToggleButton IsChecked="{Binding Path=SearchInFiles}">
                     <Image Source="Resources\toolbar_searchInFiles.png" ToolTip="Search in Files" />
                 </ToggleButton>

@@ -8,13 +8,16 @@ namespace PsISEProjectExplorer.Model
 
         public string SearchText { get; set; }
 
-        public SearchOptions(FullTextFieldType searchField, string searchText)
+        public bool SearchRegex { get; set; }
+
+        public SearchOptions(FullTextFieldType searchField, string searchText, bool searchRegex)
         {
             this.SearchField = searchField;
             this.SearchText = searchText == null ? string.Empty : searchText;
+            this.SearchRegex = searchRegex;
         }
 
-        public SearchOptions(SearchOptions searchOptions) : this(searchOptions.SearchField, searchOptions.SearchText)
+        public SearchOptions(SearchOptions searchOptions) : this(searchOptions.SearchField, searchOptions.SearchText, searchOptions.SearchRegex)
         {
         }
 
@@ -25,12 +28,12 @@ namespace PsISEProjectExplorer.Model
                 return false;
             }
             var other = (SearchOptions)obj;
-            return (other.SearchField == this.SearchField && other.SearchText == this.SearchText);
+            return (other.SearchField == this.SearchField && other.SearchText == this.SearchText && other.SearchRegex == this.SearchRegex);
         }
 
         public override int GetHashCode()
         {
-            return (this.SearchField + (this.SearchText ?? "")).GetHashCode();
+            return (this.SearchField + (this.SearchText ?? "") + this.SearchRegex).GetHashCode();
         }
 
     }
