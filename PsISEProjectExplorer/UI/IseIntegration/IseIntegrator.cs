@@ -93,7 +93,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                     }
                     catch (Exception e) 
                     {
-                        Logger.Error("Failed to set cursor", e);
+                        Logger.Error(e, "Failed to set cursor");
                     }
                 }
             }
@@ -113,7 +113,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                     }
                     catch (Exception e)
                     {
-                        Logger.Error("Failed to select text", e);
+                        Logger.Error(e, "Failed to select text");
                     }
                 }
             }

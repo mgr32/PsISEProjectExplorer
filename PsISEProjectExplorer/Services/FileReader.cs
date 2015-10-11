@@ -39,7 +39,7 @@ namespace PsISEProjectExplorer.Services
             }
             catch (IOException e)
             {
-                Logger.Error("Cannot open file '" + path + "'", e);
+                Logger.Error(e, "Cannot open file '" + path + "'");
                 if (sr != null)
                     sr.Dispose();
                 if (bs != null)
@@ -61,7 +61,7 @@ namespace PsISEProjectExplorer.Services
                 } 
                 catch (Exception e)
                 {
-                    Logger.Error("Cannot read from file '" + path + "'", e);
+                    Logger.Error(e, "Cannot read from file '" + path + "'");
                     sr.Dispose();
                     bs.Dispose();
                     fs.Dispose();

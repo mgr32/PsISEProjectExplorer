@@ -96,7 +96,7 @@ namespace PsISEProjectExplorer.Config
                 }
                 catch (Exception e)
                 {
-                    Logger.Error("Cannot save config file", e);
+                    Logger.Error(e, "Cannot save config file");
                 }
             }
         }
@@ -116,7 +116,7 @@ namespace PsISEProjectExplorer.Config
             }
             catch (Exception e)
             {
-                Logger.Error("Cannot open configuration file at " + ConfigFilePath, e);
+                Logger.Error(e, "Cannot open configuration file at " + ConfigFilePath);
                 return null;
             }
         }

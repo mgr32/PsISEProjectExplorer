@@ -55,7 +55,7 @@ namespace PsISEProjectExplorer
         private static void DispatcherUnhandledExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)
         {
             Exception e = args.Exception;
-            Logger.Error("Unhandled Dispatcher exception", e);
+            Logger.Error(e, "Unhandled Dispatcher exception");
 
             StringBuilder sources = new StringBuilder().Append("Sources: ");
             string firstSource = null;

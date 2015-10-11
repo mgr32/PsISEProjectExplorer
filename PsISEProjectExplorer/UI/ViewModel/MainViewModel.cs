@@ -334,12 +334,15 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     return;
                 }
                 bool expandNewNodes = !String.IsNullOrWhiteSpace(this.SearchText);
-                Application.Current.Dispatcher.Invoke(() =>
+                if (Application.Current != null)
                 {
-                    this.TreeViewModel.RefreshFromNode(result.ResultNode, result.Path, expandNewNodes);
-                    // when 'Sync with active document' is enabled and search results changed, we need to try to locate current document in the new search results
-                    this.ActiveDocumentPotentiallyChanged();
-                });
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        this.TreeViewModel.RefreshFromNode(result.ResultNode, result.Path, expandNewNodes);
+                        // when 'Sync with active document' is enabled and search results changed, we need to try to locate current document in the new search results
+                        this.ActiveDocumentPotentiallyChanged();
+                    });
+                }
             }
             finally
             {
