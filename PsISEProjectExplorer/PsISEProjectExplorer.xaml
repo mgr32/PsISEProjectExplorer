@@ -42,7 +42,7 @@
         <Button VerticalAlignment="Top" Height="21" Margin="10,25,10,0" HorizontalAlignment="Right" Click="TextBoxSearchClear_Click">
             <Image Source="Resources/cancel.png" ToolTip="Clear search text" />
         </Button>
-        <ToolBarTray Height="32" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,48,-4,0" IsLocked="True">
+        <ToolBarTray Height="32" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,48,-4,0" IsLocked="True" Background="{DynamicResource {x:Static SystemColors.WindowBrush}}">
             <uiHelpers:LockedToolBar x:Name="ButtonToolbar" AllowDrop="False" Background="{DynamicResource {x:Static SystemColors.WindowBrush}}">
                 <ToggleButton IsChecked="{Binding Path=SearchInFiles}">
                     <Image Source="Resources\toolbar_searchInFiles.png" ToolTip="Search in Files" />
