@@ -42,26 +42,28 @@
         <Button VerticalAlignment="Top" Height="21" Margin="10,25,10,0" HorizontalAlignment="Right" Click="TextBoxSearchClear_Click">
             <Image Source="Resources/cancel.png" ToolTip="Clear search text" />
         </Button>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,50,10,0" VerticalAlignment="Top" Height="22">
-            <ToggleButton IsChecked="{Binding Path=SearchInFiles}" Margin="0,0,4,0">
-                <Image Source="Resources\toolbar_searchInFiles.png" ToolTip="Search in Files" />
-            </ToggleButton>
-            <ToggleButton IsChecked="{Binding Path=ShowAllFiles}" Margin="0,0,4,0">
-                <Image Source="Resources\toolbar_showAllFiles.png" ToolTip="Show All Files" />
-            </ToggleButton>
-            <ToggleButton IsChecked="{Binding Path=SyncWithActiveDocument}" Margin="0,0,4,0">
-                <Image Source="Resources\toolbar_sync.png" ToolTip="Sync with Active Document" />
-            </ToggleButton>
-            <Button Margin="0,0,4,0" Click="RefreshDirectoryStructure_Click">
-                <Image Source="Resources\toolbar_refresh.png" ToolTip="Refresh Directory Structure" />
-            </Button>
-            <Button Margin="0,0,4,0" Click="CollapseAll_Click">
-                <Image Source="Resources\toolbar_toggle_collapse.png" ToolTip="Collapse All" />
-            </Button>
-            <ToggleButton IsChecked="{Binding Path=WorkspaceDirectoryModel.AutoUpdateRootDirectory}">
-                <Image Source="Resources\toolbar_autoUpdateProjectDir.png" ToolTip="Auto-update Workspace Directory"/>
-            </ToggleButton>
-        </StackPanel>
+        <ToolBarTray Height="32" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,48,-4,0" IsLocked="True">
+            <uiHelpers:LockedToolBar x:Name="ButtonToolbar" AllowDrop="False" Background="{DynamicResource {x:Static SystemColors.WindowBrush}}">
+                <ToggleButton IsChecked="{Binding Path=SearchInFiles}">
+                    <Image Source="Resources\toolbar_searchInFiles.png" ToolTip="Search in Files" />
+                </ToggleButton>
+                <ToggleButton IsChecked="{Binding Path=ShowAllFiles}">
+                    <Image Source="Resources\toolbar_showAllFiles.png" ToolTip="Show All Files" />
+                </ToggleButton>
+                <ToggleButton IsChecked="{Binding Path=SyncWithActiveDocument}">
+                    <Image Source="Resources\toolbar_sync.png" ToolTip="Sync with Active Document"/>
+                </ToggleButton>
+                <Button Click="RefreshDirectoryStructure_Click">
+                    <Image Source="Resources\toolbar_refresh.png" ToolTip="Refresh Directory Structure" />
+                </Button>
+                <Button Click="CollapseAll_Click" >
+                    <Image Source="Resources\toolbar_toggle_collapse.png" ToolTip="Collapse All" />
+                </Button>
+                <ToggleButton IsChecked="{Binding Path=WorkspaceDirectoryModel.AutoUpdateRootDirectory}">
+                    <Image Source="Resources\toolbar_autoUpdateProjectDir.png" ToolTip="Auto-update Workspace Directory"/>
+                </ToggleButton>
+            </uiHelpers:LockedToolBar>
+        </ToolBarTray>
         <TextBlock HorizontalAlignment="Left" Margin="10,54,0,5" TextWrapping="Wrap" Text="{Binding Path=TreeItemsResultString}" VerticalAlignment="Top" />
 
         <uiHelpers:StretchingTreeView x:Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewModel.TreeViewItems}" PreviewMouseLeftButtonDown="SearchResults_PreviewMouseLeftButtonDown" PreviewMouseRightButtonDown="SearchResults_PreviewMouseRightButtonDown"

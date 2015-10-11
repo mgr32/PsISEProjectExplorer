@@ -101,6 +101,7 @@
     <Compile Include="Services\TokenLocator.cs" />
     <Compile Include="UI\Helpers\EmptyListToVisibilityConverter.cs" />
     <Compile Include="UI\Helpers\FocusExtensions.cs" />
+    <Compile Include="UI\Helpers\LockedToolBar.cs" />
     <Compile Include="UI\Helpers\MessageBoxHelper.cs" />
     <Compile Include="UI\Helpers\StretchingTreeView.cs" />
     <Compile Include="UI\Helpers\TreeViewDropHighlighter.cs" />
@@ -167,6 +168,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Resources\toolbar_sync.png" />
     <Resource Include="Resources\toolbar_toggle-expand.png" />
     <Resource Include="Resources\toolbar_toggle_collapse.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -222,9 +224,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\toolbar_autoUpdateProjectDir.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\toolbar_sync.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\toolbar_refresh.png" />
