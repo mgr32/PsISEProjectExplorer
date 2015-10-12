@@ -76,6 +76,6 @@ It will create output in bin\Release directory.
 ##### Third party libraries
 * <a href="https://lucenenet.apache.org">Apache Lucene .Net 3.0.3</a> (<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>)
 * <a href="https://github.com/apache/lucenenet/tree/master/src/contrib/Regex">Apache Lucene .Net Contrib.Regex</a> (<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>)
-* <a href="http://nlog-project.org">NLog 3.2</a> (<a href="https://github.com/NLog/NLog/blob/master/LICENSE.txt">BSD license</a>)
+* <a href="http://nlog-project.org">NLog</a> (<a href="https://github.com/NLog/NLog/blob/master/LICENSE.txt">BSD license</a>)
 * <a href="http://www.ookii.org/software/dialogs">Ookii.Dialogs</a> (<a href="PsISEProjectExplorer/UI/Ookii.Dialogs.Wpf/license.txt">License</a>)
 * All icons come from <a href="http://www.famfamfam.com/lab/icons/silk">Silk icons by Mark James</a>
