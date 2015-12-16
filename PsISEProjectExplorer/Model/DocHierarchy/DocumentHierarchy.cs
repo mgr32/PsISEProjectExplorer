@@ -56,27 +56,27 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
         }
 
 
-        public INode CreateNewDirectoryNode(string absolutePath, INode parent, string errorMessage)
+        public INode CreateNewDirectoryNode(string absolutePath, INode parent, bool isExcluded, string errorMessage)
         {
             var lockObject = parent == null ? RootLockObject : parent;
             lock (lockObject)
             {
                 string name = absolutePath.Substring(absolutePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
                 INode node;
-                node = new DirectoryNode(absolutePath, name, parent, errorMessage);
+                node = new DirectoryNode(absolutePath, name, parent, isExcluded, errorMessage);
                 this.NodeMap.Add(absolutePath, node);
                 this.FullTextDirectory.DocumentCreator.AddDirectoryEntry(absolutePath, name);
                 return node;
             }
         }
 
-        public FileNode CreateNewFileNode(string absolutePath, string fileContents, INode parent, string errorMessage)
+        public FileNode CreateNewFileNode(string absolutePath, string fileContents, INode parent, bool isExcluded, string errorMessage)
         {
             var lockObject = parent == null ? RootLockObject : parent;
             lock (lockObject)
             {
                 string fileName = Path.GetFileName(absolutePath);
-                FileNode fileNode = new FileNode(absolutePath, fileName, parent, errorMessage);
+                FileNode fileNode = new FileNode(absolutePath, fileName, parent, isExcluded, errorMessage);
                 this.NodeMap.Add(absolutePath, fileNode);
                 this.FullTextDirectory.DocumentCreator.AddFileEntry(absolutePath, fileName, fileContents);
                 return fileNode;
@@ -112,7 +112,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             lock (lockObject)
             {
                 this.RemoveNode(node);
-                return this.CreateNewDirectoryNode(newPath, node.Parent, errorMessage);
+                return this.CreateNewDirectoryNode(newPath, node.Parent, node.IsExcluded, errorMessage);
             }
         }
 
@@ -126,7 +126,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             lock (lockObject)
             {
                 this.RemoveNode(node);
-                return this.CreateNewFileNode(newPath, string.Empty, node.Parent, errorMessage);
+                return this.CreateNewFileNode(newPath, string.Empty, node.Parent, node.IsExcluded, errorMessage);
             }
         }
 

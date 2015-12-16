@@ -8,6 +8,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         NodeType NodeType { get; }
         string Path { get; }
         string Name { get; }
+        bool IsExcluded { get; }
         bool IsValid { get; }
         string Metadata { get; }
         INode Parent { get; }

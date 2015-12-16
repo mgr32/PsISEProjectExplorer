@@ -9,22 +9,25 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         public abstract NodeType NodeType { get; }
         public virtual string Path { get; private set; }
         public virtual string Name { get; private set; }
+        public virtual bool IsExcluded { get; protected set; }
         public virtual bool IsValid { get; protected set; }
         public virtual string Metadata { get; protected set; }
         public INode Parent { get; private set; }
         public ISet<INode> Children { get; private set; }
 
-        protected AbstractNode(string path, string name, INode parent) : this(path, name, parent, true, null)
+        protected AbstractNode(string path, string name, INode parent)
+            : this(path, name, parent, false, true, null)
         {
         }
 
-        protected AbstractNode(string path, string name, INode parent, bool isValid, string metadata)
+        protected AbstractNode(string path, string name, INode parent, bool isExcluded, bool isValid, string metadata)
         {
             if (path == null) {
                 throw new ArgumentNullException("path");
             }
             this.Path = path;
             this.Name = name;
+            this.IsExcluded = isExcluded;
             this.IsValid = isValid;
             this.Metadata = metadata;
             this.Parent = parent;

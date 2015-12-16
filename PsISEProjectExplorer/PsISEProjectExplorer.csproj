@@ -176,6 +176,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Resources\directory_invalid_excluded.png" />
+    <Resource Include="Resources\directory_excluded.png" />
     <Resource Include="Resources\toolbar_searchRegex.png" />
     <Resource Include="Resources\toolbar_sync.png" />
     <Resource Include="Resources\toolbar_toggle-expand.png" />
