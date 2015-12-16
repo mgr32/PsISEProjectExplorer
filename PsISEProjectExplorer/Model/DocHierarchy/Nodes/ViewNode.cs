@@ -34,6 +34,14 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             }
         }
 
+        public bool IsExcluded
+        {
+            get
+            {
+                return this.Node.IsExcluded;
+            }
+        }
+
         public string Metadata
         {
             get

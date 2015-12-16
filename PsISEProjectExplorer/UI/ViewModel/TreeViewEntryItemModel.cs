@@ -49,6 +49,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 {
                     fileName += "_invalid";
                 }
+                if (this.Node.NodeType == NodeType.Directory && this.Node.IsExcluded)
+                {
+                    fileName += "_excluded";
+                }
                 return String.Format("Resources/{0}.png", fileName);
             }
         }

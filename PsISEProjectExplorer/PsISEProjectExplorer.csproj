@@ -26,6 +26,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\Windows\System32\WindowsPowerShell\v1.0\powershell_ise.exe</StartProgram>
+    <StartArguments>-File ..\..\..\Debug_LoadToIse.ps1 -NoProfile</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -173,6 +176,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Resources\directory_invalid_excluded.png" />
+    <Resource Include="Resources\directory_excluded.png" />
     <Resource Include="Resources\toolbar_searchRegex.png" />
     <Resource Include="Resources\toolbar_sync.png" />
     <Resource Include="Resources\toolbar_toggle-expand.png" />

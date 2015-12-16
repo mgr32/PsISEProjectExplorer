@@ -14,6 +14,8 @@ namespace PsISEProjectExplorer.Services
 
         public bool IsDirectory { get; private set; }
 
+        public bool IsExcluded { get; private set; }
+
         public string ErrorMessage { get; set; }
 
         public string FileName
@@ -33,15 +35,28 @@ namespace PsISEProjectExplorer.Services
         }
 
         public PowershellFileParser(string path, bool isDirectory)
-            : this(path, isDirectory, null)
+            : this(path, isDirectory, false, null)
         {
 
         }
-        
+
+        public PowershellFileParser(string path, bool isDirectory, bool isExcluded)
+            : this(path, isDirectory, isExcluded, null)
+        {
+
+        }
+
         public PowershellFileParser(string path, bool isDirectory, string errorMessage)
+            : this(path, isDirectory, false, errorMessage)
+        {
+
+        }
+
+        public PowershellFileParser(string path, bool isDirectory, bool isExcluded, string errorMessage)
         {
             this.Path = path;
             this.IsDirectory = isDirectory;
+            this.IsExcluded = isExcluded;
             this.ErrorMessage = errorMessage;
             if (!this.IsDirectory && FilesPatternProvider.IsPowershellFile(path))
             {

@@ -1,4 +1,5 @@
-﻿using PsISEProjectExplorer.Enums;
+﻿using PsISEProjectExplorer.Config;
+using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.UI.Workers;
@@ -11,6 +12,7 @@ namespace PsISEProjectExplorer.Services
 {
     public class DocumentHierarchyFactory
     {
+        private static string[] ExcludeDirectories = null;
 
         private DocumentHierarchy DocumentHierarchy { get; set; }
 
@@ -40,11 +42,11 @@ namespace PsISEProjectExplorer.Services
             }
             if (nodeType == NodeType.Directory)
             {
-                return this.DocumentHierarchy.CreateNewDirectoryNode(parent.Path + @"\", parent, null);
+                return this.DocumentHierarchy.CreateNewDirectoryNode(parent.Path + @"\", parent, false, null);
             }
             if (nodeType == NodeType.File)
             {
-                return this.DocumentHierarchy.CreateNewFileNode(parent.Path + @"\", string.Empty, parent, null);
+                return this.DocumentHierarchy.CreateNewFileNode(parent.Path + @"\", string.Empty, parent, false, null);
             }
             return null;
         }
@@ -77,6 +79,11 @@ namespace PsISEProjectExplorer.Services
 
         public bool UpdateDocumentHierarchy(IEnumerable<string> pathsToUpdate, FilesPatternProvider filesPatternProvider, BackgroundIndexer worker)
         {
+            if (ExcludeDirectories == null)
+            {
+                ExcludeDirectories = ConfigHandler.ReadConfigStringEnumerableValue("ExcludeDirectories").ToArray();
+            }
+
             if (this.DocumentHierarchy == null)
             {
                 return false;
@@ -163,12 +170,16 @@ namespace PsISEProjectExplorer.Services
                 }
                 foreach (string dir in dirs)
                 {
+                    bool isExcluded = ExcludeDirectories.Where(e => dir.StartsWith(e)).Count() != 0;
                     if (filesPatternProvider.DoesDirectoryMatch(dir) && (filesPatternProvider.IncludeAllFiles || filesPatternProvider.IsInAdditonalPaths(dir)))
                     {
-                        parser = new PowershellFileParser(dir, isDirectory: true);
+                        parser = new PowershellFileParser(dir, isDirectory: true, isExcluded: isExcluded);
                         yield return parser;
                     }
-                    pathsToEnumerate.Enqueue(dir);
+                    if (!isExcluded)
+                    {
+                        pathsToEnumerate.Enqueue(dir);
+                    }
                 }
                 this.ReportProgress(worker, currentPath);
             } while (pathsToEnumerate.Any());

@@ -26,8 +26,8 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             }
         }
 
-        public DirectoryNode(string path, string name, INode parent, string errorMessage)
-            : base(path, name, parent, errorMessage == null, errorMessage)
+        public DirectoryNode(string path, string name, INode parent, bool isExcluded, string errorMessage)
+            : base(path, name, parent, isExcluded, errorMessage == null, errorMessage)
         {
         }
 
