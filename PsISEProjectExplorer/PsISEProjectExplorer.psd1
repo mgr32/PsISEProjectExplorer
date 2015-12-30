@@ -4,7 +4,7 @@
  RootModule = 'PsISEProjectExplorer.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0'
+ModuleVersion = '1.2.7'
 
 # ID used to uniquely identify this module
 GUID = '442c24ec-44fc-4786-ad63-30a39eec6b7b'
@@ -16,7 +16,7 @@ Author = 'Marcin Grzywa'
 CompanyName = 'Marcin Grzywa'
 
 # Copyright statement for this module
-Copyright = '2014, MIT license'
+Copyright = '2015, MIT license'
 
 # Description of the functionality provided by this module
 Description = 'Provides a tree view that enables to index and explore whole directory structure containing Powershell scripts.'
