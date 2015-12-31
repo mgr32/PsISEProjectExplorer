@@ -19,7 +19,7 @@ namespace PsISEProjectExplorer.Model
 
         public string GetTokenFromCurrentPosition()
         {
-            return PowershellTokenizer.GetTokenAtColumn(this.CurrentLine, this.CurrentColumn);
+            return PowershellTokenizerProvider.GetPowershellTokenizer().GetTokenAtColumn(this.CurrentLine, this.CurrentColumn);
         }
     }
 }

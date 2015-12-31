@@ -239,16 +239,17 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     }
                 }
             }
-            else if (item.Node.NodeType == NodeType.Function)
-            {
-                var node = ((PowershellItemNode)item.Node);
-                this.IseIntegrator.GoToFile(node.FilePath);
-                this.IseIntegrator.SelectText(node.PowershellItem.StartLine, node.PowershellItem.StartColumn, node.Name.Length);
-            }
             else if (item.Node.NodeType == NodeType.Directory)
             {
                 item.IsExpanded = !item.IsExpanded;
             }
+            else if (item.Node.NodeType != NodeType.Intermediate)
+            {
+                var node = ((PowershellItemNode)item.Node);
+                this.IseIntegrator.GoToFile(node.FilePath);
+                this.IseIntegrator.SelectText(node.PowershellItem.StartLine, node.PowershellItem.StartColumn, node.PowershellItem.EndColumn - node.PowershellItem.StartColumn);
+            }
+            
         }
 
         public void DeleteTreeItem(TreeViewEntryItemModel selectedItem)

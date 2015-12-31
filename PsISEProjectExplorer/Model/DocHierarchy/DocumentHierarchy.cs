@@ -90,9 +90,10 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
                 var lockObject = parent == null ? RootLockObject : parent;
                 lock (lockObject)
                 {
-                    parent = new PowershellItemNode(filePath, item, parent);
-                    this.NodeMap.Add(parent.Path, parent);
-                    this.FullTextDirectory.DocumentCreator.AddPowershellItemEntry(parent.Path, item.Name);
+                    var newNode = new PowershellItemNode(filePath, item, parent);
+                    this.NodeMap.Add(newNode.Path, newNode);
+                    this.FullTextDirectory.DocumentCreator.AddPowershellItemEntry(newNode.Path, item.Name);
+                    parent = newNode;
                 }
             }
             foreach (var itemChild in item.Children)

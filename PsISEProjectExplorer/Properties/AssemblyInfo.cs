@@ -7,11 +7,11 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("PsISEProjectExplorer")]
-[assembly: AssemblyDescription("Powershell ISE Addon - Project Explorer")]
+[assembly: AssemblyDescription("Powershell ISE Project Explorer")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("PsISEProjectExplorer")]
-[assembly: AssemblyCopyright("Copyright © 2014 Marcin Grzywa")]
+[assembly: AssemblyCopyright("Copyright © 2015 Marcin Grzywa")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

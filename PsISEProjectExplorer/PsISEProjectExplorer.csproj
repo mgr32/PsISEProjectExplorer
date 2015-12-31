@@ -92,6 +92,8 @@
     <Compile Include="Services\FileSystemChangeNotifier.cs" />
     <Compile Include="Services\FileSystemChangeWatcher.cs" />
     <Compile Include="Services\FileSystemOperationsService.cs" />
+    <Compile Include="Services\IPowershellTokenizer.cs" />
+    <Compile Include="Services\PowershellBaseTokenizer.cs" />
     <Compile Include="Services\PowershellFileParser.cs" />
     <Compile Include="Enums\FullTextFieldType.cs" />
     <Compile Include="FullText\CustomAnalyzer.cs" />
@@ -105,7 +107,9 @@
     <Compile Include="Model\DocHierarchy\Nodes\ViewNode.cs" />
     <Compile Include="Model\PowershellItem.cs" />
     <Compile Include="Enums\NodeType.cs" />
-    <Compile Include="Services\PowershellTokenizer.cs" />
+    <Compile Include="Services\Powershell5Tokenizer.cs" />
+    <Compile Include="Services\PowershellLegacyTokenizer.cs" />
+    <Compile Include="Services\PowershellTokenizerProvider.cs" />
     <Compile Include="Services\TokenLocator.cs" />
     <Compile Include="UI\Helpers\EmptyListToVisibilityConverter.cs" />
     <Compile Include="UI\Helpers\FocusExtensions.cs" />
@@ -176,6 +180,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Resources\classproperty.png" />
+    <Resource Include="Resources\classconstructor.png" />
+    <Resource Include="Resources\class.png" />
     <Resource Include="Resources\directory_invalid_excluded.png" />
     <Resource Include="Resources\directory_excluded.png" />
     <Resource Include="Resources\toolbar_searchRegex.png" />
@@ -243,7 +250,12 @@
     <Resource Include="Resources\directory_invalid.png" />
     <Resource Include="Resources\file_invalid.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\PsISEProjectExplorerPS5\PsISEProjectExplorerPS5.csproj">
+      <Project>{0c425642-ded0-41e2-a393-9cfd6b2af181}</Project>
+      <Name>PsISEProjectExplorerPS5</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

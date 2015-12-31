@@ -4,6 +4,10 @@
     {
         Root,
         Function,
-        Command
+        Configuration,
+        Class,
+        ClassConstructor,
+        ClassMethod,
+        ClassProperty
     }
 }

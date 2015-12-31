@@ -56,7 +56,7 @@ namespace PsISEProjectExplorer.Services
             return this.DocumentHierarchy
                 .SearchNodesByTerm(name, FullTextFieldType.NameNotAnalyzed)
                 .Select(result => result.Node)
-                .FirstOrDefault(node => node.NodeType == NodeType.Function);
+                .FirstOrDefault(node => node.NodeType != NodeType.Directory && node.NodeType != NodeType.File && node.NodeType != NodeType.Intermediate);
         }
 
         private INode CreateNewViewNodeWithParents(INode node)

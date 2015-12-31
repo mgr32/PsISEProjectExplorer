@@ -3,6 +3,8 @@ if ($PSVersionTable.PSVersion.Major -lt 3) {
 	return
 }
 
+$Global:ErrorActionPreference = 'Stop'
+
 $currentDir = Split-Path -parent $MyInvocation.MyCommand.Path
 
 $docDir = [Environment]::getfolderpath("mydocuments")
