@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Management.Automation;
+using System.Management.Automation.Language;
 using System.Text.RegularExpressions;
 
 namespace PsISEProjectExplorer.Services
@@ -14,38 +15,20 @@ namespace PsISEProjectExplorer.Services
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public override PowershellItem GetPowershellItems(string path, string contents)
+        private PowershellLegacyTokenVisitor tokenVisitor;
+
+        public PowershellLegacyTokenizer()
         {
-            Collection<PSParseError> errors;
-            string newContents;
-            bool dscParse = removeImportDscResource(contents, out newContents);
-            
-            IEnumerable<PSToken> tokens = PSParser.Tokenize(newContents, out errors);
-            var errorsLog = !errors.Any() || dscParse ? null :
-                "Parsing error(s): " + Environment.NewLine + string.Join(Environment.NewLine, errors.OrderBy(err => err.Token.StartLine).Select(err => "Line " + err.Token.StartLine + ": " + err.Message));
-            PowershellItem rootItem = new PowershellItem(PowershellItemType.Root, null, 0, 0, 0, 0, null, errorsLog);
+            this.tokenVisitor = new PowershellLegacyTokenVisitor(
+                this.OnFunctionVisit,
+                this.OnConfigurationVisit,
+                this.GetDslInstanceName,
+                this.OnDslVisit);
+        }
 
-            PowershellItem currentItem = rootItem;
-
-            bool nextTokenIsFunctionName = false;
-            foreach (PSToken token in tokens)
-            {
-                if (nextTokenIsFunctionName)
-                {
-                    var item = new PowershellItem(PowershellItemType.Function, token.Content, token.StartLine, token.StartColumn, 
-                        token.EndColumn, 0, rootItem, null);
-                    nextTokenIsFunctionName = false;
-                }
-                else if (token.Type == PSTokenType.Keyword)
-                {
-                    string tokenContent = token.Content.ToLowerInvariant();
-                    if (tokenContent == "function" || tokenContent == "filter" || tokenContent == "configuration" || tokenContent == "workflow")
-                    {
-                        nextTokenIsFunctionName = true;
-                    }
-                }
-            }
-            return rootItem;
+        protected override void VisitTokens(Ast ast)
+        {
+            this.tokenVisitor.visitTokens(ast);
         }
 
     }

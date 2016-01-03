@@ -93,6 +93,7 @@
     <Compile Include="Services\FileSystemChangeWatcher.cs" />
     <Compile Include="Services\FileSystemOperationsService.cs" />
     <Compile Include="Services\IPowershellTokenizer.cs" />
+    <Compile Include="Services\PowershellLegacyTokenVisitor.cs" />
     <Compile Include="Services\PowershellBaseTokenizer.cs" />
     <Compile Include="Services\PowershellFileParser.cs" />
     <Compile Include="Enums\FullTextFieldType.cs" />
@@ -180,6 +181,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Resources\configuration.png" />
     <Resource Include="Resources\dslelement.png" />
     <Resource Include="Resources\classproperty.png" />
     <Resource Include="Resources\classconstructor.png" />

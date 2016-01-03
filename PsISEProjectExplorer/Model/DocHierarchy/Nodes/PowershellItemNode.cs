@@ -11,6 +11,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
                 {
                     switch (PowershellItem.Type)
                     {
+                        case PowershellItemType.Configuration: return NodeType.Configuration;
                         case PowershellItemType.Class: return NodeType.Class;
                         case PowershellItemType.ClassProperty: return NodeType.ClassProperty;
                         case PowershellItemType.ClassConstructor: return NodeType.ClassConstructor;

@@ -5,144 +5,129 @@ using System.Management.Automation.Language;
 
 namespace PsISEProjectExplorer.Services
 {
+    // This is required to be in different assembly because AstVisitor2 has been introduced in PS5
+    // in the same assembly as the one used by PS3 (without changing the assembly version).
     public class Powershell5TokenVisitor : AstVisitor2
     {
-        private Action<string, IScriptExtent> functionAction;
+        private Func<string, IScriptExtent, int, object, object> FunctionAction;
 
-        private Action<string, IScriptExtent> configurationAction;
+        private Func<string, IScriptExtent, int, object, object> ConfigurationAction;
 
-        private Func<string, IScriptExtent, object> classAction;
+        private Func<string, IScriptExtent, int, object, object> ClassAction;
 
-        private Action<string, IScriptExtent, object> classPropertyAction;
+        private Func<string, IScriptExtent, int, object, object> ClassPropertyAction;
 
-        private Action<string, IScriptExtent, object> classConstructorAction;
+        private Func<string, IScriptExtent, int, object, object> ClassConstructorAction;
 
-        private Action<string, IScriptExtent, object> classMethodAction;
+        private Func<string, IScriptExtent, int, object, object> ClassMethodAction;
 
-        private Func<string, string, int, IScriptExtent, object, object> dslAction;
+        private Func<CommandAst, string> DslNameGiver;
 
-        private Stack<object> parentObjectStack = new Stack<object>();
+        private Func<string, string, IScriptExtent, int, object, object> DslAction;
+
+        private Stack<object> ParentObjectStack = new Stack<object>();
 
         public Powershell5TokenVisitor(
-            Action<string, IScriptExtent> functionAction,
-            Action<string, IScriptExtent> configurationAction,
-            Func<string, IScriptExtent, object> classAction,
-            Action<string, IScriptExtent, object> classPropertyAction,
-            Action<string, IScriptExtent, object> classConstructorAction,
-            Action<string, IScriptExtent, object> classMethodAction,
-            Func<string, string, int, IScriptExtent, object, object> dslAction
+            Func<string, IScriptExtent, int, object, object> functionAction,
+            Func<string, IScriptExtent, int, object, object> configurationAction,
+            Func<string, IScriptExtent, int, object, object> classAction,
+            Func<string, IScriptExtent, int, object, object> classPropertyAction,
+            Func<string, IScriptExtent, int, object, object> classConstructorAction,
+            Func<string, IScriptExtent, int, object, object> classMethodAction,
+            Func<CommandAst, string> dslNameGiver,
+            Func<string, string, IScriptExtent, int, object, object> dslAction
             )
         {
-            this.functionAction = functionAction;
-            this.configurationAction = configurationAction;
-            this.classAction = classAction;
-            this.classPropertyAction = classPropertyAction;
-            this.classConstructorAction = classConstructorAction;
-            this.classMethodAction = classMethodAction;
-            this.dslAction = dslAction;
+            this.FunctionAction = functionAction;
+            this.ConfigurationAction = configurationAction;
+            this.ClassAction = classAction;
+            this.ClassPropertyAction = classPropertyAction;
+            this.ClassConstructorAction = classConstructorAction;
+            this.ClassMethodAction = classMethodAction;
+            this.DslNameGiver = dslNameGiver;
+            this.DslAction = dslAction;
         }
 
         public override AstVisitAction VisitCommand(CommandAst commandAst)
         {
+            string dslInstanceName = this.DslNameGiver(commandAst);
+            if (dslInstanceName == null)
+            {
+                return AstVisitAction.Continue;
+            }
+
             var commandElements = commandAst.CommandElements;
-            if (commandElements == null || commandElements.Count < 2)
-            {
-                return AstVisitAction.Continue;
-            }
-            // in order to be possibly a DSL expression, first element must be StringConstant, second must not be =, last must be ScriptBlockExpression, and last but 1 must not be CommandParameter
-            if (!(commandElements[0] is StringConstantExpressionAst) || 
-                ((commandElements[1] is StringConstantExpressionAst && ((StringConstantExpressionAst)commandElements[1]).Value == "=")) ||
-                !(commandElements[commandElements.Count-1] is ScriptBlockExpressionAst) ||
-                commandElements[commandElements.Count-2] is CommandParameterAst)
-            {
-                return AstVisitAction.Continue;
-            }
-            
-            // additionally, parent must not be a Pipeline that has more than 1 element 
-            if (commandAst.Parent is PipelineAst && ((PipelineAst)commandAst.Parent).PipelineElements.Count > 1)
-            {
-                return AstVisitAction.Continue; 
-            }
-
-            
             string dslTypeName = ((StringConstantExpressionAst)commandElements[0]).Value;
-            string dslInstanceName = GetDslInstanceName(commandElements);
-            object currentParentObject = parentObjectStack.Count == 0 ? null : parentObjectStack.Peek();
-            object newParentObject = this.dslAction(dslTypeName, dslInstanceName, parentObjectStack.Count, commandAst.Extent, currentParentObject);
-            parentObjectStack.Push(newParentObject);
-            commandElements[commandElements.Count - 1].Visit(this);
-            parentObjectStack.Pop();
+            object newParentObject = this.DslAction(dslTypeName, dslInstanceName, commandAst.Extent, this.GetCurrentNestingLevel(), this.GetCurrentParentObject());
+            Ast body = commandElements[commandElements.Count - 1];
+            this.VisitChildren(commandAst, newParentObject);
             return AstVisitAction.SkipChildren;
-        }
-
-        private string GetDslInstanceName(IEnumerable<CommandElementAst> commandElements)
-        {
-            // try to guess dsl instance name - first string constant that is not named parameter value (or is value of 'name' parameter)
-            bool lastElementIsUnknownParameter = false;
-            int num = 0;
-            
-            foreach (CommandElementAst elementAst in commandElements)
-            {
-                if (num++ == 0)
-                {
-                    continue;
-                }
-                if (elementAst is CommandParameterAst)
-                {
-                    lastElementIsUnknownParameter = ((CommandParameterAst)elementAst).ParameterName.ToLowerInvariant() != "name";
-                    continue;
-                }
-                if (elementAst is StringConstantExpressionAst && !lastElementIsUnknownParameter)
-                {
-                    return ((StringConstantExpressionAst)elementAst).Value;
-                }
-                if (elementAst is ExpandableStringExpressionAst && !lastElementIsUnknownParameter)
-                {
-                    return ((ExpandableStringExpressionAst)elementAst).Value;
-                }
-                lastElementIsUnknownParameter = false;  
-            }
-            return string.Empty;
         }
 
 
         public override AstVisitAction VisitFunctionDefinition(FunctionDefinitionAst functionDefinitionAst)
         {
-            this.functionAction(functionDefinitionAst.Name, functionDefinitionAst.Extent);
-            return base.VisitFunctionDefinition(functionDefinitionAst);
+            object newParentObject = this.FunctionAction(functionDefinitionAst.Name, functionDefinitionAst.Extent, this.GetCurrentNestingLevel(), this.GetCurrentParentObject());
+            this.VisitChildren(functionDefinitionAst.Body, newParentObject);
+            return AstVisitAction.SkipChildren;
         }
        
         public override AstVisitAction VisitConfigurationDefinition(ConfigurationDefinitionAst configurationDefinitionAst)
         {
-            this.configurationAction(configurationDefinitionAst.InstanceName.ToString(), configurationDefinitionAst.Extent);
-            return base.VisitConfigurationDefinition(configurationDefinitionAst);
+            object newParentObject = this.ConfigurationAction(configurationDefinitionAst.InstanceName.ToString(), configurationDefinitionAst.Extent, this.GetCurrentNestingLevel(), this.GetCurrentParentObject());
+            this.VisitChildren(configurationDefinitionAst.Body, newParentObject);
+            return AstVisitAction.SkipChildren;
         }
 
         public override AstVisitAction VisitTypeDefinition(TypeDefinitionAst typeDefinitionAst)
         {
 
-            object item = this.classAction(typeDefinitionAst.Name, typeDefinitionAst.Extent);
+            object item = this.ClassAction(typeDefinitionAst.Name, typeDefinitionAst.Extent, this.GetCurrentNestingLevel(), this.GetCurrentParentObject());
             foreach (MemberAst member in typeDefinitionAst.Members)
             {
                 if (member is PropertyMemberAst)
                 {
-                    this.classPropertyAction(member.Name, member.Extent, item);
+                   this.ClassPropertyAction(member.Name, member.Extent, this.GetCurrentNestingLevel() + 1, item);
                 } 
                 else if (member is FunctionMemberAst)
                 {
                     FunctionMemberAst functionMember = (FunctionMemberAst)member;
+                    object newParentObject;
                     if (functionMember.IsConstructor)
                     {
-                        this.classConstructorAction(member.Name, member.Extent, item);
+                        newParentObject = this.ClassConstructorAction(member.Name, member.Extent, this.GetCurrentNestingLevel() + 1, item);                        
                     }
                     else
                     {
-                        this.classMethodAction(member.Name, member.Extent, item);
+                        newParentObject = this.ClassMethodAction(member.Name, member.Extent, this.GetCurrentNestingLevel() + 1, item);
                     }
+                    this.VisitChildren(functionMember.Body, newParentObject);
                 }
             }
-            return base.VisitTypeDefinition(typeDefinitionAst);
+            return AstVisitAction.SkipChildren;
         }
-        
+
+        public void VisitTokens(Ast ast)
+        {
+            ast.Visit(this);
+        }
+
+        private object GetCurrentParentObject()
+        {
+            return this.ParentObjectStack.Count == 0 ? null : this.ParentObjectStack.Peek();
+        }
+
+        private int GetCurrentNestingLevel()
+        {
+            return this.ParentObjectStack.Count;
+        }
+
+        private void VisitChildren(Ast ast, object newParentObject)
+        {
+            this.ParentObjectStack.Push(newParentObject);
+            ast.Visit(this);
+            this.ParentObjectStack.Pop();
+        }
+
     }
 }
