@@ -11,7 +11,7 @@ namespace PsISEProjectExplorer.Services
 
         private Func<string, IScriptExtent, int, object, object> ConfigurationAction;
 
-        private Func<CommandAst, string> DslNameGiver;
+        private Func<ReadOnlyCollection<CommandElementAst>, Ast, string> DslNameGiver;
 
         private Func<string, string, IScriptExtent, int, object, object> DslAction;
 
@@ -20,7 +20,7 @@ namespace PsISEProjectExplorer.Services
         public PowershellLegacyTokenVisitor(
             Func<string, IScriptExtent, int, object, object> functionAction,
             Func<string, IScriptExtent, int, object, object> configurationAction,
-            Func<CommandAst, string> dslNameGiver,
+            Func<ReadOnlyCollection<CommandElementAst>, Ast, string> dslNameGiver,
             Func<string, string, IScriptExtent, int, object, object> dslAction
             )
         {
@@ -40,17 +40,18 @@ namespace PsISEProjectExplorer.Services
                 string name = configurationAst.Argument.ToString();
                 newParentObject = this.ConfigurationAction(name, commandAst.Extent, this.GetCurrentNestingLevel(), this.GetCurrentParentObject());
                 Ast body = commandAst.Find(ast => ast is CommandParameterAst && "body".Equals(((CommandParameterAst)ast).ParameterName.ToLowerInvariant()), false);
+                // TODO: this will ignore "Node" children because last command element is CommmandParameterAst
                 this.VisitChildren(body, newParentObject);
                 return AstVisitAction.SkipChildren;
             }
 
-            string dslInstanceName = this.DslNameGiver(commandAst);
+            var commandElements = commandAst.CommandElements;
+            string dslInstanceName = this.DslNameGiver(commandElements, commandAst.Parent);
             if (dslInstanceName == null)
             {
                 return AstVisitAction.Continue;
             }
 
-            var commandElements = commandAst.CommandElements;
             string dslTypeName = ((StringConstantExpressionAst)commandElements[0]).Value;
             newParentObject = this.DslAction(dslTypeName, dslInstanceName, commandAst.Extent, this.GetCurrentNestingLevel(), this.GetCurrentParentObject());
             this.VisitChildren(commandElements[commandElements.Count - 1], newParentObject);

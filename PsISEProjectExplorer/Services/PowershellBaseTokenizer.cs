@@ -14,38 +14,22 @@ namespace PsISEProjectExplorer.Services
 {
     public abstract class PowershellBaseTokenizer : IPowershellTokenizer
     {
-        private static readonly Regex ImportDscRegex = new Regex("Import-DSCResource", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        private ISet<string> AddedItems;
+        protected ISet<string> AddedItems;
 
-        private PowershellItem RootItem;
+        protected PowershellItem RootItem;
 
-        protected bool RemoveImportDscResource(string contents, out string newContents)
-        {
-            // this is fix for performance issue in PSParser.Tokenize - when file contains Import-DSCResource pointing to a non-installed resource, 
-            // parsing takes long time and 'Unable to load resource' errors appear
-            if (ImportDscRegex.IsMatch(contents))
-            {
-                newContents = ImportDscRegex.Replace(contents, "#Import-DSCResource");
-                return true;
-            } 
-            newContents = contents;
-            return false;
-        }
-
-        public PowershellItem GetPowershellItems(string path, string contents)
+        public virtual PowershellItem GetPowershellItems(string path, string contents)
         {
             ParseError[] errors;
             Token[] tokens;
-            string newContents;
             AddedItems = new HashSet<string>();
 
-            bool dscParse = this.RemoveImportDscResource(contents, out newContents);
-            Ast ast = Parser.ParseInput(newContents, out tokens, out errors);
-            var errorsLog = !errors.Any() || dscParse ? null :
+            Ast ast = Parser.ParseInput(contents, out tokens, out errors);
+            var errorsLog = !errors.Any() ? null :
                 "Parsing error(s): " + Environment.NewLine + string.Join(Environment.NewLine, errors.OrderBy(err => err.Extent.StartLineNumber).Select(err => "Line " + err.Extent.StartLineNumber + ": " + err.Message));
             RootItem = new PowershellItem(PowershellItemType.Root, null, 0, 0, 0, 0, null, errorsLog);
-
+            
             VisitTokens(ast);
 
             return RootItem;
@@ -104,9 +88,8 @@ namespace PsISEProjectExplorer.Services
             return CreateNewPowershellItem(PowershellItemType.DslElement, name, extent.StartColumnNumber, endColumnNumber, extent.StartLineNumber, (PowershellItem)parent, nestingLevel);
         }
 
-        protected string GetDslInstanceName(CommandAst commandAst)
+        protected string GetDslInstanceName(ReadOnlyCollection<CommandElementAst> commandElements, Ast parent)
         {
-            var commandElements = commandAst.CommandElements;
             if (commandElements == null || commandElements.Count < 2)
             {
                 return null;
@@ -114,14 +97,14 @@ namespace PsISEProjectExplorer.Services
             // in order to be possibly a DSL expression, first element must be StringConstant, second must not be =, last must be ScriptBlockExpression, and last but 1 must not be CommandParameter
             if (!(commandElements[0] is StringConstantExpressionAst) ||
                 ((commandElements[1] is StringConstantExpressionAst && ((StringConstantExpressionAst)commandElements[1]).Value == "=")) ||
-                !(commandElements[commandElements.Count - 1] is ScriptBlockExpressionAst) ||
+                !(commandElements[commandElements.Count - 1] is ScriptBlockExpressionAst || commandElements[commandElements.Count - 1] is HashtableAst) ||
                 commandElements[commandElements.Count - 2] is CommandParameterAst)
             {
                 return null;
             }
 
             // additionally, parent must not be a Pipeline that has more than 1 element 
-            if (commandAst.Parent is PipelineAst && ((PipelineAst)commandAst.Parent).PipelineElements.Count > 1)
+            if (parent is PipelineAst && ((PipelineAst)parent).PipelineElements.Count > 1)
             {
                 return null;
             }

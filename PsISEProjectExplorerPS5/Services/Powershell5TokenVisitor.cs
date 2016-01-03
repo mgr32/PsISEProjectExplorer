@@ -21,7 +21,7 @@ namespace PsISEProjectExplorer.Services
 
         private Func<string, IScriptExtent, int, object, object> ClassMethodAction;
 
-        private Func<CommandAst, string> DslNameGiver;
+        private Func<ReadOnlyCollection<CommandElementAst>, Ast, string> DslNameGiver;
 
         private Func<string, string, IScriptExtent, int, object, object> DslAction;
 
@@ -34,7 +34,7 @@ namespace PsISEProjectExplorer.Services
             Func<string, IScriptExtent, int, object, object> classPropertyAction,
             Func<string, IScriptExtent, int, object, object> classConstructorAction,
             Func<string, IScriptExtent, int, object, object> classMethodAction,
-            Func<CommandAst, string> dslNameGiver,
+            Func<ReadOnlyCollection<CommandElementAst>, Ast, string> dslNameGiver,
             Func<string, string, IScriptExtent, int, object, object> dslAction
             )
         {
@@ -50,18 +50,7 @@ namespace PsISEProjectExplorer.Services
 
         public override AstVisitAction VisitCommand(CommandAst commandAst)
         {
-            string dslInstanceName = this.DslNameGiver(commandAst);
-            if (dslInstanceName == null)
-            {
-                return AstVisitAction.Continue;
-            }
-
-            var commandElements = commandAst.CommandElements;
-            string dslTypeName = ((StringConstantExpressionAst)commandElements[0]).Value;
-            object newParentObject = this.DslAction(dslTypeName, dslInstanceName, commandAst.Extent, this.GetCurrentNestingLevel(), this.GetCurrentParentObject());
-            Ast body = commandElements[commandElements.Count - 1];
-            this.VisitChildren(commandAst, newParentObject);
-            return AstVisitAction.SkipChildren;
+            return this.VisitDslExpression(commandAst.CommandElements, commandAst.Parent, commandAst.Extent);
         }
 
 
@@ -77,6 +66,11 @@ namespace PsISEProjectExplorer.Services
             object newParentObject = this.ConfigurationAction(configurationDefinitionAst.InstanceName.ToString(), configurationDefinitionAst.Extent, this.GetCurrentNestingLevel(), this.GetCurrentParentObject());
             this.VisitChildren(configurationDefinitionAst.Body, newParentObject);
             return AstVisitAction.SkipChildren;
+        }
+
+        public override AstVisitAction VisitDynamicKeywordStatement(DynamicKeywordStatementAst dynamicKeywordStatementAst)
+        {
+            return this.VisitDslExpression(dynamicKeywordStatementAst.CommandElements, dynamicKeywordStatementAst.Parent, dynamicKeywordStatementAst.Extent);
         }
 
         public override AstVisitAction VisitTypeDefinition(TypeDefinitionAst typeDefinitionAst)
@@ -110,6 +104,22 @@ namespace PsISEProjectExplorer.Services
         public void VisitTokens(Ast ast)
         {
             ast.Visit(this);
+        }
+
+
+        private AstVisitAction VisitDslExpression(ReadOnlyCollection<CommandElementAst> commandElements, Ast parent, IScriptExtent extent)
+        {
+            string dslInstanceName = this.DslNameGiver(commandElements, parent);
+            if (dslInstanceName == null)
+            {
+                return AstVisitAction.Continue;
+            }
+
+            string dslTypeName = ((StringConstantExpressionAst)commandElements[0]).Value;
+            object newParentObject = this.DslAction(dslTypeName, dslInstanceName, extent, this.GetCurrentNestingLevel(), this.GetCurrentParentObject());
+            Ast body = commandElements[commandElements.Count - 1];
+            this.VisitChildren(body, newParentObject);
+            return AstVisitAction.SkipChildren;
         }
 
         private object GetCurrentParentObject()
