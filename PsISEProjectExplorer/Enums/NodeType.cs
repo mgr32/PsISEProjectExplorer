@@ -9,6 +9,7 @@ namespace PsISEProjectExplorer.Enums
         Class,
         ClassProperty,
         ClassConstructor,
+        DslElement,
         Function,
         Intermediate
     }

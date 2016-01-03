@@ -25,7 +25,9 @@ namespace PsISEProjectExplorer.Services
                 this.onClassVisit,
                 this.onClassPropertyVisit,
                 this.onClassConstructorVisit,
-                this.onClassMethodVisit);
+                this.onClassMethodVisit,
+                this.onDslVisit
+                );
         }
 
         public override PowershellItem GetPowershellItems(string path, string contents)
@@ -51,10 +53,19 @@ namespace PsISEProjectExplorer.Services
         {
             int startColumnNumber = extent.StartColumnNumber + extent.Text.IndexOf(itemName);
             int endColumnNumber = startColumnNumber + itemName.Length;
+            return CreateNewPowershellItem(type, itemName, startColumnNumber, endColumnNumber, extent, parent, nestingLevel);
+        }
+
+        private PowershellItem CreateNewPowershellItem(PowershellItemType type, string itemName, int startColumnNumber, int endColumnNumber, IScriptExtent extent, PowershellItem parent, int nestingLevel)
+        {
             string itemKey = extent.StartLineNumber + "_" + startColumnNumber;
             if (!addedItems.Contains(itemKey))
             {
                 addedItems.Add(itemKey);
+                if (parent == null)
+                {
+                    parent = rootItem;
+                }
                 return new PowershellItem(type, itemName, extent.StartLineNumber, startColumnNumber, endColumnNumber, nestingLevel, parent, null);
             }
             else
@@ -65,17 +76,17 @@ namespace PsISEProjectExplorer.Services
 
         private void onFunctionVisit(string name, IScriptExtent extent)
         {
-            CreateNewPowershellItem(PowershellItemType.Function, name, extent, rootItem, 0);
+            CreateNewPowershellItem(PowershellItemType.Function, name, extent, null, 0);
         }
 
         private void onConfigurationVisit(string name, IScriptExtent extent)
         {
-            CreateNewPowershellItem(PowershellItemType.Configuration, name, extent, rootItem, 0);
+            CreateNewPowershellItem(PowershellItemType.Configuration, name, extent, null, 0);
         }
 
         private object onClassVisit(string name, IScriptExtent extent)
         {
-            return CreateNewPowershellItem(PowershellItemType.Class, name, extent, rootItem, 0);
+            return CreateNewPowershellItem(PowershellItemType.Class, name, extent, null, 0);
         }
 
         private void onClassPropertyVisit(string name, IScriptExtent extent, object classItem)
@@ -91,6 +102,13 @@ namespace PsISEProjectExplorer.Services
         private void onClassMethodVisit(string name, IScriptExtent extent, object classItem)
         {
             CreateNewPowershellItem(PowershellItemType.ClassMethod, name, extent, (PowershellItem)classItem, 1);
+        }
+
+        private object onDslVisit(string dslTypeName, string dslInstanceName, int nestingLevel, IScriptExtent extent, object parent)
+        {
+            string name = dslTypeName + " " + dslInstanceName;
+            int endColumnNumber = extent.StartColumnNumber + dslTypeName.Length;
+            return CreateNewPowershellItem(PowershellItemType.DslElement, name, extent.StartColumnNumber, endColumnNumber, extent, (PowershellItem)parent, nestingLevel);
         }
     }
 }

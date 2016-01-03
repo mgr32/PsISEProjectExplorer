@@ -14,6 +14,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
                         case PowershellItemType.Class: return NodeType.Class;
                         case PowershellItemType.ClassProperty: return NodeType.ClassProperty;
                         case PowershellItemType.ClassConstructor: return NodeType.ClassConstructor;
+                        case PowershellItemType.DslElement: return NodeType.DslElement;
                     }
                 }
                 return NodeType.Function;

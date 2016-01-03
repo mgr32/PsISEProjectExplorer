@@ -8,6 +8,7 @@
         Class,
         ClassConstructor,
         ClassMethod,
-        ClassProperty
+        ClassProperty,
+        DslElement
     }
 }
