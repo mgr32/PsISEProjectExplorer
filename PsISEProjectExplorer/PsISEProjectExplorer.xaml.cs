@@ -364,6 +364,10 @@ namespace PsISEProjectExplorer
                     this.mainViewModel.TreeViewModel.StartEditingTreeItem(item);
                     e.Handled = true;
                     return;
+                case Key.F8:
+                    this.mainViewModel.ExcludeOrIncludeItem(item);
+                    e.Handled = true;
+                    return;
                 case Key.Enter:
                     this.mainViewModel.TreeViewModel.OpenItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.mainViewModel.SearchOptions);
                     e.Handled = true;
