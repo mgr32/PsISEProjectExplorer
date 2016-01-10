@@ -64,6 +64,10 @@ namespace PsISEProjectExplorer.Services
         // runs on a separate thread (from system)
         private void OnFileChanged(object source, FileSystemEventArgs e)
         {
+            if (this.FilesPatternProvider.IsExcluded(e.FullPath))
+            {
+                return;
+            }
             bool isDir = Directory.Exists(e.FullPath);
             if (isDir && !this.FilesPatternProvider.DoesDirectoryMatch(e.FullPath))
             {
@@ -87,11 +91,11 @@ namespace PsISEProjectExplorer.Services
         {
             Logger.Debug("File renamed: " + e.OldFullPath + " to " + e.FullPath);
             bool isDir = Directory.Exists(e.FullPath) || Directory.Exists(e.OldFullPath);
-            if (isDir || this.FilesPatternProvider.DoesFileMatch(e.OldFullPath))
+            if (!this.FilesPatternProvider.IsExcluded(e.OldFullPath) && (isDir || this.FilesPatternProvider.DoesFileMatch(e.OldFullPath)))
             {
                 this.FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.OldFullPath, RootPath));
             }
-            if ((isDir || this.FilesPatternProvider.DoesFileMatch(e.FullPath)) &&
+            if (!this.FilesPatternProvider.IsExcluded(e.FullPath) && (isDir || this.FilesPatternProvider.DoesFileMatch(e.FullPath)) &&
                 e.FullPath.ToLowerInvariant() != e.OldFullPath.ToLowerInvariant())
             {
                 this.FileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.FullPath, RootPath));
