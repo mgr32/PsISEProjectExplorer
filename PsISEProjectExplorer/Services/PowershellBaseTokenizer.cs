@@ -101,7 +101,7 @@ namespace PsISEProjectExplorer.Services
         protected string GetDslInstanceName(ReadOnlyCollection<CommandElementAst> commandElements, Ast parent)
         {
             // todo: what with "configuration" in legacy mode?
-            if (!this.dslAutoDiscovery || commandElements == null || commandElements.Count < 2)
+            if (commandElements == null || commandElements.Count < 2)
             {
                 return null;
             }
@@ -117,8 +117,8 @@ namespace PsISEProjectExplorer.Services
 
             string dslTypeName = ((StringConstantExpressionAst)commandElements[0]).Value;
             if (!dslTypeName.StartsWith("PSDesiredStateConfiguration") &&
-                !this.dslCustomDictionary.Contains(dslTypeName.ToLowerInvariant()) && 
-                ((!(commandElements[commandElements.Count - 1] is ScriptBlockExpressionAst || commandElements[commandElements.Count - 1] is HashtableAst) ||
+                !this.dslCustomDictionary.Contains(dslTypeName.ToLowerInvariant()) &&
+                (!this.dslAutoDiscovery || (!(commandElements[commandElements.Count - 1] is ScriptBlockExpressionAst || commandElements[commandElements.Count - 1] is HashtableAst) ||
                 commandElements[commandElements.Count - 2] is CommandParameterAst)))
             {
                 return null;
