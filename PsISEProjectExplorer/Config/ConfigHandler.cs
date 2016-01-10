@@ -46,6 +46,7 @@ namespace PsISEProjectExplorer.Config
             bool result;
             if (!Boolean.TryParse(value, out result))
             {
+                SaveConfigValue(key, defaultValue.ToString());
                 return defaultValue;
             }
             return result;
@@ -57,6 +58,7 @@ namespace PsISEProjectExplorer.Config
             int result;
             if (!Int32.TryParse(value, out result))
             {
+                SaveConfigValue(key, defaultValue.ToString());
                 return defaultValue;
             }
             return result;
