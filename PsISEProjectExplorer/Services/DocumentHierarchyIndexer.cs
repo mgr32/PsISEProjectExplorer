@@ -65,13 +65,18 @@ namespace PsISEProjectExplorer.Services
                     return currentNode;
                 }
                 segments.RemoveAt(segments.Count - 1);
+                isExcluded = false;
             }
             var currentAbsolutePath = this.RootNode.Path;
+            int lastIndex = segments.Count - 1;
+            int i = 0;
             foreach (string segment in segments)
             {
                 currentAbsolutePath = Path.Combine(currentAbsolutePath, segment);
+                bool nodeIsExcluded = i == lastIndex ? isExcluded : false;
                 currentNode = this.DocumentHierarchy.GetNode(currentAbsolutePath) ??
-                    this.DocumentHierarchy.CreateNewDirectoryNode(currentAbsolutePath, currentNode, isExcluded, currentAbsolutePath == path ? errorMessage : null);
+                    this.DocumentHierarchy.CreateNewDirectoryNode(currentAbsolutePath, currentNode, nodeIsExcluded, currentAbsolutePath == path ? errorMessage : null);
+                i++;
             }
             return currentNode;
         }

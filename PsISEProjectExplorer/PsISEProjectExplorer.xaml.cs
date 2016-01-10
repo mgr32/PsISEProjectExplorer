@@ -240,7 +240,30 @@ namespace PsISEProjectExplorer
                         this.SearchResults.ContextMenu = null;
                         break;
                 }
+
+            if (this.SearchResults.ContextMenu != null)
+            {
+                MenuItem includeMenuItem = this.FindMenuItem(this.SearchResults.ContextMenu.Items, "Include");
+                MenuItem excludeMenuItem = this.FindMenuItem(this.SearchResults.ContextMenu.Items, "Exclude");
+
+                if (item.IsExcluded)
+                {
+                    includeMenuItem.Visibility = Visibility.Visible;
+                    excludeMenuItem.Visibility = Visibility.Collapsed;
+                } else
+                {
+                    includeMenuItem.Visibility = Visibility.Collapsed;
+                    excludeMenuItem.Visibility = Visibility.Visible;
+                }
+            }
+
         }
+
+        private MenuItem FindMenuItem(ItemCollection itemCollection, string header)
+        {
+            return (MenuItem)itemCollection.Cast<object>().Where(item => item is MenuItem && ((MenuItem)item).Header.ToString() == header).FirstOrDefault();
+        }
+            
 
         private void SearchResults_KeyUp(object sender, KeyEventArgs e)
         {
@@ -266,6 +289,16 @@ namespace PsISEProjectExplorer
         {
             var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
             this.mainViewModel.TreeViewModel.AddNewTreeItem(item, NodeType.File);
+        }
+
+        private void SearchResults_ExcludeOrInclude(object sender, RoutedEventArgs e)
+        {
+            var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
+            if (item == null || item.IsBeingEdited)
+            {
+                return;
+            }
+            this.mainViewModel.ExcludeOrIncludeItem(item);
         }
 
         private void SearchResults_Rename(object sender, RoutedEventArgs e)

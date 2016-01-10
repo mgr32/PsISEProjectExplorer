@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.IO;
-using System.Reflection;
 
 namespace PsISEProjectExplorer.Config
 {
@@ -65,9 +65,9 @@ namespace PsISEProjectExplorer.Config
         public static IEnumerable<string> ReadConfigStringEnumerableValue(string key)
         {
             var value = ReadConfigStringValue(key);
-            if (value == null)
+            if (String.IsNullOrWhiteSpace(value))
             {
-                return new string[0];
+                return Enumerable.Empty<string>();
             }
             try
             {
@@ -75,7 +75,7 @@ namespace PsISEProjectExplorer.Config
             }
             catch (Exception)
             {
-                return new string[0];
+                return Enumerable.Empty<string>();
             }
         }
 
@@ -103,8 +103,38 @@ namespace PsISEProjectExplorer.Config
 
         public static void SaveConfigEnumerableValue(string key, IEnumerable<string> value)
         {
-            var str = value == null ? String.Empty : String.Join(",", value);
+            var str = value == null ? String.Empty : String.Join(",", value.Where(s => !(String.IsNullOrWhiteSpace(s))));
             SaveConfigValue(key, str);
+        }
+
+        public static IEnumerable<string> AddConfigEnumerableValue(string key, string value)
+        { 
+            lock (ConfigHandlerLock)
+            {
+                IEnumerable<string> currentValue = ReadConfigStringEnumerableValue(key);
+                if (!currentValue.Contains(value))
+                {
+                    currentValue = currentValue.ToList();
+                    ((IList<string>)currentValue).Add(value);
+                    SaveConfigEnumerableValue(key, currentValue);
+                }
+                return currentValue;
+            }
+        }
+
+        public static IEnumerable<string> RemoveConfigEnumerableValue(string key, string value)
+        {
+            lock (ConfigHandlerLock)
+            {
+                IEnumerable<string> currentValue = ReadConfigStringEnumerableValue(key);
+                if (currentValue.Contains(value))
+                {
+                    currentValue = currentValue.ToList();
+                    ((IList<string>)currentValue).Remove(value);
+                    SaveConfigEnumerableValue(key, currentValue);
+                }
+                return currentValue;
+            }
         }
 
         private static Configuration OpenConfigFile()

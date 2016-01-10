@@ -45,14 +45,15 @@ namespace PsISEProjectExplorer.UI.ViewModel
             get
             {
                 string fileName = this.NodeType.ToString().ToLowerInvariant();
-                if (!this.Node.IsValid)
-                {
-                    fileName += "_invalid";
-                }
-                if (this.Node.NodeType == NodeType.Directory && this.Node.IsExcluded)
+                if (this.Node.IsExcluded)
                 {
                     fileName += "_excluded";
                 }
+                else if (!this.Node.IsValid)
+                {
+                    fileName += "_invalid";
+                }
+                
                 return String.Format("Resources/{0}.png", fileName);
             }
         }
@@ -70,6 +71,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
             get
             {
                 return this.Node.Path;
+            }
+        }
+
+        public bool IsExcluded
+        {
+            get
+            {
+                return this.Node.IsExcluded;
             }
         }
 

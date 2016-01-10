@@ -58,7 +58,7 @@ namespace PsISEProjectExplorer.Services
             this.IsDirectory = isDirectory;
             this.IsExcluded = isExcluded;
             this.ErrorMessage = errorMessage;
-            if (!this.IsDirectory && FilesPatternProvider.IsPowershellFile(path))
+            if (!isExcluded && !this.IsDirectory && FilesPatternProvider.IsPowershellFile(path))
             {
                 this.ParseFile();
             }

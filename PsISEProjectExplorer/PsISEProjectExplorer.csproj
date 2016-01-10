@@ -181,12 +181,14 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Resources\file_excluded.png" />
+    <Resource Include="Resources\textfield_exclude.png" />
+    <Resource Include="Resources\textfield_include.png" />
     <Resource Include="Resources\configuration.png" />
     <Resource Include="Resources\dslelement.png" />
     <Resource Include="Resources\classproperty.png" />
     <Resource Include="Resources\classconstructor.png" />
     <Resource Include="Resources\class.png" />
-    <Resource Include="Resources\directory_invalid_excluded.png" />
     <Resource Include="Resources\directory_excluded.png" />
     <Resource Include="Resources\toolbar_searchRegex.png" />
     <Resource Include="Resources\toolbar_sync.png" />

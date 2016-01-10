@@ -96,6 +96,16 @@
                             </MenuItem.Icon>
                         </MenuItem>
                     </MenuItem>
+                    <MenuItem Header="Include" Click="SearchResults_ExcludeOrInclude" InputGestureText="F8">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/textfield_include.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Exclude" Click="SearchResults_ExcludeOrInclude" InputGestureText="F8">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/textfield_exclude.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <MenuItem Header="Rename" Click="SearchResults_Rename" InputGestureText="F2" >
                         <MenuItem.Icon>
                             <Image Source="Resources/textfield_rename.png" />
@@ -114,6 +124,16 @@
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator />
+                    <MenuItem Header="Include" Click="SearchResults_ExcludeOrInclude" InputGestureText="F8">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/textfield_include.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Exclude" Click="SearchResults_ExcludeOrInclude" InputGestureText="F8">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/textfield_exclude.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <MenuItem Header="Rename" Click="SearchResults_Rename" InputGestureText="F2">
                         <MenuItem.Icon>
                             <Image Source="Resources/textfield_rename.png" />
