@@ -29,7 +29,7 @@ namespace PsISEProjectExplorer.Services
             var errorsLog = !errors.Any() ? null :
                 "Parsing error(s): " + Environment.NewLine + string.Join(Environment.NewLine, errors.OrderBy(err => err.Extent.StartLineNumber).Select(err => "Line " + err.Extent.StartLineNumber + ": " + err.Message));
             RootItem = new PowershellItem(PowershellItemType.Root, null, 0, 0, 0, 0, null, errorsLog);
-            
+
             VisitTokens(ast);
 
             return RootItem;
@@ -69,13 +69,13 @@ namespace PsISEProjectExplorer.Services
         }
 
         protected object OnFunctionVisit(string name, IScriptExtent extent, int nestingLevel, object parent)
-        { 
+        {
             return CreateNewPowershellItem(PowershellItemType.Function, name, extent, (PowershellItem)parent, nestingLevel);
         }
 
         protected object OnConfigurationVisit(string name, IScriptExtent extent, int nestingLevel, object parent)
         {
-            int startColumnNumber = extent.StartColumnNumber + "configuration".Length + 1 ;
+            int startColumnNumber = extent.StartColumnNumber + "configuration".Length + 1;
             int endColumnNumber = startColumnNumber + name.Length;
             int startLineNumber = extent.StartLineNumber;
             return CreateNewPowershellItem(PowershellItemType.Configuration, name, startColumnNumber, endColumnNumber, startLineNumber, (PowershellItem)parent, nestingLevel);
@@ -94,11 +94,18 @@ namespace PsISEProjectExplorer.Services
             {
                 return null;
             }
-            // in order to be possibly a DSL expression, first element must be StringConstant, second must not be =, last must be ScriptBlockExpression, and last but 1 must not be CommandParameter
+            // in order to be possibly a DSL expression, first element must be StringConstant AND second must not be =
+            // AND (first element must start with PSDesiredStateConfiguration - legacy OR (last must be ScriptBlockExpression, and last but 1 must not be CommandParameter))
             if (!(commandElements[0] is StringConstantExpressionAst) ||
-                ((commandElements[1] is StringConstantExpressionAst && ((StringConstantExpressionAst)commandElements[1]).Value == "=")) ||
-                !(commandElements[commandElements.Count - 1] is ScriptBlockExpressionAst || commandElements[commandElements.Count - 1] is HashtableAst) ||
-                commandElements[commandElements.Count - 2] is CommandParameterAst)
+                ((commandElements[1] is StringConstantExpressionAst && ((StringConstantExpressionAst)commandElements[1]).Value == "=")))
+            {
+                return null;
+            }
+
+            string dslTypeName = ((StringConstantExpressionAst)commandElements[0]).Value;
+            if (!dslTypeName.StartsWith("PSDesiredStateConfiguration") &&
+                ((!(commandElements[commandElements.Count - 1] is ScriptBlockExpressionAst || commandElements[commandElements.Count - 1] is HashtableAst) ||
+                commandElements[commandElements.Count - 2] is CommandParameterAst)))
             {
                 return null;
             }
@@ -109,10 +116,10 @@ namespace PsISEProjectExplorer.Services
                 return null;
             }
 
-            return this.GetDslInstanceName(commandElements);
+            return this.TrimQuotes(this.GetDslInstanceName(dslTypeName, commandElements));
         }
 
-        private string GetDslInstanceName(IEnumerable<CommandElementAst> commandElements)
+        private string GetDslInstanceName(string dslTypeName, IEnumerable<CommandElementAst> commandElements)
         {
             // try to guess dsl instance name - first string constant that is not named parameter value (or is value of 'name' parameter)
             bool lastElementIsUnknownParameter = false;
@@ -126,7 +133,12 @@ namespace PsISEProjectExplorer.Services
                 }
                 if (elementAst is CommandParameterAst)
                 {
-                    lastElementIsUnknownParameter = ((CommandParameterAst)elementAst).ParameterName.ToLowerInvariant() != "name";
+                    CommandParameterAst commandParameterAst = (CommandParameterAst)elementAst;
+                    lastElementIsUnknownParameter = commandParameterAst.ParameterName.ToLowerInvariant() != "name";
+                    if (dslTypeName.StartsWith("PSDesiredStateConfiguration") && !lastElementIsUnknownParameter)
+                    {
+                        return commandParameterAst.Argument.ToString();
+                    }
                     continue;
                 }
                 if (elementAst is StringConstantExpressionAst && !lastElementIsUnknownParameter)
@@ -137,9 +149,19 @@ namespace PsISEProjectExplorer.Services
                 {
                     return ((ExpandableStringExpressionAst)elementAst).Value;
                 }
+                if (elementAst is MemberExpressionAst && !lastElementIsUnknownParameter)
+                {
+                    return ((MemberExpressionAst)elementAst).Extent.Text;
+                }
+
                 lastElementIsUnknownParameter = false;
             }
             return string.Empty;
+        }
+
+        private string TrimQuotes(string str)
+        {
+            return Regex.Replace(str, "('|\")(.+)('|\")", "$2");
         }
 
 

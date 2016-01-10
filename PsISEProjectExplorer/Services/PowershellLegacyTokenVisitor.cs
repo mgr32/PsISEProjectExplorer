@@ -32,19 +32,7 @@ namespace PsISEProjectExplorer.Services
 
         public override AstVisitAction VisitCommand(CommandAst commandAst)
         {
-            // in legacy visitor we need to check for Configuration ourselves (in PS5 this is done in VisitConfigurationDefinition)
-            CommandParameterAst configurationAst = this.GetConfigurationAst(commandAst);
             object newParentObject;
-            if (configurationAst != null)
-            {
-                string name = configurationAst.Argument.ToString();
-                newParentObject = this.ConfigurationAction(name, commandAst.Extent, this.GetCurrentNestingLevel(), this.GetCurrentParentObject());
-                Ast body = commandAst.Find(ast => ast is CommandParameterAst && "body".Equals(((CommandParameterAst)ast).ParameterName.ToLowerInvariant()), false);
-                // TODO: this will ignore "Node" children because last command element is CommmandParameterAst
-                this.VisitChildren(body, newParentObject);
-                return AstVisitAction.SkipChildren;
-            }
-
             var commandElements = commandAst.CommandElements;
             string dslInstanceName = this.DslNameGiver(commandElements, commandAst.Parent);
             if (dslInstanceName == null)
@@ -53,8 +41,28 @@ namespace PsISEProjectExplorer.Services
             }
 
             string dslTypeName = ((StringConstantExpressionAst)commandElements[0]).Value;
-            newParentObject = this.DslAction(dslTypeName, dslInstanceName, commandAst.Extent, this.GetCurrentNestingLevel(), this.GetCurrentParentObject());
-            this.VisitChildren(commandElements[commandElements.Count - 1], newParentObject);
+            dslTypeName = dslTypeName.Replace("PSDesiredStateConfiguration\\", "");
+            if (dslTypeName.ToLowerInvariant() == "configuration")
+            {
+                CommandParameterAst nameAst = (CommandParameterAst)commandAst.Find(ast => ast is CommandParameterAst && "name".Equals(((CommandParameterAst)ast).ParameterName.ToLowerInvariant()), false);
+                newParentObject = this.ConfigurationAction(nameAst.Argument.ToString(), commandAst.Extent, this.GetCurrentNestingLevel(), this.GetCurrentParentObject());
+            }
+            else
+            {
+                newParentObject = this.DslAction(dslTypeName, dslInstanceName, commandAst.Extent, this.GetCurrentNestingLevel(), this.GetCurrentParentObject());
+            }
+
+            Ast body = commandAst.Find(ast => ast is CommandParameterAst && ("body".Equals(((CommandParameterAst)ast).ParameterName.ToLowerInvariant())
+                || "value".Equals(((CommandParameterAst)ast).ParameterName.ToLowerInvariant())), false);
+            if (body != null)
+            {
+                this.VisitChildren(body, newParentObject);
+            }
+            else
+            {
+                this.VisitChildren(commandElements[commandElements.Count - 1], newParentObject);
+            }
+
             return AstVisitAction.SkipChildren;
         }
 
@@ -63,22 +71,6 @@ namespace PsISEProjectExplorer.Services
             object newParentObject = this.FunctionAction(functionDefinitionAst.Name, functionDefinitionAst.Extent, this.GetCurrentNestingLevel(), this.GetCurrentParentObject());
             this.VisitChildren(functionDefinitionAst.Body, newParentObject);
             return AstVisitAction.SkipChildren;
-        }
-
-        private CommandParameterAst GetConfigurationAst(CommandAst commandAst)
-        {
-            var commandElements = commandAst.CommandElements;
-            if (commandElements == null || commandElements.Count < 2)
-            {
-                return null;
-            }
-
-            if ((commandElements[0] is StringConstantExpressionAst) && "PSDesiredStateConfiguration\\Configuration".Equals(((StringConstantExpressionAst)commandElements[0]).Value))
-            {
-                Ast nameAst = commandAst.Find(ast => ast is CommandParameterAst && "name".Equals(((CommandParameterAst)ast).ParameterName.ToLowerInvariant()), false);
-                return (CommandParameterAst)nameAst;
-            }
-            return null;
         }
 
         private object GetCurrentParentObject()
