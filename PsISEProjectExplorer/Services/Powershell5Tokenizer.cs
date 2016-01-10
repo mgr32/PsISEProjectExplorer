@@ -14,7 +14,7 @@ namespace PsISEProjectExplorer.Services
 
         private Powershell5TokenVisitor tokenVisitor;
 
-        public Powershell5Tokenizer()
+        public Powershell5Tokenizer(bool dslAutoDiscovery, IEnumerable<string> dslCustomDictionary) : base(dslAutoDiscovery, dslCustomDictionary)
         {
             this.tokenVisitor = new Powershell5TokenVisitor(this.OnFunctionVisit,
                 this.OnConfigurationVisit,

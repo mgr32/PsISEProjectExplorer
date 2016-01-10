@@ -66,18 +66,28 @@ namespace PsISEProjectExplorer.Config
 
         public static IEnumerable<string> ReadConfigStringEnumerableValue(string key)
         {
+            return ReadConfigStringEnumerableValue(key, false, Enumerable.Empty<string>());
+        }
+
+        public static IEnumerable<string> ReadConfigStringEnumerableValue(string key, bool toLower, IEnumerable<string> defaultValue)
+        {
             var value = ReadConfigStringValue(key);
             if (String.IsNullOrWhiteSpace(value))
             {
-                return Enumerable.Empty<string>();
+                if (defaultValue != null && defaultValue.Any())
+                {
+                    SaveConfigEnumerableValue(key, defaultValue);
+                }
+                return defaultValue;
             }
             try
             {
-                return value.Split(',');
+                return toLower ? value.ToLowerInvariant().Split(',') : value.Split(',');
             }
             catch (Exception)
             {
-                return Enumerable.Empty<string>();
+                SaveConfigEnumerableValue(key, defaultValue);
+                return defaultValue;
             }
         }
 

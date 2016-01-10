@@ -19,6 +19,16 @@ namespace PsISEProjectExplorer.Services
 
         protected PowershellItem RootItem;
 
+        private bool dslAutoDiscovery;
+
+        private IEnumerable<string> dslCustomDictionary;
+
+        public PowershellBaseTokenizer(bool dslAutoDiscovery, IEnumerable<string> dslCustomDictionary)
+        {
+            this.dslAutoDiscovery = dslAutoDiscovery;
+            this.dslCustomDictionary = dslCustomDictionary == null ? Enumerable.Empty<string>() : dslCustomDictionary;
+        }
+
         public virtual PowershellItem GetPowershellItems(string path, string contents)
         {
             ParseError[] errors;
@@ -90,10 +100,13 @@ namespace PsISEProjectExplorer.Services
 
         protected string GetDslInstanceName(ReadOnlyCollection<CommandElementAst> commandElements, Ast parent)
         {
-            if (commandElements == null || commandElements.Count < 2)
+            // todo: what with "configuration" in legacy mode?
+            if (!this.dslAutoDiscovery || commandElements == null || commandElements.Count < 2)
             {
                 return null;
             }
+
+
             // in order to be possibly a DSL expression, first element must be StringConstant AND second must not be =
             // AND (first element must start with PSDesiredStateConfiguration - legacy OR (last must be ScriptBlockExpression, and last but 1 must not be CommandParameter))
             if (!(commandElements[0] is StringConstantExpressionAst) ||
@@ -104,6 +117,7 @@ namespace PsISEProjectExplorer.Services
 
             string dslTypeName = ((StringConstantExpressionAst)commandElements[0]).Value;
             if (!dslTypeName.StartsWith("PSDesiredStateConfiguration") &&
+                !this.dslCustomDictionary.Contains(dslTypeName.ToLowerInvariant()) && 
                 ((!(commandElements[commandElements.Count - 1] is ScriptBlockExpressionAst || commandElements[commandElements.Count - 1] is HashtableAst) ||
                 commandElements[commandElements.Count - 2] is CommandParameterAst)))
             {

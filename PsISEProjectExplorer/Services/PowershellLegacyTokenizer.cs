@@ -19,7 +19,7 @@ namespace PsISEProjectExplorer.Services
 
         private PowershellLegacyTokenVisitor tokenVisitor;
 
-        public PowershellLegacyTokenizer()
+        public PowershellLegacyTokenizer(bool dslAutoDiscovery, IEnumerable<string> dslCustomDictionary) : base(dslAutoDiscovery, dslCustomDictionary)
         {
             this.tokenVisitor = new PowershellLegacyTokenVisitor(
                 this.OnFunctionVisit,
