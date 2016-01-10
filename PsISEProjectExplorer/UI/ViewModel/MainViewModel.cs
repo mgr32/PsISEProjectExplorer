@@ -111,19 +111,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        private IEnumerable<string> excludePaths;
-
-        public IEnumerable<string> ExcludePaths
-        {
-            get { return this.excludePaths; }
-            set
-            {
-                this.excludePaths = value;
-                this.OnPropertyChanged();
-                this.ReindexSearchTree();
-            }
-        }
-
         private int numOfSearchingThreads;
 
         private int NumOfSearchingThreads
@@ -204,9 +191,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.searchRegex = ConfigHandler.ReadConfigBoolValue("SearchRegex", false);
             this.searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles", true);
             this.showAllFiles = ConfigHandler.ReadConfigBoolValue("ShowAllFiles", true);
-            this.FilesPatternProvider = new FilesPatternProvider(this.showAllFiles);
+            IEnumerable<string> excludePaths = ConfigHandler.ReadConfigStringEnumerableValue("ExcludePaths");
+            this.FilesPatternProvider = new FilesPatternProvider(this.showAllFiles, excludePaths);
             this.syncWithActiveDocument = ConfigHandler.ReadConfigBoolValue("SyncWithActiveDocument", false);
-            this.excludePaths = ConfigHandler.ReadConfigStringEnumerableValue("ExcludePaths");
             var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
             this.SearchOptions = new SearchOptions(searchField, string.Empty, this.searchRegex);
             this.DocumentHierarchyFactory = new DocumentHierarchyFactory();
@@ -266,12 +253,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
             if (selectedItem.IsExcluded)
             {
-                this.ExcludePaths = ConfigHandler.RemoveConfigEnumerableValue("ExcludePaths", selectedItem.Path);
+                this.FilesPatternProvider.ExcludePaths = ConfigHandler.RemoveConfigEnumerableValue("ExcludePaths", selectedItem.Path);
             }
             else
             {
-                this.ExcludePaths = ConfigHandler.AddConfigEnumerableValue("ExcludePaths", selectedItem.Path);
+                this.FilesPatternProvider.ExcludePaths = ConfigHandler.AddConfigEnumerableValue("ExcludePaths", selectedItem.Path);
             }
+            this.OnPropertyChanged();
+            this.ReindexSearchTree();
         }
 
         private string GetFunctionNameAtCurrentPosition()
@@ -358,7 +347,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.NumOfIndexingThreads++;
             }
-            var indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyFactory, this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, pathsChanged, this.ExcludePaths, this.FilesPatternProvider);
+            var indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyFactory, this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, pathsChanged, this.FilesPatternProvider);
             this.IndexingSearchingModel.ReindexSearchTree(indexerParams);
         }
 

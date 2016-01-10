@@ -19,7 +19,7 @@ namespace PsISEProjectExplorer.Services
             {
                 return null;
             }
-            var filesPatternProvider = new FilesPatternProvider(false);
+            var filesPatternProvider = new FilesPatternProvider(false, Enumerable.Empty<string>());
             string currentDir = rootDir;
             while (true)
             {

@@ -75,7 +75,7 @@ namespace PsISEProjectExplorer.Services
             this.DocumentHierarchy.RemoveNode(node);
         }
 
-        public bool UpdateDocumentHierarchy(IEnumerable<string> pathsToUpdate, IEnumerable<string> excludePaths, FilesPatternProvider filesPatternProvider, BackgroundIndexer worker)
+        public bool UpdateDocumentHierarchy(IEnumerable<string> pathsToUpdate, FilesPatternProvider filesPatternProvider, BackgroundIndexer worker)
         {
 
             if (this.DocumentHierarchy == null)
@@ -88,7 +88,7 @@ namespace PsISEProjectExplorer.Services
             {
                 INode node = this.DocumentHierarchy.GetNode(path);
                 bool nodeShouldBeRemoved = node != null;
-                var fileSystemEntryList = this.GetFileList(path, excludePaths, filesPatternProvider, worker);
+                var fileSystemEntryList = this.GetFileList(path, filesPatternProvider, worker);
                 
                 foreach (PowershellFileParser fileSystemEntry in fileSystemEntryList)
                 {
@@ -121,7 +121,7 @@ namespace PsISEProjectExplorer.Services
             worker.ReportProgressInCurrentThread(path);
         }
 
-        private IEnumerable<PowershellFileParser> GetFileList(string path, IEnumerable<string> excludePaths, FilesPatternProvider filesPatternProvider, BackgroundIndexer worker)
+        private IEnumerable<PowershellFileParser> GetFileList(string path, FilesPatternProvider filesPatternProvider, BackgroundIndexer worker)
         {
             PowershellFileParser parser = null;
             Queue<string> pathsToEnumerate = new Queue<string>();
@@ -146,7 +146,7 @@ namespace PsISEProjectExplorer.Services
                 parser = null;
                 string currentPath = pathsToEnumerate.Dequeue();
 
-                foreach (var file in this.GetFilesInDirectory(currentPath, excludePaths, filesPatternProvider))
+                foreach (var file in this.GetFilesInDirectory(currentPath, filesPatternProvider))
                 {
                     yield return file;
                 }
@@ -164,7 +164,7 @@ namespace PsISEProjectExplorer.Services
                 }
                 foreach (string dir in dirs)
                 {
-                    bool isExcluded = excludePaths.Any(e => dir.StartsWith(e));
+                    bool isExcluded = filesPatternProvider.IsExcluded(dir);
                     if (filesPatternProvider.DoesDirectoryMatch(dir) && (isExcluded || filesPatternProvider.IncludeAllFiles || filesPatternProvider.IsInAdditonalPaths(dir)))
                     {
                         parser = new PowershellFileParser(dir, isDirectory: true, isExcluded: isExcluded);
@@ -179,7 +179,7 @@ namespace PsISEProjectExplorer.Services
             } while (pathsToEnumerate.Any());
         }
 
-        private IEnumerable<PowershellFileParser> GetFilesInDirectory(string path, IEnumerable<string> excludePaths, FilesPatternProvider filesPatternProvider)
+        private IEnumerable<PowershellFileParser> GetFilesInDirectory(string path, FilesPatternProvider filesPatternProvider)
         {
             IEnumerable<string> files = null;
             PowershellFileParser parser = null;
@@ -200,8 +200,7 @@ namespace PsISEProjectExplorer.Services
 
             foreach (string file in files)
             {
-                bool isExcluded = excludePaths.Contains(file);
-                parser = new PowershellFileParser(file, isDirectory: false, isExcluded: isExcluded);
+                parser = new PowershellFileParser(file, isDirectory: false, isExcluded: filesPatternProvider.IsExcluded(file));
                 yield return parser;
             }
         }

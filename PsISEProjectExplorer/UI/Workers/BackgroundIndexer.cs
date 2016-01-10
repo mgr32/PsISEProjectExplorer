@@ -49,7 +49,7 @@ namespace PsISEProjectExplorer.UI.Workers
                     {
                         paths = indexerParams.PathsChanged;
                     }
-                    var isChanged = indexerParams.DocumentHierarchyFactory.UpdateDocumentHierarchy(paths, indexerParams.ExcludePaths, indexerParams.FilesPatternProvider, this);
+                    var isChanged = indexerParams.DocumentHierarchyFactory.UpdateDocumentHierarchy(paths, indexerParams.FilesPatternProvider, this);
                     e.Result = new IndexerResult(this.StartTimestamp, isChanged);
                 }
                 catch (OperationCanceledException)

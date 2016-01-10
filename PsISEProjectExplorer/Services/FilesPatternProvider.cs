@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace PsISEProjectExplorer.Services
@@ -20,12 +21,15 @@ namespace PsISEProjectExplorer.Services
 
         public bool IncludeAllFiles { get; set; }
 
+        public IEnumerable<string> ExcludePaths { get; set; }
+
         private ISet<string> AdditionalPaths { get; set; }
 
-        public FilesPatternProvider(bool includeAllFiles)
+        public FilesPatternProvider(bool includeAllFiles, IEnumerable<string> excludePaths)
         {
             this.IncludeAllFiles = includeAllFiles;
             this.AdditionalPaths = new HashSet<string>();
+            this.ExcludePaths = excludePaths;
         }
 
         public static bool IsPowershellFile(string fileName)
@@ -46,6 +50,11 @@ namespace PsISEProjectExplorer.Services
         public bool DoesDirectoryMatch(string dirName)
         {
             return !ExcludeRegex.IsMatch(dirName) && !IsReparsePointOrHiddenSystem(dirName);
+        }
+
+        public bool IsExcluded(string path)
+        {
+            return ExcludePaths.Any(e => path.StartsWith(e));
         }
 
         public string GetFilesPattern()
