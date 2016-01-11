@@ -40,7 +40,7 @@ If you find it useful, see any bugs or have any suggestions for improvements fee
 
 When you open a Powershell file in ISE, Project Explorer will automatically set its project root directory to the last parent directory of the opened file where any .ps*1 file resides. 
 
-You can also select the root directory manually (by clicking 'Change' button) and ensure it doesn't update automatically (by unselecting 'Auto-update root dir' checkbox).
+You can also select the root directory manually (by clicking 'Change' button), which will prevent automatic root directory changes (you can enable it again by enabling 'Auto-update root dir').
 
 ##### Why?
 
@@ -56,9 +56,9 @@ Uses three background threads:
 * Third one for listening on file system changes (checking for accumulated changes each 100 ms).
 
 Uses a configuration file PsISEProjectExplorer.config stored next to PsISEProjectExplorer.dll ($env:LOCALAPPDATA\PsISEProjectExplorer). It contains last state of the UI, plus following entries which can be modified manually:
-* `<add key="MaxNumOfWorkspaceDirectories" value="5" />` - maximum number of remembered workspace directories
-* `<add key="DslAutoDiscovery" value="True" />` - whether automatic recognition of DSL elements (like `Describe` or `It` should be enabled (lines starting with constant string and ending with scriptblock)
-* `<add key="DslCustomDictionary" value="task,serverrole,serverconnection,step" />` - additional dictionary of DSL elements (useful for ones that does not necessarily end with scriptblock)
+* `<add key="MaxNumOfWorkspaceDirectories" value="5" />` - maximum number of remembered workspace directories.
+* `<add key="DslAutoDiscovery" value="True" />` - whether automatic recognition of DSL elements (like `Describe` or `It` should be enabled (lines starting with constant string and ending with scriptblock).
+* `<add key="DslCustomDictionary" value="task,serverrole,serverconnection,step" />` - additional dictionary of DSL elements (useful for ones that does not necessarily end with scriptblock).
 
 
 To modify keyboard shortcuts, edit PsISEProjectExplorer.psm1 file.
