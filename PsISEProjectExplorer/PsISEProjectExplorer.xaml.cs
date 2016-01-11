@@ -346,6 +346,46 @@ namespace PsISEProjectExplorer
             }
         }
 
+        private void SearchResults_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            // this is another WPF workaround - see http://stackoverflow.com/questions/32265569/treeviewitem-with-textbox-in-wpf-type-special-characters
+            var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
+            if (item == null || !item.IsBeingEdited)
+            {
+                return;
+            }
+            
+            string keyText = null;
+            switch (e.Key)
+            {
+                case Key.Subtract: keyText = "-"; break;
+                case Key.Add: keyText = "+"; break;
+                case Key.Multiply: keyText = "*"; break;
+            }
+            if (keyText == null)
+            {
+                return;
+            }
+
+            var target = Keyboard.FocusedElement;
+            if (target == null)
+            {
+                return;
+            }
+            e.Handled = true;
+            var routedEvent = TextCompositionManager.TextInputEvent;
+            target.RaiseEvent(
+                new TextCompositionEventArgs
+                    (
+                        InputManager.Current.PrimaryKeyboardDevice,
+                        new TextComposition(InputManager.Current, target, keyText)
+                    )
+                {
+                    RoutedEvent = routedEvent
+                });
+            
+        }
+
         private void SearchResults_KeyDown(object sender, KeyEventArgs e)
         {
             var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;

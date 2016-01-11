@@ -70,7 +70,7 @@
         <TextBlock HorizontalAlignment="Left" Margin="10,54,0,5" TextWrapping="Wrap" Text="{Binding Path=TreeItemsResultString}" VerticalAlignment="Top" />
 
         <uiHelpers:StretchingTreeView x:Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewModel.TreeViewItems}" PreviewMouseLeftButtonDown="SearchResults_PreviewMouseLeftButtonDown" PreviewMouseRightButtonDown="SearchResults_PreviewMouseRightButtonDown"
-                   x:FieldModifier="private" PreviewMouseMove="SearchResults_PreviewMouseMove" Drop="SearchResults_Drop" DragEnter="SearchResults_DragEnter" AllowDrop="True" KeyDown="SearchResults_KeyDown"
+                   x:FieldModifier="private" PreviewMouseMove="SearchResults_PreviewMouseMove" Drop="SearchResults_Drop" DragEnter="SearchResults_DragEnter" AllowDrop="True" KeyDown="SearchResults_KeyDown" PreviewKeyDown="SearchResults_PreviewKeyDown"
                    Visibility="{Binding Path=TreeViewModel.TreeViewItems, Converter={StaticResource EmptyListToVisibilityConverter}}">
 
             <TreeView.Resources>
