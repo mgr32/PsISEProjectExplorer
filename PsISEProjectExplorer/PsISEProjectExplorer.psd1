@@ -4,7 +4,7 @@
  RootModule = 'PsISEProjectExplorer.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.2.7'
+ModuleVersion = '1.3.0'
 
 # ID used to uniquely identify this module
 GUID = '442c24ec-44fc-4786-ad63-30a39eec6b7b'
