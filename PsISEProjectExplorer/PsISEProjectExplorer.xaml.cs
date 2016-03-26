@@ -1,4 +1,5 @@
-﻿using Microsoft.PowerShell.Host.ISE;
+﻿using GongSolutions.Shell;
+using Microsoft.PowerShell.Host.ISE;
 using NLog;
 using NLog.Targets;
 using Ookii.Dialogs.Wpf;
@@ -541,6 +542,37 @@ namespace PsISEProjectExplorer
             catch (Exception ex)
             {
                 MessageBoxHelper.ShowError(string.Format("Cannot open path: '{0}' - {1}.", item.Path, ex.Message));
+            }
+        }
+
+        private void SearchResults_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            {
+                // if ctrl is pressed - show builtin context menu
+                return;
+            }
+
+            // otherwise, show Windows Explorer context menu
+            var selectedItem = this.SearchResults.SelectedItem as TreeViewEntryItemModel;
+            if (selectedItem == null)
+            {
+                return;
+            }
+
+            if (!File.Exists(selectedItem.Path) && !Directory.Exists(selectedItem.Path))
+            {
+                return;
+            }
+
+            var uri = new System.Uri(selectedItem.Path);
+            ShellItem shellItem = new ShellItem(uri.AbsoluteUri);
+            ShellContextMenu menu = new ShellContextMenu(shellItem);
+            try {
+                menu.ShowContextMenu(System.Windows.Forms.Control.MousePosition);
+            } catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to show Windows Explorer Context Menu");
             }
         }
     }

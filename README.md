@@ -1,8 +1,14 @@
 ## Powershell ISE Addon - Project Explorer
 
-<a href="https://github.com/mgrzywa/PsISEProjectExplorer/releases/latest">Download</a>
+<a href="https://github.com/mgr32/PsISEProjectExplorer/releases/latest">Download</a>
 
-##### Description
+#### What's new?
+
+##### 1.3.1 (unreleased)
+
+* Right-clicking on a tree item opens Windows Explorer context menu to enable access to shell extensions (like TortoiseGIT). In order to open the builtin context menu, press CTRL when clicking.
+
+#### Description
 
 Provides a tree view that enables to index and explore whole directory structure containing Powershell scripts. It has following features:
 
@@ -22,11 +28,11 @@ Requires Powershell 3.0 or above.
 
 If you find it useful, see any bugs or have any suggestions for improvements feel free to add an <a href="https://github.com/mgr32/PsISEProjectExplorer/issues">issue</a>.
 
-##### Screenshots
+#### Screenshots
 ![ScreenShot](./PsISEProjectExplorer_screen.png?raw=true)
 ![ScreenShot](./PsISEProjectExplorer_screen_dsl.png?raw=true)
 
-##### Installation
+#### Installation
 
 * Automatic - run Install_to_UserModules.bat
 * Manual:
@@ -36,17 +42,17 @@ If you find it useful, see any bugs or have any suggestions for improvements fee
  * Run 'Import-Module PsISEProjectExplorer'.
  * If you want it to be loaded automatically when ISE starts, add the line above to your ISE profile (see $profile).
 
-##### Usage
+#### Usage
 
 When you open a Powershell file in ISE, Project Explorer will automatically set its project root directory to the last parent directory of the opened file where any .ps*1 file resides. 
 
 You can also select the root directory manually (by clicking 'Change' button), which will prevent automatic root directory changes (you can enable it again by enabling 'Auto-update root dir').
 
-##### Why?
+#### Why?
 
-Because I work on complex Powershell modules with lots of functions, and navigating between them in ISE is painful. I wasn't able to find an ISE plugin that could search through whole directory structure, without requiring the user to load the files into the ISE first. Also, I was missing 'Go to Definition' and 'Find all references' features from Visual Studio and 'Locate in Solution Explorer' from Resharper.
+Because I used to work on complex Powershell modules with lots of functions, and navigating between them in ISE was painful. I wasn't able to find an ISE plugin that could search through whole directory structure, without requiring the user to load the files into the ISE first. Also, I was missing 'Go to Definition' and 'Find all references' features from Visual Studio and 'Locate in Solution Explorer' from Resharper.
 
-##### Implementation details
+#### Implementation details
 
 Written in C#, .NET 4.5, WPF using Microsoft Visual Studio 2015.
 
@@ -61,9 +67,9 @@ Uses a configuration file PsISEProjectExplorer.config stored next to PsISEProjec
 * `<add key="DslCustomDictionary" value="task,serverrole,serverconnection,step" />` - additional dictionary of DSL elements (useful for ones that does not necessarily end with scriptblock).
 
 
-To modify keyboard shortcuts, edit PsISEProjectExplorer.psm1 file.
+To modify keyboard shortcuts, you need to edit PsISEProjectExplorer.psm1 file.
 
-##### How to build
+#### How to build
 
 * Open PsISEProjectExplorer.sln.
 * Select 'Release' configuration.
@@ -71,7 +77,7 @@ To modify keyboard shortcuts, edit PsISEProjectExplorer.psm1 file.
 
 It will create output in bin\Release directory.
 
-##### How to debug
+#### How to debug
 
 * Ensure you don't have PsISEProjectExplorer module in your profile directory (see Debug_LoadToIse.bat).
 * Open PsISEProjectExplorer.sln.
@@ -79,9 +85,10 @@ It will create output in bin\Release directory.
 * Start Debugging (F5). It will run Powershell ISE with Debug_LoadToIse.ps1 opened.
 * Run Debug_LoadToIse.ps1 in Powershell ISE (F5). It will start PsISEProjectExplorer in debug mode.
 
-##### Third party libraries
+#### Third party libraries
 * <a href="https://lucenenet.apache.org">Apache Lucene .Net 3.0.3</a> (<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>)
 * <a href="https://github.com/apache/lucenenet/tree/master/src/contrib/Regex">Apache Lucene .Net Contrib.Regex</a> (<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>)
 * <a href="http://nlog-project.org">NLog</a> (<a href="https://github.com/NLog/NLog/blob/master/LICENSE.txt">BSD license</a>)
 * <a href="http://www.ookii.org/software/dialogs">Ookii.Dialogs</a> (<a href="PsISEProjectExplorer/UI/Ookii.Dialogs.Wpf/license.txt">License</a>)
+* <a href="https://github.com/grokys/gong-shell">gong-shell</a> (<a href="https://github.com/grokys/gong-shell/blob/master/Licence.md">MIT License</a>)
 * All icons come from <a href="http://www.famfamfam.com/lab/icons/silk">Silk icons by Mark James</a>

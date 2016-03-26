@@ -50,13 +50,14 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.1.2\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.4.2.3\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -112,6 +113,35 @@
     <Compile Include="Services\PowershellLegacyTokenizer.cs" />
     <Compile Include="Services\PowershellTokenizerProvider.cs" />
     <Compile Include="Services\TokenLocator.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\BHID.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\CoClass.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\ComCtl32.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\HResult.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\ICommDlgBrowser.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IContextMenu.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IDropSource.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IDropTarget.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IEnumIDList.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IFileDialog.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IKnownFolder.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IKnownFolderManager.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IOleCommandTarget.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IQueryInfo.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IServiceProvider.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IShellBrowser.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IShellFolder.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IShellItem.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IShellItemArray.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\IShellView.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\Kernel32.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\Ole32.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\Shell32.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\ShlWapi.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\User32.cs" />
+    <Compile Include="UI\GongSolutions.Shell\Interop\VistaBridge\ShellItemImpl.cs" />
+    <Compile Include="UI\GongSolutions.Shell\KnownFolderManager.cs" />
+    <Compile Include="UI\GongSolutions.Shell\ShellContextMenu.cs" />
+    <Compile Include="UI\GongSolutions.Shell\ShellItem.cs" />
     <Compile Include="UI\Helpers\EmptyListToVisibilityConverter.cs" />
     <Compile Include="UI\Helpers\FocusExtensions.cs" />
     <Compile Include="UI\Helpers\LockedToolBar.cs" />
@@ -181,6 +211,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="UI\GongSolutions.Shell\Licence.md" />
     <Resource Include="Resources\file_excluded.png" />
     <Resource Include="Resources\textfield_exclude.png" />
     <Resource Include="Resources\textfield_include.png" />
