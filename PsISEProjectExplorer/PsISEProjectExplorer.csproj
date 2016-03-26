@@ -146,6 +146,7 @@
     <Compile Include="UI\Helpers\FocusExtensions.cs" />
     <Compile Include="UI\Helpers\LockedToolBar.cs" />
     <Compile Include="UI\Helpers\MessageBoxHelper.cs" />
+    <Compile Include="UI\Helpers\MultiSelectStretchingTreeView.cs" />
     <Compile Include="UI\Helpers\StretchingTreeView.cs" />
     <Compile Include="UI\Helpers\TreeViewDropHighlighter.cs" />
     <Compile Include="UI\Helpers\TreeViewMouseHelper.cs" />

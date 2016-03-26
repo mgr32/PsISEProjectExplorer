@@ -555,27 +555,29 @@ namespace PsISEProjectExplorer
 
         private void SearchResults_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
+            clearDragStartPoint();
             if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
             {
                 // if ctrl is pressed - show builtin context menu
                 return;
             }
-
+            var selectedItems = this.mainViewModel.TreeViewModel.SelectedItems;
             // otherwise, show Windows Explorer context menu
-            var selectedItem = this.SearchResults.SelectedItem as TreeViewEntryItemModel;
-            if (selectedItem == null)
+            if (!selectedItems.Any())
             {
                 return;
             }
-
-            if (!File.Exists(selectedItem.Path) && !Directory.Exists(selectedItem.Path))
+            var shellItems = selectedItems
+                .Where(item => File.Exists(item.Path) || Directory.Exists(item.Path))
+                .Select(item => new ShellItem(new System.Uri(item.Path).AbsoluteUri))
+                .ToArray();
+            
+            if (!shellItems.Any())
             {
                 return;
             }
-
-            var uri = new System.Uri(selectedItem.Path);
-            ShellItem shellItem = new ShellItem(uri.AbsoluteUri);
-            ShellContextMenu menu = new ShellContextMenu(shellItem);
+            
+            ShellContextMenu menu = new ShellContextMenu(shellItems);
             try {
                 menu.ShowContextMenu(System.Windows.Forms.Control.MousePosition);
             } catch (Exception ex)

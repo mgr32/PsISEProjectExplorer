@@ -69,7 +69,8 @@
         </ToolBarTray>
         <TextBlock HorizontalAlignment="Left" Margin="10,54,0,5" TextWrapping="Wrap" Text="{Binding Path=TreeItemsResultString}" VerticalAlignment="Top" />
 
-        <uiHelpers:StretchingTreeView x:Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewModel.TreeViewItems}" PreviewMouseLeftButtonDown="SearchResults_PreviewMouseLeftButtonDown" PreviewMouseRightButtonDown="SearchResults_PreviewMouseRightButtonDown"
+        <uiHelpers:MultiSelectStretchingTreeView x:Name="SearchResults" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,75,10,10" ItemsSource="{Binding Path=TreeViewModel.TreeViewItems}" SelectedItems="{Binding Path=TreeViewModel.SelectedItems}"
+                   PreviewMouseLeftButtonDown="SearchResults_PreviewMouseLeftButtonDown" PreviewMouseRightButtonDown="SearchResults_PreviewMouseRightButtonDown"
                    x:FieldModifier="private" PreviewMouseMove="SearchResults_PreviewMouseMove" Drop="SearchResults_Drop" DragEnter="SearchResults_DragEnter" AllowDrop="True" KeyDown="SearchResults_KeyDown" PreviewKeyDown="SearchResults_PreviewKeyDown"
                    Visibility="{Binding Path=TreeViewModel.TreeViewItems, Converter={StaticResource EmptyListToVisibilityConverter}}" MouseRightButtonUp="SearchResults_MouseRightButtonUp">
 
@@ -181,18 +182,23 @@
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
             <TreeView.ItemContainerStyle>
-                <Style TargetType="TreeViewItem">
+                <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay}" />
-                    <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}" />
+                    <Setter Property="uiHelpers:MultiSelectStretchingTreeView.IsItemSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                     <Setter Property="FontWeight" Value="Normal" />
                     <Style.Triggers>
                         <MultiTrigger>
+							<!-- TODO -->
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsSelected" Value="True" />
                                 <Condition Property="IsSelectionActive" Value="False" />
                             </MultiTrigger.Conditions>
                             <Setter Property="FontWeight" Value="Bold" />
                         </MultiTrigger>
+                        <Trigger Property="uiHelpers:MultiSelectStretchingTreeView.IsItemSelected" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
+                        </Trigger>
                         <Trigger Property="uiHelpers:TreeViewMouseHelper.IsMouseDirectlyOverItem" Value="True">
                             <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.MenuBrushKey}}" />
                         </Trigger>
@@ -203,6 +209,6 @@
                     </Style.Triggers>
                 </Style>
             </TreeView.ItemContainerStyle>
-        </uiHelpers:StretchingTreeView>
+        </uiHelpers:MultiSelectStretchingTreeView>
     </Grid>
 </UserControl>

@@ -4,7 +4,7 @@ using System.Windows.Controls;
 namespace PsISEProjectExplorer.UI.Helpers
 {
     // http://blogs.msdn.com/b/jpricket/archive/2008/08/05/wpf-a-stretching-treeview.aspx
-    public class StretchingTreeView : TreeView
+    public abstract class StretchingTreeView : TreeView
     {
         protected override DependencyObject GetContainerForItemOverride()
         {

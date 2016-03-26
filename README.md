@@ -7,6 +7,7 @@
 ##### 1.3.1 (unreleased)
 
 * Right-clicking on a tree item opens Windows Explorer context menu to enable access to shell extensions (like TortoiseGIT). In order to open the builtin context menu, press CTRL when clicking.
+* Added multi-selection support to the tree view.
 
 #### Description
 
@@ -91,4 +92,5 @@ It will create output in bin\Release directory.
 * <a href="http://nlog-project.org">NLog</a> (<a href="https://github.com/NLog/NLog/blob/master/LICENSE.txt">BSD license</a>)
 * <a href="http://www.ookii.org/software/dialogs">Ookii.Dialogs</a> (<a href="PsISEProjectExplorer/UI/Ookii.Dialogs.Wpf/license.txt">License</a>)
 * <a href="https://github.com/grokys/gong-shell">gong-shell</a> (<a href="https://github.com/grokys/gong-shell/blob/master/Licence.md">MIT License</a>)
+* <a href="https://github.com/cmyksvoll/MultiSelectTreeView">MultiSelectTreeView</a> (<a href="https://github.com/cmyksvoll/MultiSelectTreeView/blob/master/LICENSE.txt">MIT License</a>)
 * All icons come from <a href="http://www.famfamfam.com/lab/icons/silk">Silk icons by Mark James</a>

@@ -27,6 +27,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public IseIntegrator IseIntegrator { private get; set; }
 
+        private IList<TreeViewEntryItemModel> selectedItems = new List<TreeViewEntryItemModel>();
+
+        public IList<TreeViewEntryItemModel> SelectedItems
+        {
+            get { return this.selectedItems; }
+        }
+
         private TreeViewEntryItemModel rootTreeViewEntryItem;
 
         public TreeViewEntryItemModel RootTreeViewEntryItem
