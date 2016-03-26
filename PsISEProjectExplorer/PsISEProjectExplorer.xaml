@@ -74,7 +74,7 @@
                    Visibility="{Binding Path=TreeViewModel.TreeViewItems, Converter={StaticResource EmptyListToVisibilityConverter}}" MouseRightButtonUp="SearchResults_MouseRightButtonUp">
 
             <TreeView.Resources>
-                <ContextMenu x:Key="DirectoryContext" Opened="SearchResults_ContextMenuOpened" Closed="SearchResults_ContextMenuClosed">
+                <ContextMenu x:Key="DirectoryContext">
                     <MenuItem Header="Open in Explorer" Click="SearchResults_OpenInExplorer">
                         <MenuItem.Icon>
                             <Image Source="Resources/directory.png" />
@@ -117,7 +117,7 @@
                         </MenuItem.Icon>
                     </MenuItem>
                 </ContextMenu>
-                <ContextMenu x:Key="FileContext" Opened="SearchResults_ContextMenuOpened" Closed="SearchResults_ContextMenuClosed">
+                <ContextMenu x:Key="FileContext">
                     <MenuItem Header="Open in Explorer" Click="SearchResults_OpenInExplorer">
                         <MenuItem.Icon>
                             <Image Source="Resources/directory.png" />
@@ -145,7 +145,7 @@
                         </MenuItem.Icon>
                     </MenuItem>
                 </ContextMenu>
-                <ContextMenu x:Key="EmptyContext" Opened="SearchResults_ContextMenuOpened" Closed="SearchResults_ContextMenuClosed">
+                <ContextMenu x:Key="EmptyContext">
                     <MenuItem Header="Add">
                         <MenuItem.Icon>
                             <Image Source="Resources/add.png" />

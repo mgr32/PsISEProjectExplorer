@@ -30,7 +30,6 @@ namespace PsISEProjectExplorer
         private readonly MainViewModel mainViewModel;
         private Point dragStartPoint;
         private ObjectModelRoot hostObject;
-        private bool isContextMenuOpened;
 
         // Entry point to the ISE object model.
         public ObjectModelRoot HostObject
@@ -433,7 +432,11 @@ namespace PsISEProjectExplorer
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 var selectedItem = this.SearchResults.SelectedItem as TreeViewEntryItemModel;
-                if ((selectedItem != null && selectedItem.IsBeingEdited) || this.isContextMenuOpened)
+                if ((selectedItem != null && selectedItem.IsBeingEdited))
+                {
+                    return;
+                }
+                if (this.isDragStartPointEmpty())
                 {
                     return;
                 }
@@ -465,7 +468,21 @@ namespace PsISEProjectExplorer
                     var dragData = new DataObject(item);
                     DragDrop.DoDragDrop(treeViewItem, dragData, DragDropEffects.Move);
                 }
+            } else if (!isDragStartPointEmpty())
+            {
+                clearDragStartPoint();
             }
+        }
+
+        private Boolean isDragStartPointEmpty()
+        {
+            return this.dragStartPoint.X == 0.0 && this.dragStartPoint.Y == 0.0;
+        }
+
+        private void clearDragStartPoint()
+        {
+            this.dragStartPoint.X = 0.0;
+            this.dragStartPoint.Y = 0.0;
         }
 
         private void SearchResults_Drop(object sender, DragEventArgs e)
@@ -498,6 +515,7 @@ namespace PsISEProjectExplorer
                     this.mainViewModel.TreeViewModel.MoveTreeItem(item, dropTarget, this.mainViewModel.WorkspaceDirectoryModel.CurrentWorkspaceDirectory);
                 }
             }
+            this.clearDragStartPoint();
         }
 
         private void SearchResults_DragEnter(object sender, DragEventArgs e)
@@ -506,16 +524,6 @@ namespace PsISEProjectExplorer
             {
                 e.Effects = DragDropEffects.None;
             }
-        }
-
-        private void SearchResults_ContextMenuClosed(object sender, RoutedEventArgs e)
-        {
-            this.isContextMenuOpened = false;
-        }
-
-        private void SearchResults_ContextMenuOpened(object sender, RoutedEventArgs e)
-        {
-            this.isContextMenuOpened = true;
         }
 
         private void SearchResults_OpenInExplorer(object sender, RoutedEventArgs e)
