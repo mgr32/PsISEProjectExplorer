@@ -86,7 +86,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return this.Node.Metadata;
+                return String.IsNullOrEmpty(this.Node.Metadata) ? null : this.Node.Metadata;
             }
         }
 
