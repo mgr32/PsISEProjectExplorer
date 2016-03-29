@@ -1,6 +1,11 @@
-﻿using PsISEProjectExplorer.Enums;
+﻿using GongSolutions.Shell;
+using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using System;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
@@ -40,10 +45,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        public string Image
+        public ImageSource Image
         {
             get
             {
+                /*
                 string fileName = this.NodeType.ToString().ToLowerInvariant();
                 if (this.Node.IsExcluded)
                 {
@@ -54,7 +60,19 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     fileName += "_invalid";
                 }
                 
-                return String.Format("Resources/{0}.png", fileName);
+                return String.Format("Resources/{0}.png", fileName);*/
+
+
+                ShellItem shellItem = new ShellItem(new Uri(this.Path));
+                var icon = shellItem.ShellIcon;
+                ImageDrawing shellIcon = new ImageDrawing(Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()), new Rect(new Size(16, 16)));
+
+                DrawingGroup iconOverlays = new DrawingGroup();
+                iconOverlays.Children.Add(shellIcon);
+                //TODO
+
+                return new DrawingImage(iconOverlays);
+
             }
         }
 

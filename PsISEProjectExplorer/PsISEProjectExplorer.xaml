@@ -13,13 +13,13 @@
             <uiHelpers:EmptyListToVisibilityConverter x:Key="EmptyListToVisibilityConverter"/>
             <DataTemplate x:Key="StandardTemplate">
                 <StackPanel Orientation="Horizontal" ToolTip="{Binding Path=Tooltip}">
-                    <Image Source="{Binding Path=Image}" />
+                    <Image Source="{Binding Path=Image}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                     <TextBlock Text="{Binding Path=Name}" Margin="5,0,0,0" />
                 </StackPanel>
             </DataTemplate>
             <DataTemplate x:Key="EditTemplate">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="{Binding Path=Image}" />
+                    <Image Source="{Binding Path=Image}" RenderOptions.BitmapScalingMode="NearestNeighbor" />
                     <TextBox Name="EditItemTextBox" Text="{Binding Path=Name, UpdateSourceTrigger=Explicit, Mode=OneWay}" Margin="5,0,0,0" LostFocus="SearchResults_EndEdit"
                              uiHelpers:FocusExtensions.IsDefaultFocusElement="True" KeyDown="SearchResults_EditKeyDown"/>
                 </StackPanel>

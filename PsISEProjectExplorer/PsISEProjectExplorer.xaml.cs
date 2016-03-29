@@ -580,7 +580,7 @@ namespace PsISEProjectExplorer
             }
 
             var uri = new System.Uri(path);
-            ShellItem shellItem = new ShellItem(uri.AbsoluteUri);
+            ShellItem shellItem = new ShellItem(uri);
             ShellContextMenu menu = new ShellContextMenu(shellItem);
             try {
                 menu.ShowContextMenu(System.Windows.Forms.Control.MousePosition);

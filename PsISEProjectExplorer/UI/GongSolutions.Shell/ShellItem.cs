@@ -651,8 +651,8 @@ namespace GongSolutions.Shell
                 SHFILEINFO info = new SHFILEINFO();
                 IntPtr result = Shell32.SHGetFileInfo(Pidl, 0, out info,
                     Marshal.SizeOf(info),
-                    SHGFI.ADDOVERLAYS | SHGFI.ICON |
-                    SHGFI.SHELLICONSIZE | SHGFI.PIDL);
+                    SHGFI.ADDOVERLAYS | SHGFI.ICON | 
+                    SHGFI.SMALLICON | SHGFI.PIDL);
 
                 if (result == IntPtr.Zero)
                 {
