@@ -4,9 +4,12 @@
 
 #### What's new?
 
-##### 1.3.1 (unreleased)
+##### 1.4.0 (unreleased)
 
-* Right-clicking on a tree item opens Windows Explorer context menu to enable access to shell extensions (like TortoiseGIT). In order to open the builtin context menu, press CTRL when clicking.
+* Showing system icons instead of custom ones. This allows to see the item's current Git status if you have TortoiseGIT installed.
+* Right-clicking on a tree item opens Windows Explorer context menu to enable access to shell extensions (like TortoiseGIT). In order to open the builtin context menu (e.g. to add, rename or exclude an item), press CTRL when clicking.
+* Added multi-selection support to the tree view.
+* Minor bugfixes.
 
 #### Description
 
