@@ -555,6 +555,7 @@ namespace PsISEProjectExplorer
 
         private void SearchResults_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
+            clearDragStartPoint();
             if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
             {
                 // if ctrl is pressed - show builtin context menu
@@ -562,18 +563,23 @@ namespace PsISEProjectExplorer
             }
 
             // otherwise, show Windows Explorer context menu
+            string path;
             var selectedItem = this.SearchResults.SelectedItem as TreeViewEntryItemModel;
             if (selectedItem == null)
             {
-                return;
+                path = this.mainViewModel.WorkspaceDirectoryModel.CurrentWorkspaceDirectory;
+            } 
+            else
+            {
+                path = selectedItem.Path;
             }
 
-            if (!File.Exists(selectedItem.Path) && !Directory.Exists(selectedItem.Path))
+            if (String.IsNullOrEmpty(path) || (!File.Exists(path) && !Directory.Exists(path)))
             {
                 return;
             }
 
-            var uri = new System.Uri(selectedItem.Path);
+            var uri = new System.Uri(path);
             ShellItem shellItem = new ShellItem(uri.AbsoluteUri);
             ShellContextMenu menu = new ShellContextMenu(shellItem);
             try {
