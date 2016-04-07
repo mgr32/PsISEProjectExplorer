@@ -11,6 +11,10 @@
 * Added multi-selection support to the tree view.
 * Minor bugfixes.
 
+##### 1.3.1
+
+* Published PsISEProjectExplorer to [PowerShell Gallery](https://www.powershellgallery.com/packages/PsISEProjectExplorer/)
+
 #### Description
 
 Provides a tree view that enables to index and explore whole directory structure containing Powershell scripts. It has following features:
@@ -37,13 +41,21 @@ If you find it useful, see any bugs or have any suggestions for improvements fee
 
 #### Installation
 
-* Automatic - run Install_to_UserModules.bat
-* Manual:
+If you have Powershell 5 or PowerShellGet, run following commands in Powershell ISE:
+```
+Install-Module PsISEProjectExplorer
+Import-Module PsISEProjectExplorer
+Add-PsISEProjectExplorerToIseProfile
+```
+
+If you don't have PsGet, [download latest package](https://github.com/mgr32/PsISEProjectExplorer/releases/latest) and either:
+* Install it automatically - by running `Install_to_UserModules.bat`, or
+* Install it manually:
  * Ensure all the files are unblocked (properties of the file / General)
- * Copy PSISEProjectExplorer to $env:USERPROFILE\Documents\WindowsPowerShell\Modules.
+ * Copy PSISEProjectExplorer to `$env:USERPROFILE\Documents\WindowsPowerShell\Modules`.
  * Launch PowerShell ISE.
- * Run 'Import-Module PsISEProjectExplorer'.
- * If you want it to be loaded automatically when ISE starts, add the line above to your ISE profile (see $profile).
+ * Run `Import-Module PsISEProjectExplorer`.
+ * If you want it to be loaded automatically when ISE starts, add the line above to your ISE profile (see `$profile`).
 
 #### Usage
 

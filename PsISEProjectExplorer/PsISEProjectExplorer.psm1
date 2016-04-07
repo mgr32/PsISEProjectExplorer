@@ -44,7 +44,8 @@ function Register-PsISEProjectExplorerMenu($root, $name, $scriptblock, $hotkey) 
 	$root.SubMenus.Add($name, $scriptblock, $hotkey)
 }
 
-function Copy-PsISEConfigFile {
+# this is for backward compatibility, to be removed in future
+function Copy-PsISEOldConfigFile {
 	$OldFile = Join-Path -Path $PSScriptRoot -ChildPath 'PsISEProjectExplorer.config'
 	$NewPath = Join-Path -Path $Env:LOCALAPPDATA -ChildPath 'PsISEProjectExplorer'
 	$NewFile = Join-Path -Path $Env:LOCALAPPDATA -ChildPath 'PsISEProjectExplorer\PsISEProjectExplorer.config'
@@ -56,6 +57,33 @@ function Copy-PsISEConfigFile {
 	}
 }
 
+function Add-PsISEProjectExplorerToIseProfile {
+	$docDir = [Environment]::GetFolderPath("mydocuments")
+	$profileFile = "$docDir\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1"
+
+	if (!(Test-Path $profileFile)) {
+		Write-Host -Object "Creating file '$profileFile'..." -NoNewline
+		[void](New-Item -Path $profileFile -ItemType File)
+		Write-Host -Object 'OK'
+		$content = ''
+	} else {
+		Write-Host "Reading file '$profileFile'..." -NoNewLine
+		$contents = Get-Content -Path $profileFile | Out-String
+        Write-Host -Object 'OK'
+	}
+
+	$importModule = "Import-Module PsISEProjectExplorer"
+
+	if ($contents -inotmatch $importModule) {
+		Write-Host "Adding '$importModule'..." -NoNewLine
+		Add-Content -Path $profileFile -Value $importModule | Out-Null
+        Write-Host 'OK'
+	} else {
+		Write-Host 'Import command for PsISEProjectExplorer already exists in profile file.'
+	}
+}
+
+
 if ($host.Name -ne 'Windows PowerShell ISE Host') {
 	Write-Warning "PsISEProjectExplorer module only runs inside PowerShell ISE"
 	return
@@ -66,7 +94,7 @@ if ($PSVersionTable.PSVersion.Major -lt 3) {
 	return
 }
 
-Copy-PsISEConfigFile
+Copy-PsISEOldConfigFile
 
 Register-PsISEProjectExplorer
 Register-PsISEProjectExplorerMenus
