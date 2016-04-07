@@ -68,4 +68,5 @@ To modify keyboard shortcuts, you need to edit PsISEProjectExplorer.psm1 file.
 #### Links
 
 [How to build](https://github.com/mgr32/PsISEProjectExplorer/wiki/How-to-build)
+
 [Third party libraries](https://github.com/mgr32/PsISEProjectExplorer/wiki/Third-party-libraries)
