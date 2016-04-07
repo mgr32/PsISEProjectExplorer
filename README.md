@@ -1,4 +1,4 @@
-## Powershell ISE Addon - Project Explorer 1.3.1
+## Powershell ISE Addon - Project Explorer 1.3.2
 
 [PsGallery](https://www.powershellgallery.com/packages/PsISEProjectExplorer) or [direct download](https://github.com/mgr32/PsISEProjectExplorer/releases/latest)
 
