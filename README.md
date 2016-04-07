@@ -54,4 +54,4 @@ You can also select the root directory manually (by clicking 'Change' button), w
 
 #### Documentation
 
-Please see [wiki](https://github.com/mgr32/PsISEProjectExplorer/wiki)
+Please see [wiki](https://github.com/mgr32/PsISEProjectExplorer/wiki).
