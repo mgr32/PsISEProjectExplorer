@@ -58,14 +58,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.WorkspaceDirectories = new ObservableCollection<string>(workspaceDirs);
             this.autoUpdateRootDirectory = ConfigHandler.ReadConfigBoolValue("AutoUpdateRootDirectory", true);
 
-            // handle old config value -> to be removed in future
-            var oldRootDirectoryToSearch = ConfigHandler.ReadConfigStringValue("RootDirectory");
-            if (!this.WorkspaceDirectories.Any() && !String.IsNullOrEmpty(oldRootDirectoryToSearch))
-            {
-                this.WorkspaceDirectories = new ObservableCollection<string>(new List<string>() { oldRootDirectoryToSearch });
-            }
-            // ~
-
             this.SanitizeWorkspaceDirectories();
         }
 

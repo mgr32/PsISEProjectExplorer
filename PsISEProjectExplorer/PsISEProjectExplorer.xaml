@@ -77,7 +77,7 @@
                 <ContextMenu x:Key="DirectoryContext">
                     <MenuItem Header="Open in Explorer" Click="SearchResults_OpenInExplorer">
                         <MenuItem.Icon>
-                            <Image Source="Resources/directory.png" />
+                            <Image Source="Resources/node_directory.png" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator />
@@ -87,12 +87,12 @@
                         </MenuItem.Icon>
                         <MenuItem Header="Directory" Click="SearchResults_AddDirectory">
                             <MenuItem.Icon>
-                                <Image Source="Resources/directory.png" />
+                                <Image Source="Resources/node_directory.png" />
                             </MenuItem.Icon>
                         </MenuItem>
                         <MenuItem Header="File" Click="SearchResults_AddFile">
                             <MenuItem.Icon>
-                                <Image Source="Resources/file.png" />
+                                <Image Source="Resources/node_file.png" />
                             </MenuItem.Icon>
                         </MenuItem>
                     </MenuItem>
@@ -120,7 +120,7 @@
                 <ContextMenu x:Key="FileContext">
                     <MenuItem Header="Open in Explorer" Click="SearchResults_OpenInExplorer">
                         <MenuItem.Icon>
-                            <Image Source="Resources/directory.png" />
+                            <Image Source="Resources/node_directory.png" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator />
@@ -152,12 +152,12 @@
                         </MenuItem.Icon>
                         <MenuItem Header="Directory" Click="SearchResults_AddDirectory">
                             <MenuItem.Icon>
-                                <Image Source="Resources/directory.png" />
+                                <Image Source="Resources/node_directory.png" />
                             </MenuItem.Icon>
                         </MenuItem>
                         <MenuItem Header="File" Click="SearchResults_AddFile">
                             <MenuItem.Icon>
-                                <Image Source="Resources/file.png" />
+                                <Image Source="Resources/node_file.png" />
                             </MenuItem.Icon>
                         </MenuItem>
                     </MenuItem>

@@ -11,7 +11,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("PsISEProjectExplorer")]
-[assembly: AssemblyCopyright("Copyright © 2015 Marcin Grzywa")]
+[assembly: AssemblyCopyright("Copyright © 2016 Marcin Grzywa")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

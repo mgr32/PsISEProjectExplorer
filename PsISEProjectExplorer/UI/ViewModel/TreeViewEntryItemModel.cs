@@ -13,6 +13,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
     {
         public static object RootLockObject = new object();
 
+        private static IconProvider iconProvider = new IconProvider();
+
         private INode documentHierarchyNode;
 
         private INode DocumentHierarchyNode
@@ -49,30 +51,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                /*
-                string fileName = this.NodeType.ToString().ToLowerInvariant();
-                if (this.Node.IsExcluded)
+                if (this.NodeType == NodeType.Directory || this.NodeType == NodeType.File)
                 {
-                    fileName += "_excluded";
+                    return iconProvider.GetImageSourceForFileSystemEntry(this.Path, this.Node.IsExcluded, this.Node.IsValid);
                 }
-                else if (!this.Node.IsValid)
+                else
                 {
-                    fileName += "_invalid";
+                    return iconProvider.GetImageSourceForPowershellItemEntry(this.NodeType.ToString());
                 }
-                
-                return String.Format("Resources/{0}.png", fileName);*/
-
-
-                ShellItem shellItem = new ShellItem(new Uri(this.Path));
-                var icon = shellItem.ShellIcon;
-                ImageDrawing shellIcon = new ImageDrawing(Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()), new Rect(new Size(16, 16)));
-
-                DrawingGroup iconOverlays = new DrawingGroup();
-                iconOverlays.Children.Add(shellIcon);
-                //TODO
-
-                return new DrawingImage(iconOverlays);
-
             }
         }
 

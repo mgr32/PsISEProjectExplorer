@@ -162,6 +162,7 @@
     <Compile Include="UI\Ookii.Dialogs.Wpf\VistaFolderBrowserDialog.cs" />
     <Compile Include="UI\ViewModel\BaseViewModel.cs" />
     <Compile Include="UI\ViewModel\DefaultTreeViewEntryItemComparer.cs" />
+    <Compile Include="UI\ViewModel\IconProvider.cs" />
     <Compile Include="UI\ViewModel\IndexingSearchingModel.cs" />
     <Compile Include="UI\ViewModel\MainViewModel.cs" />
     <Compile Include="UI\ViewModel\TreeViewEntryItemModelState.cs" />
@@ -212,15 +213,14 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="UI\GongSolutions.Shell\Licence.md" />
-    <Resource Include="Resources\file_excluded.png" />
+    <Resource Include="Resources\node_overlay_excluded.png" />
     <Resource Include="Resources\textfield_exclude.png" />
     <Resource Include="Resources\textfield_include.png" />
-    <Resource Include="Resources\configuration.png" />
-    <Resource Include="Resources\dslelement.png" />
-    <Resource Include="Resources\classproperty.png" />
-    <Resource Include="Resources\classconstructor.png" />
-    <Resource Include="Resources\class.png" />
-    <Resource Include="Resources\directory_excluded.png" />
+    <Resource Include="Resources\node_configuration.png" />
+    <Resource Include="Resources\node_dslelement.png" />
+    <Resource Include="Resources\node_classproperty.png" />
+    <Resource Include="Resources\node_classconstructor.png" />
+    <Resource Include="Resources\node_class.png" />
     <Resource Include="Resources\toolbar_searchRegex.png" />
     <Resource Include="Resources\toolbar_sync.png" />
     <Resource Include="Resources\toolbar_toggle-expand.png" />
@@ -247,13 +247,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\directory.png" />
+    <Resource Include="Resources\node_directory.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\file.png" />
+    <Resource Include="Resources\node_file.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\function.png" />
+    <Resource Include="Resources\node_function.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="UI\Ookii.Dialogs.Wpf\license.txt" />
@@ -283,8 +283,7 @@
     <Resource Include="Resources\toolbar_refresh.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\directory_invalid.png" />
-    <Resource Include="Resources\file_invalid.png" />
+    <Resource Include="Resources\node_overlay_invalid.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PsISEProjectExplorerPS5\PsISEProjectExplorerPS5.csproj">
@@ -292,6 +291,7 @@
       <Name>PsISEProjectExplorerPS5</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

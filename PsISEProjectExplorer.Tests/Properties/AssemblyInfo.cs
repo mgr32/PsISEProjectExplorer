@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("PsISEProjectExplorerPS5")]
-[assembly: AssemblyDescription("Powershell5 extensions for Powershell ISE Project Explorer")]
+[assembly: AssemblyTitle("PsISEProjectExplorer.Tests")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("PsISEProjectExplorerPS5")]
+[assembly: AssemblyProduct("PsISEProjectExplorer.Tests")]
 [assembly: AssemblyCopyright("Copyright © 2016 Marcin Grzywa")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("0c425642-ded0-41e2-a393-9cfd6b2af181")]
+[assembly: Guid("80493b05-f311-47ad-b361-a2ccba29082a")]
 
 // Version information for an assembly consists of the following four values:
 //
