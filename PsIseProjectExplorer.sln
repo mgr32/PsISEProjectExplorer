@@ -5,12 +5,6 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PsISEProjectExplorer", "PsISEProjectExplorer\PsISEProjectExplorer.csproj", "{FCE0F6FA-5377-4D9A-8FB7-561F97AD2ABA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{3A3CC59A-D025-4AB8-A933-4878B547F021}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PsISEProjectExplorerPS5", "PsISEProjectExplorerPS5\PsISEProjectExplorerPS5.csproj", "{0C425642-DED0-41E2-A393-9CFD6B2AF181}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PsISEProjectExplorer.Tests", "PsISEProjectExplorer.Tests\PsISEProjectExplorer.Tests.csproj", "{80493B05-F311-47AD-B361-A2CCBA29082A}"

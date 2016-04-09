@@ -22,7 +22,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             foreach (string fileName in this.GetNodeResourceNames())
             {
-                string shortName = fileName.Replace(@"resources/node_", "").Replace(".png", "").ToLowerInvariant();
+                string shortName = fileName.ToLowerInvariant().Replace(@"resources/node_", "").Replace(".png", "");
                 iconsMap.Add(shortName, GetBitmapImage(fileName));
             }
         }

@@ -193,6 +193,9 @@
                             </MultiTrigger.Conditions>
                             <Setter Property="FontWeight" Value="Bold" />
                         </MultiTrigger>
+                        <DataTrigger Binding="{Binding Path=IsExcluded}" Value="True">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </DataTrigger>
                         <Trigger Property="uiHelpers:TreeViewMouseHelper.IsMouseDirectlyOverItem" Value="True">
                             <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.MenuBrushKey}}" />
                         </Trigger>
