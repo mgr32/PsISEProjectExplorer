@@ -1,19 +1,24 @@
-﻿using System;
+﻿using PsISEProjectExplorer.Config;
+using PsISEProjectExplorer.Enums;
+using PsISEProjectExplorer.Model;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Management.Automation;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using PsISEProjectExplorer.Model;
-using PsISEProjectExplorer.Enums;
 using System.Management.Automation.Language;
+using System.Text.RegularExpressions;
 
 namespace PsISEProjectExplorer.Services
 {
     public abstract class PowershellBaseTokenizer : IPowershellTokenizer
     {
+        private static readonly Regex ImportDscRegex = new Regex("Import-DSCResource", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private static readonly IEnumerable<string> DefaultDslCustomDictionary = new List<string>() {
+            "task", // psake
+            "serverrole", "serverconnection", "step" // PSCI
+        };
 
         protected ISet<string> AddedItems;
 
@@ -23,26 +28,55 @@ namespace PsISEProjectExplorer.Services
 
         private IEnumerable<string> dslCustomDictionary;
 
-        public PowershellBaseTokenizer(bool dslAutoDiscovery, IEnumerable<string> dslCustomDictionary)
+        private bool parsePowershellDscWithExternalImports;
+
+        public PowershellBaseTokenizer()
         {
-            this.dslAutoDiscovery = dslAutoDiscovery;
-            this.dslCustomDictionary = dslCustomDictionary == null ? Enumerable.Empty<string>() : dslCustomDictionary;
+            this.dslAutoDiscovery = ConfigHandler.ReadConfigBoolValue("DslAutoDiscovery", true);
+            this.dslCustomDictionary = ConfigHandler.ReadConfigStringEnumerableValue("DslCustomDictionary", true, DefaultDslCustomDictionary);
+            // this is fix for performance issue in PSParser.Tokenize - when file contains Import - DSCResource pointing to a non - installed resource,
+            // parsing takes long time and 'Unable to load resource' errors appear 
+            this.parsePowershellDscWithExternalImports = ConfigHandler.ReadConfigBoolValue("ParsePowershellDSCWithExternalImports", false);
         }
 
-        public virtual PowershellItem GetPowershellItems(string path, string contents)
+        public PowershellItem GetPowershellItems(string path, string contents)
         {
+            bool parsePowershellItems = ConfigHandler.ReadConfigBoolValue("ParsePowershellItems", true);
+            if (!parsePowershellItems || !this.parsePowershellDscWithExternalImports && ImportDscRegex.IsMatch(contents))
+            {
+                return this.createRootItem(null);
+            }
+
             ParseError[] errors;
             Token[] tokens;
             AddedItems = new HashSet<string>();
-
+            
+            
             Ast ast = Parser.ParseInput(contents, out tokens, out errors);
             var errorsLog = !errors.Any() ? null :
                 "Parsing error(s): " + Environment.NewLine + string.Join(Environment.NewLine, errors.OrderBy(err => err.Extent.StartLineNumber).Select(err => "Line " + err.Extent.StartLineNumber + ": " + err.Message));
-            RootItem = new PowershellItem(PowershellItemType.Root, null, 0, 0, 0, 0, null, errorsLog);
+            RootItem = this.createRootItem(errorsLog);
 
             VisitTokens(ast);
 
             return RootItem;
+        }
+
+        private PowershellItem createRootItem(string errorsLog)
+        {
+            RootItem = new PowershellItem(PowershellItemType.Root, null, 0, 0, 0, 0, null, errorsLog);
+            return RootItem;
+        } 
+
+        protected bool RemoveImportDscResource(string contents, out string newContents)
+        {
+            if (ImportDscRegex.IsMatch(contents))
+            {
+                newContents = ImportDscRegex.Replace(contents, "#Import-DSCResource");
+                return true;
+            }
+            newContents = contents;
+            return false;
         }
 
         public string GetTokenAtColumn(string line, int column)

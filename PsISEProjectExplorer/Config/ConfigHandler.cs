@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.IO;
+using System.Collections.Concurrent;
 
 namespace PsISEProjectExplorer.Config
 {
@@ -15,6 +16,8 @@ namespace PsISEProjectExplorer.Config
 
         private static Object ConfigHandlerLock = new Object();
 
+        private static IDictionary<String, String> cache = new ConcurrentDictionary<string, string>();
+
         static ConfigHandler()
         {
             ConfigFilePath = Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA"), "PsISEProjectExplorer", "PsISEProjectExplorer.config");
@@ -22,6 +25,10 @@ namespace PsISEProjectExplorer.Config
 
         public static string ReadConfigStringValue(string key)
         {
+            if (cache.ContainsKey(key))
+            {
+                return cache[key];
+            }
             lock (ConfigHandlerLock)
             {
                 var config = OpenConfigFile();
@@ -31,7 +38,9 @@ namespace PsISEProjectExplorer.Config
                 }
                 try
                 {
-                    return config.AppSettings.Settings[key].Value;
+                    String value = config.AppSettings.Settings[key].Value;
+                    cache[key] = value;
+                    return value;
                 }
                 catch (Exception)
                 {
@@ -95,6 +104,7 @@ namespace PsISEProjectExplorer.Config
         {
             lock (ConfigHandlerLock)
             {
+                cache[key] = value;
                 var config = OpenConfigFile();
                 if (config == null)
                 {

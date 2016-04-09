@@ -1,9 +1,6 @@
 ﻿using NLog;
 using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Management.Automation.Language;
 
 namespace PsISEProjectExplorer.Services
@@ -14,7 +11,7 @@ namespace PsISEProjectExplorer.Services
 
         private Powershell5TokenVisitor tokenVisitor;
 
-        public Powershell5Tokenizer(bool dslAutoDiscovery, IEnumerable<string> dslCustomDictionary) : base(dslAutoDiscovery, dslCustomDictionary)
+        public Powershell5Tokenizer() : base()
         {
             this.tokenVisitor = new Powershell5TokenVisitor(this.OnFunctionVisit,
                 this.OnConfigurationVisit,

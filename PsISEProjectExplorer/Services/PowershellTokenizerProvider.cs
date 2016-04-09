@@ -13,11 +13,6 @@ namespace PsISEProjectExplorer.Services
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private static readonly IEnumerable<string> DefaultDslCustomDictionary = new List<string>() {
-            "task", // psake
-            "serverrole", "serverconnection", "step" // PSCI
-        };
-
         private static readonly Boolean isPowershell5Available;
 
         static PowershellTokenizerProvider() {
@@ -28,17 +23,15 @@ namespace PsISEProjectExplorer.Services
 
         public static IPowershellTokenizer GetPowershellTokenizer()
         {
-            bool dslAutoDiscovery = ConfigHandler.ReadConfigBoolValue("DslAutoDiscovery", true);
-            IEnumerable<string> dslCustomDictionary = ConfigHandler.ReadConfigStringEnumerableValue("DslCustomDictionary", true, DefaultDslCustomDictionary);
             if (isPowershell5Available)
             {
                 Logger.Info("Using Powershell5Tokenizer");
-                return new Powershell5Tokenizer(dslAutoDiscovery, dslCustomDictionary);
+                return new Powershell5Tokenizer();
             }
             else
             {
                 Logger.Info("Using PowershellLegacyTokenizer");
-                return new PowershellLegacyTokenizer(dslAutoDiscovery, dslCustomDictionary);
+                return new PowershellLegacyTokenizer();
             }
         }
     }

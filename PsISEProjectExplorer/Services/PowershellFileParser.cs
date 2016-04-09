@@ -6,6 +6,8 @@ namespace PsISEProjectExplorer.Services
 {
     public class PowershellFileParser
     {
+        private static IPowershellTokenizer powershellTokenizer = PowershellTokenizerProvider.GetPowershellTokenizer();
+
         public string Path { get; private set; }
 
         public string FileContents { get; private set; }
@@ -81,7 +83,7 @@ namespace PsISEProjectExplorer.Services
             }
             if (this.FileContents != null)
             {
-               this.RootPowershellItem = PowershellTokenizerProvider.GetPowershellTokenizer().GetPowershellItems(this.Path, this.FileContents);
+               this.RootPowershellItem = this.powershellTokenizer.GetPowershellItems(this.Path, this.FileContents);
                this.ErrorMessage = this.RootPowershellItem.ParsingErrors;
             }
         }
