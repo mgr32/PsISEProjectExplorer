@@ -83,7 +83,7 @@ namespace PsISEProjectExplorer.Services
             }
             if (this.FileContents != null)
             {
-               this.RootPowershellItem = this.powershellTokenizer.GetPowershellItems(this.Path, this.FileContents);
+               this.RootPowershellItem = powershellTokenizer.GetPowershellItems(this.Path, this.FileContents);
                this.ErrorMessage = this.RootPowershellItem.ParsingErrors;
             }
         }
