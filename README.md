@@ -4,6 +4,8 @@
 
 [What's new](https://github.com/mgr32/PsISEProjectExplorer/wiki/What's-new)
 
+[![Build status](https://ci.appveyor.com/api/projects/status/u2erfvsojuedn1sl/branch/master?svg=true)](https://ci.appveyor.com/project/mgr32/psiseprojectexplorer/branch/master)
+
 #### Description
 
 Provides a tree view that enables to index and explore whole directory structure containing Powershell scripts. It has following features:
