@@ -5,9 +5,10 @@ using System.Linq;
 
 namespace PsISEProjectExplorer.Services
 {
-    public static class RootDirectoryProvider
+    [Component]
+    public class RootDirectoryProvider
     {
-        public static string GetRootDirectoryToSearch(string filePath)
+        public string GetRootDirectoryToSearch(string filePath)
         {
             if (String.IsNullOrEmpty(filePath))
             {
@@ -19,7 +20,7 @@ namespace PsISEProjectExplorer.Services
             {
                 return null;
             }
-            var filesPatternProvider = new FilesPatternProvider(false, Enumerable.Empty<string>());
+            var filesPatternProvider = new FilesPatternProvider();
             string currentDir = rootDir;
             while (true)
             {

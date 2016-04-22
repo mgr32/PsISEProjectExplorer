@@ -13,15 +13,18 @@ namespace PsISEProjectExplorer.Services
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public event EventHandler<FileSystemChangedInfo> FileSystemChanged;
-        
+
         private readonly ISet<ChangePoolEntry> ChangePool = new HashSet<ChangePoolEntry>();
 
         private readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
         private string Name;
 
-        public FileSystemChangeNotifier(string name)
+        private FileSystemOperationsService FileSystemOperationsService { get; set; }
+
+        public FileSystemChangeNotifier(string name, FileSystemOperationsService fileSystemOperationsService)
         {
+            this.FileSystemOperationsService = fileSystemOperationsService;
             this.Name = name;
             Task.Factory.StartNew(ChangeNotifier);
         }

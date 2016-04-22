@@ -54,9 +54,16 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private ConfigHandler ConfigHandler { get; set; }
 
-        public WorkspaceDirectoryModel(ConfigHandler configHandler)
+        private FileSystemOperationsService FileSystemOperationsService { get; set; }
+
+        private RootDirectoryProvider RootDirectoryProvider { get; set; }
+
+        public WorkspaceDirectoryModel(ConfigHandler configHandler, FileSystemOperationsService fileSystemOperationsService, RootDirectoryProvider rootDirectoryProvider)
         {
             this.ConfigHandler = configHandler;
+            this.FileSystemOperationsService = fileSystemOperationsService;
+            this.RootDirectoryProvider = rootDirectoryProvider;
+
             this.MaxNumOfWorkspaceDirectories = configHandler.ReadConfigIntValue("MaxNumOfWorkspaceDirectories", 5);
             var workspaceDirs = configHandler.ReadConfigStringEnumerableValue("WorkspaceDirectories");
             this.WorkspaceDirectories = new ObservableCollection<string>(workspaceDirs);
@@ -123,7 +130,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 return false;
             }
-            string newRootDirectoryToSearch = RootDirectoryProvider.GetRootDirectoryToSearch(currentPath);
+            string newRootDirectoryToSearch = this.RootDirectoryProvider.GetRootDirectoryToSearch(currentPath);
             if (newRootDirectoryToSearch == null || newRootDirectoryToSearch == this.CurrentWorkspaceDirectory || 
                 FileSystemOperationsService.IsSubdirectory(this.CurrentWorkspaceDirectory, newRootDirectoryToSearch) ||
                 !Directory.Exists(newRootDirectoryToSearch))

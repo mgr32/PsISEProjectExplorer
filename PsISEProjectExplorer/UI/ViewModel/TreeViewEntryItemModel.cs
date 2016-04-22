@@ -1,11 +1,7 @@
-﻿using GongSolutions.Shell;
-using PsISEProjectExplorer.Enums;
+﻿using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using System;
-using System.Windows;
-using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
@@ -13,7 +9,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
     {
         public static object RootLockObject = new object();
 
-        private static IconProvider iconProvider = new IconProvider();
+        private IconProvider IconProvider { get; set; }
 
         private INode documentHierarchyNode;
 
@@ -53,11 +49,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 if (this.NodeType == NodeType.Directory || this.NodeType == NodeType.File)
                 {
-                    return iconProvider.GetImageSourceForFileSystemEntry(this.Path, this.Node.IsExcluded, this.Node.IsValid);
+                    return this.IconProvider.GetImageSourceForFileSystemEntry(this.Path, this.Node.IsExcluded, this.Node.IsValid);
                 }
                 else
                 {
-                    return iconProvider.GetImageSourceForPowershellItemEntry(this.NodeType.ToString());
+                    return this.IconProvider.GetImageSourceForPowershellItemEntry(this.NodeType.ToString());
                 }
             }
         }
@@ -164,8 +160,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public TreeViewEntryItemObservableSet Children { get; private set; }
 
-        public TreeViewEntryItemModel(INode node, TreeViewEntryItemModel parent, bool isSelected)
+        public TreeViewEntryItemModel(INode node, TreeViewEntryItemModel parent, bool isSelected, IconProvider iconProvider)
         {
+            this.IconProvider = iconProvider;
             var lockObject = this.Parent == null ? RootLockObject : this.Parent;
             lock (lockObject)
             {

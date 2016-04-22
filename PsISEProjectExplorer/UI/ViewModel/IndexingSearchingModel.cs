@@ -6,6 +6,7 @@ using System.ComponentModel;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
+    [Component]
     public class IndexingSearchingModel : BaseViewModel
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -20,13 +21,17 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private EventHandler<SearcherResult> SearcherResultHandler { get; set; }
 
-        public IndexingSearchingModel(EventHandler<SearcherResult> searcherResultHandler, EventHandler<IndexerResult> indexerResultHandler, EventHandler<string> indexerProgressHandler)
+        public IndexingSearchingModel()
+        {
+            this.BackgroundIndexers = new List<BackgroundIndexer>();
+            this.BackgroundSearchers = new List<BackgroundSearcher>();
+        }
+
+        public void RegisterHandlers(EventHandler<SearcherResult> searcherResultHandler, EventHandler<IndexerResult> indexerResultHandler, EventHandler<string> indexerProgressHandler)
         {
             this.SearcherResultHandler = searcherResultHandler;
             this.IndexerResultHandler = indexerResultHandler;
             this.IndexerProgressHandler = indexerProgressHandler;
-            this.BackgroundIndexers = new List<BackgroundIndexer>();
-            this.BackgroundSearchers = new List<BackgroundSearcher>();
         }
 
         // running in UI thread

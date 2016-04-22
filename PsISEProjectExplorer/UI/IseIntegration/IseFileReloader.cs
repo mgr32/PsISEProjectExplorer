@@ -11,6 +11,7 @@ using System.Linq;
 
 namespace PsISEProjectExplorer.UI.IseIntegration
 {
+    [Component]
     public class IseFileReloader
     {
 
@@ -22,12 +23,19 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         private FileSystemChangeNotifier FileSystemChangeNotifier { get; set; }
 
-        public IseFileReloader(IseIntegrator iseIntegrator)
+        private FileSystemOperationsService FileSystemOperationsService { get; set; }
+
+        public IseFileReloader(IseIntegrator iseIntegrator, FileSystemOperationsService fileSystemOperationsService)
         {
             this.IseIntegrator = iseIntegrator;
+            this.FileSystemOperationsService = fileSystemOperationsService;
             this.IseFileWatchers = new Dictionary<string, IseFileWatcher>();
             this.PathsToIgnore = new HashSet<string>();
-            this.FileSystemChangeNotifier = new FileSystemChangeNotifier("PsISEPE-FileSystemNotifierIseReloader");
+        }
+
+        public void startWatching()
+        {
+            this.FileSystemChangeNotifier = new FileSystemChangeNotifier("PsISEPE-FileSystemNotifierIseReloader", this.FileSystemOperationsService);
             this.FileSystemChangeNotifier.FileSystemChanged += OnIseFileChangedBatch;
             this.IseIntegrator.AttachFileCollectionChangedHandler(this.OnIseFilesCollectionChanged);
         }

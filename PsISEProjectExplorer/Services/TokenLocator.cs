@@ -3,8 +3,16 @@ using System.Text.RegularExpressions;
 
 namespace PsISEProjectExplorer.Services
 {
+    [Component]
     public class TokenLocator
     {
+
+        private FileReader FileReader { get; set; }
+
+        public TokenLocator(FileReader fileReader)
+        {
+            this.FileReader = fileReader;
+        }
 
         public TokenPosition LocateNextToken(string filePath, SearchOptions searchOptions, EditorInfo editorInfo)
         {

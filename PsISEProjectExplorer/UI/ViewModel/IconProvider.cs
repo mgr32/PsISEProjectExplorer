@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
+    [Component]
     public class IconProvider
     {
         private IDictionary<String, BitmapImage> iconsMap = new Dictionary<String, BitmapImage>();

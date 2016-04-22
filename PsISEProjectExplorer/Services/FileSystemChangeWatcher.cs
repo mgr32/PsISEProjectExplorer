@@ -5,6 +5,7 @@ using System.IO;
 
 namespace PsISEProjectExplorer.Services
 {
+    [Component]
     public class FileSystemChangeWatcher
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -15,11 +16,18 @@ namespace PsISEProjectExplorer.Services
 
         private FilesPatternProvider FilesPatternProvider { get; set; }
 
+        private FileSystemOperationsService FileSystemOperationsService { get; set; }
+
         private string RootPath { get; set; }
 
-        public FileSystemChangeWatcher(EventHandler<FileSystemChangedInfo> fileSystemChangedEvent)
+        public FileSystemChangeWatcher(FileSystemOperationsService fileSystemOperationsService)
         {
-            this.FileSystemChangeNotifier = new FileSystemChangeNotifier("PsISEPE-FileSystemNotifierReindexWatcher");
+            this.FileSystemOperationsService = fileSystemOperationsService;
+        }
+
+        public void RegisterOnChangeCallback(EventHandler<FileSystemChangedInfo> fileSystemChangedEvent)
+        {
+            this.FileSystemChangeNotifier = new FileSystemChangeNotifier("PsISEPE-FileSystemNotifierReindexWatcher", this.FileSystemOperationsService);
             this.FileSystemChangeNotifier.FileSystemChanged += fileSystemChangedEvent;
             this.Watcher = new FileSystemWatcher();
         }

@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using Microsoft.PowerShell.Host.ISE;
+using NLog;
 using PsISEProjectExplorer.Config;
 using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
@@ -147,29 +148,9 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public SearchOptions SearchOptions { get; private set; }
 
+        public IseIntegrator IseIntegrator { get; private set; }
+
         private DocumentHierarchyFactory DocumentHierarchyFactory { get; set; }
-
-        private IseIntegrator iseIntegrator;
-
-        public IseIntegrator IseIntegrator
-        {
-            get
-            {
-                return this.iseIntegrator;
-            }
-            set
-            {
-                this.iseIntegrator = value;
-                this.IseFileReloader = new IseFileReloader(this.iseIntegrator);
-                this.TreeViewModel.IseIntegrator = this.iseIntegrator;
-                this.WorkspaceDirectoryModel.IseIntegrator = this.iseIntegrator;
-                this.iseIntegrator.FileTabChanged += OnFileTabChanged;
-                if (!this.WorkspaceDirectoryModel.ResetWorkspaceDirectoryIfRequired())
-                {
-                    this.ReindexSearchTree();
-                }
-            }
-        }
 
         private IseFileReloader IseFileReloader { get; set; }
 
@@ -192,30 +173,52 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private readonly ConfigHandler configHandler;
 
         public MainViewModel(ConfigHandler configHandler, WorkspaceDirectoryModel workspaceDirectoryModel, DocumentHierarchyFactory documentHierarchyFactory,
-            PowershellTokenizerProvider powershellTokenizerProvider)
+            PowershellTokenizerProvider powershellTokenizerProvider, FileSystemChangeWatcher fileSystemChangeWatcher, IndexingSearchingModel indexingSearchingModel,
+            TreeViewModel treeViewModel, FilesPatternProvider filesPatternProvider, IseIntegrator iseIntegrator, IseFileReloader iseFileReloader)
         {
             this.configHandler = configHandler;
             this.WorkspaceDirectoryModel = workspaceDirectoryModel;
             this.DocumentHierarchyFactory = documentHierarchyFactory;
             this.PowershellTokenizerProvider = powershellTokenizerProvider;
+            this.FileSystemChangeWatcher = fileSystemChangeWatcher;
+            this.IndexingSearchingModel = indexingSearchingModel;
+            this.TreeViewModel = treeViewModel;
+            this.FilesPatternProvider = filesPatternProvider;
+            this.IseIntegrator = iseIntegrator;
+            this.IseFileReloader = iseFileReloader;
+            this.TreeViewModel.PropertyChanged += (s, e) => { if (e.PropertyName == "NumberOfFiles") this.OnPropertyChanged("TreeItemsResultString"); };
+
+            fileSystemChangeWatcher.RegisterOnChangeCallback(this.ReindexOnFileSystemChanged);
+            indexingSearchingModel.RegisterHandlers(this.OnSearchingFinished, this.OnIndexingFinished, this.OnIndexingProgress);
+
             this.searchRegex = configHandler.ReadConfigBoolValue("SearchRegex", false);
             this.searchInFiles = configHandler.ReadConfigBoolValue("SearchInFiles", true);
             this.showAllFiles = configHandler.ReadConfigBoolValue("ShowAllFiles", true);
             IEnumerable<string> excludePaths = configHandler.ReadConfigStringEnumerableValue("ExcludePaths");
-            this.FilesPatternProvider = new FilesPatternProvider(this.showAllFiles, excludePaths);
+            this.FilesPatternProvider.IncludeAllFiles = this.showAllFiles;
+            this.FilesPatternProvider.ExcludePaths = excludePaths;
+            
             this.syncWithActiveDocument = configHandler.ReadConfigBoolValue("SyncWithActiveDocument", false);
             var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
             this.SearchOptions = new SearchOptions(searchField, string.Empty, this.searchRegex);
-            this.FileSystemChangeWatcher = new FileSystemChangeWatcher(this.ReindexOnFileSystemChanged);
-            this.IndexingSearchingModel = new IndexingSearchingModel(this.OnSearchingFinished, this.OnIndexingFinished, this.OnIndexingProgress);
-            this.TreeViewModel = new TreeViewModel(this.FileSystemChangeWatcher, this.DocumentHierarchyFactory, this.FilesPatternProvider);
-            this.TreeViewModel.PropertyChanged += (s, e) => { if (e.PropertyName == "NumberOfFiles") this.OnPropertyChanged("TreeItemsResultString"); };
-            
+
             if (this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory != null)
             {
                 this.DocumentHierarchySearcher = this.DocumentHierarchyFactory.CreateDocumentHierarchySearcher(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
             }
             this.WorkspaceDirectoryModel.PropertyChanged += this.OnWorkspaceDirectoryChanged;
+
+        }
+
+        public void setIseHostObject(ObjectModelRoot hostObject)
+        {
+            this.IseIntegrator.setHostObject(hostObject);
+            this.IseIntegrator.FileTabChanged += OnFileTabChanged;
+            this.IseFileReloader.startWatching();
+            if (!this.WorkspaceDirectoryModel.ResetWorkspaceDirectoryIfRequired())
+            {
+                this.ReindexSearchTree();
+            }
         }
 
         public void GoToDefinition()

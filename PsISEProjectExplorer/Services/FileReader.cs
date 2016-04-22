@@ -6,12 +6,13 @@ using System.IO;
 
 namespace PsISEProjectExplorer.Services
 {
-    public static class FileReader
+    [Component]
+    public class FileReader
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         // note: exceptions not handled
-        public static string ReadFileAsString(string path) 
+        public string ReadFileAsString(string path) 
         {
             using (var fs = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
@@ -26,7 +27,7 @@ namespace PsISEProjectExplorer.Services
         }
 
         // note: exceptions handled and ignored (logged only)
-        public static IEnumerable<LineInfo> ReadFileAsEnumerableWithWrap(string path, int startLine)
+        public IEnumerable<LineInfo> ReadFileAsEnumerableWithWrap(string path, int startLine)
         {
             FileStream fs = null;
             BufferedStream bs = null;

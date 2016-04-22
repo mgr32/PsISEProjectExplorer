@@ -10,6 +10,7 @@ using System.Linq;
 
 namespace PsISEProjectExplorer.UI.IseIntegration
 {
+    [Component]
     public class IseIntegrator
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -55,7 +56,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         private string CurrentSelectedFile { get; set; }
 
-        public IseIntegrator(ObjectModelRoot hostObject)
+        public void setHostObject(ObjectModelRoot hostObject)
         {
             if (hostObject == null)
             {

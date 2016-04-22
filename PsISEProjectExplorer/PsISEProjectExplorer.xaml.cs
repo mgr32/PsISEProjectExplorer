@@ -31,7 +31,6 @@ namespace PsISEProjectExplorer
 
         private readonly MainViewModel mainViewModel;
         private Point dragStartPoint;
-        private ObjectModelRoot hostObject;
         private Container dependencyInjectionContainer;
 
         // Entry point to the ISE object model.
@@ -40,8 +39,7 @@ namespace PsISEProjectExplorer
             get { throw new InvalidOperationException("Should not use HostObject in user control - please use IseIntegrator class."); }
             set
             {
-                this.hostObject = value;
-                this.mainViewModel.IseIntegrator = new IseIntegrator(this.hostObject);
+                this.mainViewModel.setIseHostObject(value);
             }
         }
 

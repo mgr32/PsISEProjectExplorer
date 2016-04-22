@@ -3,9 +3,10 @@ using System.IO;
 
 namespace PsISEProjectExplorer.Services
 {
-    public static class FileSystemOperationsService
+    [Component]
+    public class FileSystemOperationsService
     {
-        public static void RenameFileOrDirectory(string filePath, string newFilePath)
+        public void RenameFileOrDirectory(string filePath, string newFilePath)
         {
             if (newFilePath == filePath)
             {
@@ -29,7 +30,7 @@ namespace PsISEProjectExplorer.Services
             }
         }
 
-        public static void DeleteFileOrDirectory(string filePath)
+        public void DeleteFileOrDirectory(string filePath)
         {
             if (Directory.Exists(filePath))
             {
@@ -45,7 +46,7 @@ namespace PsISEProjectExplorer.Services
             }
         }
 
-        public static void CreateFile(string filePath)
+        public void CreateFile(string filePath)
         {
             if (File.Exists(filePath))
             {
@@ -54,7 +55,7 @@ namespace PsISEProjectExplorer.Services
             File.Create(filePath).Dispose();
         }
 
-        public static void CreateDirectory(string filePath)
+        public void CreateDirectory(string filePath)
         {
             if (Directory.Exists(filePath))
             {
@@ -63,7 +64,7 @@ namespace PsISEProjectExplorer.Services
             Directory.CreateDirectory(filePath);
         }
 
-        public static bool IsSubdirectory(string rootDir, string potentialSubDir)
+        public bool IsSubdirectory(string rootDir, string potentialSubDir)
         {
             if (String.IsNullOrEmpty(rootDir) || String.IsNullOrEmpty(potentialSubDir))
             {

@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace PsISEProjectExplorer.Services
 {
+    [Component]
     public class FilesPatternProvider
     {
         private const string PowershellFilesPattern = "*.ps*1";
@@ -25,11 +26,9 @@ namespace PsISEProjectExplorer.Services
 
         private ISet<string> AdditionalPaths { get; set; }
 
-        public FilesPatternProvider(bool includeAllFiles, IEnumerable<string> excludePaths)
+        public FilesPatternProvider()
         {
-            this.IncludeAllFiles = includeAllFiles;
             this.AdditionalPaths = new HashSet<string>();
-            this.ExcludePaths = excludePaths;
         }
 
         public static bool IsPowershellFile(string fileName)

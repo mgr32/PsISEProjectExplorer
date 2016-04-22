@@ -7,11 +7,14 @@ namespace PsISEProjectExplorer.Services
     [Component]
     public class PowershellFileParser
     {
-        private IPowershellTokenizer powershellTokenizer;
+        private IPowershellTokenizer PowershellTokenizer { get; set; }
 
-        public PowershellFileParser(PowershellTokenizerProvider powershellTokenizerProvider)
+        private FileReader FileReader { get; set; }
+
+        public PowershellFileParser(PowershellTokenizerProvider powershellTokenizerProvider, FileReader fileReader)
         {
-            this.powershellTokenizer = powershellTokenizerProvider.GetPowershellTokenizer();
+            this.PowershellTokenizer = powershellTokenizerProvider.GetPowershellTokenizer();
+            this.FileReader = fileReader;
         }
 
         public PowershellParseResult ParseFile(string path, bool isDirectory, bool isExcluded, string errorMessage)
@@ -31,7 +34,7 @@ namespace PsISEProjectExplorer.Services
             }
             if (fileContents != null)
             {
-               var rootPowershellItem = powershellTokenizer.GetPowershellItems(path, fileContents);
+               var rootPowershellItem = this.PowershellTokenizer.GetPowershellItems(path, fileContents);
                return new PowershellParseResult(rootPowershellItem, errorMessage, path, fileContents, isDirectory, isExcluded);
             }
             return new PowershellParseResult(null, errorMessage, path, fileContents, isDirectory, isExcluded);

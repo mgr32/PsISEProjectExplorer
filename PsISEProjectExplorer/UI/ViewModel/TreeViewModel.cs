@@ -11,6 +11,7 @@ using System.Linq;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
+    [Component]
     public class TreeViewModel : BaseViewModel
     {
         public IEnumerable<TreeViewEntryItemModel> TreeViewItems
@@ -66,17 +67,25 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private FilesPatternProvider FilesPatternProvider { get; set; }
 
+        private FileSystemOperationsService FileSystemOperationsService { get; set; }
+
         private IDictionary<string, TreeViewEntryItemModel> ItemsMap { get; set; }
 
-        private TokenLocator TokenLocator;
+        private TokenLocator TokenLocator { get; set; }
 
-        public TreeViewModel(FileSystemChangeWatcher fileSystemChangeWatcher, DocumentHierarchyFactory documentHierarchyFactory, FilesPatternProvider filesPatternProvider)
+        private IconProvider IconProvider { get; set; }
+             
+        public TreeViewModel(FileSystemChangeWatcher fileSystemChangeWatcher, DocumentHierarchyFactory documentHierarchyFactory, FilesPatternProvider filesPatternProvider,
+            FileSystemOperationsService fileSystemOperationsService, TokenLocator tokenLocator, IconProvider iconProvider, IseIntegrator iseIntegrator)
         {
             this.FileSystemChangeWatcher = fileSystemChangeWatcher;
             this.DocumentHierarchyFactory = documentHierarchyFactory;
             this.FilesPatternProvider = filesPatternProvider;
+            this.FileSystemOperationsService = fileSystemOperationsService;
             this.ItemsMap = new Dictionary<string, TreeViewEntryItemModel>();
-            this.TokenLocator = new TokenLocator();
+            this.TokenLocator = tokenLocator;
+            this.IconProvider = iconProvider;
+            this.IseIntegrator = iseIntegrator;
         }
 
         public void ReRoot(INode rootNode)
@@ -531,7 +540,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             var lockObject = parent == null ? TreeViewEntryItemModel.RootLockObject : parent;
             lock (lockObject)
             {
-                var item = new TreeViewEntryItemModel(node, parent, isSelected);
+                var item = new TreeViewEntryItemModel(node, parent, isSelected, this.IconProvider);
                 this.ItemsMap[node.Path] = item;
                 if (node.NodeType == NodeType.File)
                 {
