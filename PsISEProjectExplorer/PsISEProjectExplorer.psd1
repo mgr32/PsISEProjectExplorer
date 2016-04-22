@@ -12,7 +12,7 @@
 RootModule = 'PsISEProjectExplorer.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.3.1'
+ModuleVersion = '1.4.0'
 
 # ID used to uniquely identify this module
 GUID = '442c24ec-44fc-4786-ad63-30a39eec6b7b'
@@ -66,7 +66,7 @@ FormatsToProcess = @()
 # NestedModules = @()
 
 # Functions to export from this module
-FunctionsToExport = 'Add-PsISEProjectExplorerToIseProfile'
+FunctionsToExport = @('Add-PsISEProjectExplorerToIseProfile', 'Get-PsISEProjectExplorerControlHandle')
 
 # Cmdlets to export from this module
 CmdletsToExport = @()

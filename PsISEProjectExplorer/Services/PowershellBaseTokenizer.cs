@@ -30,18 +30,21 @@ namespace PsISEProjectExplorer.Services
 
         private bool parsePowershellDscWithExternalImports;
 
-        public PowershellBaseTokenizer()
+        private readonly ConfigHandler configHandler;
+
+        public PowershellBaseTokenizer(ConfigHandler configHandler)
         {
-            this.dslAutoDiscovery = ConfigHandler.ReadConfigBoolValue("DslAutoDiscovery", true);
-            this.dslCustomDictionary = ConfigHandler.ReadConfigStringEnumerableValue("DslCustomDictionary", true, DefaultDslCustomDictionary);
+            this.configHandler = configHandler;
+            this.dslAutoDiscovery = configHandler.ReadConfigBoolValue("DslAutoDiscovery", true);
+            this.dslCustomDictionary = configHandler.ReadConfigStringEnumerableValue("DslCustomDictionary", true, DefaultDslCustomDictionary);
             // this is fix for performance issue in PSParser.Tokenize - when file contains Import - DSCResource pointing to a non-installed resource,
             // parsing takes long time and 'Unable to load resource' errors appear 
-            this.parsePowershellDscWithExternalImports = ConfigHandler.ReadConfigBoolValue("ParsePowershellDSCWithExternalImports", false);
+            this.parsePowershellDscWithExternalImports = configHandler.ReadConfigBoolValue("ParsePowershellDSCWithExternalImports", false);
         }
 
         public PowershellItem GetPowershellItems(string path, string contents)
         {
-            bool parsePowershellItems = ConfigHandler.ReadConfigBoolValue("ParsePowershellItems", true);
+            bool parsePowershellItems = this.configHandler.ReadConfigBoolValue("ParsePowershellItems", true);
             if (!parsePowershellItems || !this.parsePowershellDscWithExternalImports && ImportDscRegex.IsMatch(contents))
             {
                 return this.createRootItem(null);

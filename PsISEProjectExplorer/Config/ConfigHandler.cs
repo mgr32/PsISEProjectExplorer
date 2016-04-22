@@ -8,22 +8,23 @@ using System.Collections.Concurrent;
 
 namespace PsISEProjectExplorer.Config
 {
-    public static class ConfigHandler
+    [Component]
+    public class ConfigHandler
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private static readonly string ConfigFilePath;
+        private readonly string ConfigFilePath;
 
-        private static Object ConfigHandlerLock = new Object();
+        private Object ConfigHandlerLock = new Object();
 
-        private static IDictionary<String, String> cache = new ConcurrentDictionary<string, string>();
+        private IDictionary<String, String> cache = new ConcurrentDictionary<string, string>();
 
-        static ConfigHandler()
+        public ConfigHandler()
         {
             ConfigFilePath = Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA"), "PsISEProjectExplorer", "PsISEProjectExplorer.config");
         }
 
-        public static string ReadConfigStringValue(string key)
+        public string ReadConfigStringValue(string key)
         {
             if (cache.ContainsKey(key))
             {
@@ -49,7 +50,7 @@ namespace PsISEProjectExplorer.Config
             }
         }
 
-        public static bool ReadConfigBoolValue(string key, bool defaultValue)
+        public bool ReadConfigBoolValue(string key, bool defaultValue)
         {
             string value = ReadConfigStringValue(key);
             bool result;
@@ -61,7 +62,7 @@ namespace PsISEProjectExplorer.Config
             return result;
         }
 
-        public static int ReadConfigIntValue(string key, int defaultValue)
+        public int ReadConfigIntValue(string key, int defaultValue)
         {
             string value = ReadConfigStringValue(key);
             int result;
@@ -73,12 +74,12 @@ namespace PsISEProjectExplorer.Config
             return result;
         }
 
-        public static IEnumerable<string> ReadConfigStringEnumerableValue(string key)
+        public IEnumerable<string> ReadConfigStringEnumerableValue(string key)
         {
             return ReadConfigStringEnumerableValue(key, false, Enumerable.Empty<string>());
         }
 
-        public static IEnumerable<string> ReadConfigStringEnumerableValue(string key, bool toLower, IEnumerable<string> defaultValue)
+        public IEnumerable<string> ReadConfigStringEnumerableValue(string key, bool toLower, IEnumerable<string> defaultValue)
         {
             var value = ReadConfigStringValue(key);
             if (String.IsNullOrWhiteSpace(value))
@@ -100,7 +101,7 @@ namespace PsISEProjectExplorer.Config
             }
         }
 
-        public static void SaveConfigValue(string key, string value)
+        public void SaveConfigValue(string key, string value)
         {
             lock (ConfigHandlerLock)
             {
@@ -123,13 +124,13 @@ namespace PsISEProjectExplorer.Config
             }
         }
 
-        public static void SaveConfigEnumerableValue(string key, IEnumerable<string> value)
+        public void SaveConfigEnumerableValue(string key, IEnumerable<string> value)
         {
             var str = value == null ? String.Empty : String.Join(",", value.Where(s => !(String.IsNullOrWhiteSpace(s))));
             SaveConfigValue(key, str);
         }
 
-        public static IEnumerable<string> AddConfigEnumerableValue(string key, string value)
+        public IEnumerable<string> AddConfigEnumerableValue(string key, string value)
         { 
             lock (ConfigHandlerLock)
             {
@@ -144,7 +145,7 @@ namespace PsISEProjectExplorer.Config
             }
         }
 
-        public static IEnumerable<string> RemoveConfigEnumerableValue(string key, string value)
+        public IEnumerable<string> RemoveConfigEnumerableValue(string key, string value)
         {
             lock (ConfigHandlerLock)
             {
@@ -159,7 +160,7 @@ namespace PsISEProjectExplorer.Config
             }
         }
 
-        private static Configuration OpenConfigFile()
+        private Configuration OpenConfigFile()
         {
             var map = new ExeConfigurationFileMap { ExeConfigFilename = ConfigFilePath };
             try

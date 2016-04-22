@@ -4,88 +4,38 @@ using System.Linq;
 
 namespace PsISEProjectExplorer.Services
 {
+    [Component]
     public class PowershellFileParser
     {
-        private static IPowershellTokenizer powershellTokenizer = PowershellTokenizerProvider.GetPowershellTokenizer();
+        private IPowershellTokenizer powershellTokenizer;
 
-        public string Path { get; private set; }
-
-        public string FileContents { get; private set; }
-
-        public PowershellItem RootPowershellItem { get; private set; }
-
-        public bool IsDirectory { get; private set; }
-
-        public bool IsExcluded { get; private set; }
-
-        public string ErrorMessage { get; set; }
-
-        public string FileName
+        public PowershellFileParser(PowershellTokenizerProvider powershellTokenizerProvider)
         {
-            get
+            this.powershellTokenizer = powershellTokenizerProvider.GetPowershellTokenizer();
+        }
+
+        public PowershellParseResult ParseFile(string path, bool isDirectory, bool isExcluded, string errorMessage)
+        {
+            if (isExcluded || isDirectory || !FilesPatternProvider.IsPowershellFile(path))
             {
-                return Path.Split('\\').Last();
+                return new PowershellParseResult(null, errorMessage, path, null, isDirectory, isExcluded);
             }
-        }
-
-        public bool IsValid
-        {
-            get
+            string fileContents;
+            try                
             {
-                return ErrorMessage != null;
-            }
-        }
-
-        public PowershellFileParser(string path, bool isDirectory)
-            : this(path, isDirectory, false, null)
-        {
-
-        }
-
-        public PowershellFileParser(string path, bool isDirectory, bool isExcluded)
-            : this(path, isDirectory, isExcluded, null)
-        {
-
-        }
-
-        public PowershellFileParser(string path, bool isDirectory, string errorMessage)
-            : this(path, isDirectory, false, errorMessage)
-        {
-
-        }
-
-        public PowershellFileParser(string path, bool isDirectory, bool isExcluded, string errorMessage)
-        {
-            this.Path = path;
-            this.IsDirectory = isDirectory;
-            this.IsExcluded = isExcluded;
-            this.ErrorMessage = errorMessage;
-            if (!isExcluded && !this.IsDirectory && FilesPatternProvider.IsPowershellFile(path))
-            {
-                this.ParseFile();
-            }
-            else
-            {
-                this.FileContents = string.Empty;
-            }
-        }
-
-        private void ParseFile()
-        {
-            try
-            {
-                this.FileContents = FileReader.ReadFileAsString(this.Path);
+                fileContents = FileReader.ReadFileAsString(path);
             }
             catch (Exception e)
             {
-                this.ErrorMessage = e.Message;
-                return;
+                return new PowershellParseResult(null, e.Message, path, null, isDirectory, isExcluded);
             }
-            if (this.FileContents != null)
+            if (fileContents != null)
             {
-               this.RootPowershellItem = powershellTokenizer.GetPowershellItems(this.Path, this.FileContents);
-               this.ErrorMessage = this.RootPowershellItem.ParsingErrors;
+               var rootPowershellItem = powershellTokenizer.GetPowershellItems(path, fileContents);
+               return new PowershellParseResult(rootPowershellItem, errorMessage, path, fileContents, isDirectory, isExcluded);
             }
+            return new PowershellParseResult(null, errorMessage, path, fileContents, isDirectory, isExcluded);
         }
+
     }
 }

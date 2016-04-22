@@ -14,14 +14,14 @@ function Register-PsISEProjectExplorerMenus() {
     if (!$root) {
         return
     }
-	Register-PsISEProjectExplorerMenu -name 'Go To Definition' -scriptblock { (Get-PSISEProjectExplorerControlHandle).GoToDefinition() } -hotkey "F12"
-	Register-PsISEProjectExplorerMenu -name 'Find All Occurrences' -scriptblock { (Get-PSISEProjectExplorerControlHandle).FindAllOccurrences() } -hotkey "SHIFT+F12"
-	Register-PsISEProjectExplorerMenu -name 'Locate Current File' -scriptblock { (Get-PSISEProjectExplorerControlHandle).LocateFileInTree() } -hotkey "ALT+SHIFT+L"
-	Register-PsISEProjectExplorerMenu -name 'Find In Files' -scriptblock { (Get-PSISEProjectExplorerControlHandle).FindInFiles() } -hotkey "CTRL+SHIFT+F"
-	Register-PsISEProjectExplorerMenu -name 'Close All But This' -scriptblock { (Get-PSISEProjectExplorerControlHandle).CloseAllButThis() } -hotkey "CTRL+ALT+W"
+	Register-PsISEProjectExplorerMenu -name 'Go To Definition' -scriptblock { (Get-PsISEProjectExplorerControlHandle).GoToDefinition() } -hotkey "F12"
+	Register-PsISEProjectExplorerMenu -name 'Find All Occurrences' -scriptblock { (Get-PsISEProjectExplorerControlHandle).FindAllOccurrences() } -hotkey "SHIFT+F12"
+	Register-PsISEProjectExplorerMenu -name 'Locate Current File' -scriptblock { (Get-PsISEProjectExplorerControlHandle).LocateFileInTree() } -hotkey "ALT+SHIFT+L"
+	Register-PsISEProjectExplorerMenu -name 'Find In Files' -scriptblock { (Get-PsISEProjectExplorerControlHandle).FindInFiles() } -hotkey "CTRL+SHIFT+F"
+	Register-PsISEProjectExplorerMenu -name 'Close All But This' -scriptblock { (Get-PsISEProjectExplorerControlHandle).CloseAllButThis() } -hotkey "CTRL+ALT+W"
 }
 
-function Get-PSISEProjectExplorerControlHandle() {
+function Get-PsISEProjectExplorerControlHandle() {
 	return ($psISE.CurrentPowerShellTab.VerticalAddOnTools | where { $_.Name -eq 'Project Explorer' }).Control
 }
 

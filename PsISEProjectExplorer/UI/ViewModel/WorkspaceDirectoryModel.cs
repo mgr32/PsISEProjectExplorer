@@ -10,6 +10,7 @@ using System.Linq;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
+    [Component]
     public class WorkspaceDirectoryModel : BaseViewModel
     {
         public string CurrentWorkspaceDirectory
@@ -47,16 +48,19 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        private int MaxNumOfWorkspaceDirectories { get; set; }
-
         public IseIntegrator IseIntegrator { get; set; }
 
-        public WorkspaceDirectoryModel()
+        private int MaxNumOfWorkspaceDirectories { get; set; }
+
+        private ConfigHandler ConfigHandler { get; set; }
+
+        public WorkspaceDirectoryModel(ConfigHandler configHandler)
         {
-            this.MaxNumOfWorkspaceDirectories = ConfigHandler.ReadConfigIntValue("MaxNumOfWorkspaceDirectories", 5);
-            var workspaceDirs = ConfigHandler.ReadConfigStringEnumerableValue("WorkspaceDirectories");
+            this.ConfigHandler = configHandler;
+            this.MaxNumOfWorkspaceDirectories = configHandler.ReadConfigIntValue("MaxNumOfWorkspaceDirectories", 5);
+            var workspaceDirs = configHandler.ReadConfigStringEnumerableValue("WorkspaceDirectories");
             this.WorkspaceDirectories = new ObservableCollection<string>(workspaceDirs);
-            this.autoUpdateRootDirectory = ConfigHandler.ReadConfigBoolValue("AutoUpdateRootDirectory", true);
+            this.autoUpdateRootDirectory = configHandler.ReadConfigBoolValue("AutoUpdateRootDirectory", true);
 
             this.SanitizeWorkspaceDirectories();
         }

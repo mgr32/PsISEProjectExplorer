@@ -1,4 +1,5 @@
-﻿using PsISEProjectExplorer.Model.DocHierarchy;
+﻿using PsISEProjectExplorer.Model;
+using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using System.Collections.Generic;
 using System.IO;
@@ -23,23 +24,23 @@ namespace PsISEProjectExplorer.Services
             
         }
 
-        public bool AddFileSystemNode(PowershellFileParser parser)
+        public bool AddFileSystemNode(PowershellParseResult parseResult)
         {
-            if (this.DocumentHierarchy.GetNode(parser.Path) != null || parser.Path == this.DocumentHierarchy.RootNode.Path)
+            if (this.DocumentHierarchy.GetNode(parseResult.Path) != null || parseResult.Path == this.DocumentHierarchy.RootNode.Path)
             {
                 return false;
             }
-            INode lastDirNode = this.FillHierarchyWithIntermediateDirectories(parser.Path, parser.IsDirectory, parser.IsExcluded, parser.ErrorMessage);
-            if (!parser.IsDirectory)
+            INode lastDirNode = this.FillHierarchyWithIntermediateDirectories(parseResult.Path, parseResult.IsDirectory, parseResult.IsExcluded, parseResult.ErrorMessage);
+            if (!parseResult.IsDirectory)
             {
-                FileNode fileNode = this.DocumentHierarchy.CreateNewFileNode(parser.Path, parser.FileContents, lastDirNode, parser.IsExcluded, parser.ErrorMessage);
-                if (parser.RootPowershellItem != null)
+                FileNode fileNode = this.DocumentHierarchy.CreateNewFileNode(parseResult.Path, parseResult.FileContents, lastDirNode, parseResult.IsExcluded, parseResult.ErrorMessage);
+                if (parseResult.RootPowershellItem != null)
                 {
-                    this.DocumentHierarchy.CreateNewPowershellItemNode(parser.Path, parser.RootPowershellItem, fileNode);
+                    this.DocumentHierarchy.CreateNewPowershellItemNode(parseResult.Path, parseResult.RootPowershellItem, fileNode);
                     var parent = fileNode.Parent;
                     while (parent != null && parent is DirectoryNode)
                     {
-                        if (parser.RootPowershellItem.ParsingErrors != null)
+                        if (parseResult.RootPowershellItem.ParsingErrors != null)
                         {
                             ((DirectoryNode)parent).AddFileError(fileNode.Name);
                         }

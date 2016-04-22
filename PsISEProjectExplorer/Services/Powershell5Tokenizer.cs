@@ -1,4 +1,5 @@
 ﻿using NLog;
+using PsISEProjectExplorer.Config;
 using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
 using System.Management.Automation.Language;
@@ -11,7 +12,7 @@ namespace PsISEProjectExplorer.Services
 
         private Powershell5TokenVisitor tokenVisitor;
 
-        public Powershell5Tokenizer() : base()
+        public Powershell5Tokenizer(ConfigHandler configHandler) : base(configHandler)
         {
             this.tokenVisitor = new Powershell5TokenVisitor(this.OnFunctionVisit,
                 this.OnConfigurationVisit,

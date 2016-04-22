@@ -1,5 +1,6 @@
 ﻿using PsISEProjectExplorer.Config;
 using PsISEProjectExplorer.Enums;
+using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.UI.Workers;
@@ -10,9 +11,12 @@ using System.Linq;
 
 namespace PsISEProjectExplorer.Services
 {
+    [Component]
     public class DocumentHierarchyFactory
     {
         private DocumentHierarchy DocumentHierarchy { get; set; }
+
+        private PowershellFileParser PowershellFileParser { get; set; }
 
         public string CurrentDocumentHierarchyPath
         {
@@ -20,6 +24,11 @@ namespace PsISEProjectExplorer.Services
             {
                 return this.DocumentHierarchy == null ? null : this.DocumentHierarchy.RootNode.Path;
             }
+        }
+
+        public DocumentHierarchyFactory(PowershellFileParser powershellFileParser)
+        {
+            this.PowershellFileParser = powershellFileParser;
         }
 
         public DocumentHierarchySearcher CreateDocumentHierarchySearcher(string path, bool analyzeContents)
@@ -90,7 +99,7 @@ namespace PsISEProjectExplorer.Services
                 bool nodeShouldBeRemoved = node != null;
                 var fileSystemEntryList = this.GetFileList(path, filesPatternProvider, worker);
                 
-                foreach (PowershellFileParser fileSystemEntry in fileSystemEntryList)
+                foreach (PowershellParseResult fileSystemEntry in fileSystemEntryList)
                 {
                     // this is to prevent from reporting progress after deletion if the node is only updated
                     if (fileSystemEntry.Path == path && node != null)
@@ -121,15 +130,15 @@ namespace PsISEProjectExplorer.Services
             worker.ReportProgressInCurrentThread(path);
         }
 
-        private IEnumerable<PowershellFileParser> GetFileList(string path, FilesPatternProvider filesPatternProvider, BackgroundIndexer worker)
+        private IEnumerable<PowershellParseResult> GetFileList(string path, FilesPatternProvider filesPatternProvider, BackgroundIndexer worker)
         {
-            PowershellFileParser parser = null;
+            PowershellParseResult parseResult = null;
             Queue<string> pathsToEnumerate = new Queue<string>();
 
             if (File.Exists(path) && filesPatternProvider.DoesFileMatch(path))
             {
-                parser = new PowershellFileParser(path, isDirectory: false);
-                yield return parser;
+                parseResult = this.PowershellFileParser.ParseFile(path, isDirectory: false, isExcluded: false, errorMessage: null);
+                yield return parseResult;
                 this.ReportProgress(worker, path);
                 yield break;
             }
@@ -137,13 +146,13 @@ namespace PsISEProjectExplorer.Services
             {
                 yield break;
             }
-            parser = new PowershellFileParser(path, isDirectory: true);
-            yield return parser;
+            parseResult = this.PowershellFileParser.ParseFile(path, isDirectory: true, isExcluded: false, errorMessage: null);
+            yield return parseResult;
             pathsToEnumerate.Enqueue(path);
             while (pathsToEnumerate.Any())
             {
                 IEnumerable<string> dirs = null;
-                parser = null;
+                parseResult = null;
                 string currentPath = pathsToEnumerate.Dequeue();
 
                 foreach (var file in this.GetFilesInDirectory(currentPath, filesPatternProvider))
@@ -155,11 +164,11 @@ namespace PsISEProjectExplorer.Services
                     dirs = Directory.EnumerateDirectories(currentPath).Where(dir => filesPatternProvider.DoesDirectoryMatch(dir));
                 } catch (Exception e) 
                 {
-                    parser = new PowershellFileParser(currentPath, isDirectory: true, errorMessage: e.Message);
+                    parseResult = this.PowershellFileParser.ParseFile(currentPath, isDirectory: true, isExcluded: false, errorMessage: e.Message);
                 }
-                if (parser != null)
+                if (parseResult != null)
                 {
-                    yield return parser;
+                    yield return parseResult;
                     continue;
                 }
                 foreach (string dir in dirs)
@@ -167,8 +176,8 @@ namespace PsISEProjectExplorer.Services
                     bool isExcluded = filesPatternProvider.IsExcluded(dir);
                     if (filesPatternProvider.DoesDirectoryMatch(dir) && (isExcluded || filesPatternProvider.IncludeAllFiles || filesPatternProvider.IsInAdditonalPaths(dir)))
                     {
-                        parser = new PowershellFileParser(dir, isDirectory: true, isExcluded: isExcluded);
-                        yield return parser;
+                        parseResult = this.PowershellFileParser.ParseFile(dir, isDirectory: true, isExcluded: isExcluded, errorMessage: null);
+                        yield return parseResult;
                     }
                     if (!isExcluded)
                     {
@@ -179,29 +188,29 @@ namespace PsISEProjectExplorer.Services
             } while (pathsToEnumerate.Any());
         }
 
-        private IEnumerable<PowershellFileParser> GetFilesInDirectory(string path, FilesPatternProvider filesPatternProvider)
+        private IEnumerable<PowershellParseResult> GetFilesInDirectory(string path, FilesPatternProvider filesPatternProvider)
         {
             IEnumerable<string> files = null;
-            PowershellFileParser parser = null;
+            PowershellParseResult parseResult = null;
             try
             {
                 files = Directory.GetFiles(path, filesPatternProvider.GetFilesPattern()).Where(f => filesPatternProvider.DoesFileMatch(f));
             }
             catch (Exception e)
             {
-                parser = new PowershellFileParser(path, isDirectory: true, errorMessage: e.Message);
+                parseResult = this.PowershellFileParser.ParseFile(path, isDirectory: true, isExcluded: false, errorMessage: e.Message);
             }
 
-            if (parser != null)
+            if (parseResult != null)
             {
-                yield return parser;
+                yield return parseResult;
                 yield break;
             }
 
             foreach (string file in files)
             {
-                parser = new PowershellFileParser(file, isDirectory: false, isExcluded: filesPatternProvider.IsExcluded(file));
-                yield return parser;
+                parseResult = this.PowershellFileParser.ParseFile(file, isDirectory: false, isExcluded: filesPatternProvider.IsExcluded(file), errorMessage: null);
+                yield return parseResult;
             }
         }
     }

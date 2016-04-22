@@ -14,6 +14,7 @@ using System.Windows;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
+    [Component]
     public class MainViewModel : BaseViewModel
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -58,7 +59,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.searchRegex = value;
                 this.OnPropertyChanged();
                 this.SearchOptions.SearchRegex = this.searchRegex;
-                ConfigHandler.SaveConfigValue("SearchRegex", value.ToString());
+                this.configHandler.SaveConfigValue("SearchRegex", value.ToString());
                 this.DocumentHierarchySearcher = this.DocumentHierarchyFactory.CreateDocumentHierarchySearcher(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
                 this.ReindexSearchTree();
             }
@@ -78,7 +79,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 {
                     this.RunSearch();
                 }
-                ConfigHandler.SaveConfigValue("SearchInFiles", value.ToString());
+                this.configHandler.SaveConfigValue("SearchInFiles", value.ToString());
             }
         }
 
@@ -92,7 +93,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.showAllFiles = value;
                 this.FilesPatternProvider.IncludeAllFiles = value;
                 this.OnPropertyChanged();
-                ConfigHandler.SaveConfigValue("ShowAllFiles", value.ToString());
+                this.configHandler.SaveConfigValue("ShowAllFiles", value.ToString());
                 this.ReindexSearchTree();
             }
         }
@@ -107,7 +108,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.syncWithActiveDocument = value;
                 this.OnPropertyChanged();
                 this.ActiveDocumentPotentiallyChanged();
-                ConfigHandler.SaveConfigValue("SyncWithActiveDocument", value.ToString());
+                this.configHandler.SaveConfigValue("SyncWithActiveDocument", value.ToString());
             }
         }
 
@@ -178,6 +179,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private DocumentHierarchySearcher DocumentHierarchySearcher { get; set; }
 
+        private PowershellTokenizerProvider PowershellTokenizerProvider { get; set; }
+
         private bool AnalyzeDocumentContents
         {
             get
@@ -186,22 +189,28 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        public MainViewModel()
+        private readonly ConfigHandler configHandler;
+
+        public MainViewModel(ConfigHandler configHandler, WorkspaceDirectoryModel workspaceDirectoryModel, DocumentHierarchyFactory documentHierarchyFactory,
+            PowershellTokenizerProvider powershellTokenizerProvider)
         {
-            this.searchRegex = ConfigHandler.ReadConfigBoolValue("SearchRegex", false);
-            this.searchInFiles = ConfigHandler.ReadConfigBoolValue("SearchInFiles", true);
-            this.showAllFiles = ConfigHandler.ReadConfigBoolValue("ShowAllFiles", true);
-            IEnumerable<string> excludePaths = ConfigHandler.ReadConfigStringEnumerableValue("ExcludePaths");
+            this.configHandler = configHandler;
+            this.WorkspaceDirectoryModel = workspaceDirectoryModel;
+            this.DocumentHierarchyFactory = documentHierarchyFactory;
+            this.PowershellTokenizerProvider = powershellTokenizerProvider;
+            this.searchRegex = configHandler.ReadConfigBoolValue("SearchRegex", false);
+            this.searchInFiles = configHandler.ReadConfigBoolValue("SearchInFiles", true);
+            this.showAllFiles = configHandler.ReadConfigBoolValue("ShowAllFiles", true);
+            IEnumerable<string> excludePaths = configHandler.ReadConfigStringEnumerableValue("ExcludePaths");
             this.FilesPatternProvider = new FilesPatternProvider(this.showAllFiles, excludePaths);
-            this.syncWithActiveDocument = ConfigHandler.ReadConfigBoolValue("SyncWithActiveDocument", false);
+            this.syncWithActiveDocument = configHandler.ReadConfigBoolValue("SyncWithActiveDocument", false);
             var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
             this.SearchOptions = new SearchOptions(searchField, string.Empty, this.searchRegex);
-            this.DocumentHierarchyFactory = new DocumentHierarchyFactory();
             this.FileSystemChangeWatcher = new FileSystemChangeWatcher(this.ReindexOnFileSystemChanged);
             this.IndexingSearchingModel = new IndexingSearchingModel(this.OnSearchingFinished, this.OnIndexingFinished, this.OnIndexingProgress);
             this.TreeViewModel = new TreeViewModel(this.FileSystemChangeWatcher, this.DocumentHierarchyFactory, this.FilesPatternProvider);
             this.TreeViewModel.PropertyChanged += (s, e) => { if (e.PropertyName == "NumberOfFiles") this.OnPropertyChanged("TreeItemsResultString"); };
-            this.WorkspaceDirectoryModel = new WorkspaceDirectoryModel();
+            
             if (this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory != null)
             {
                 this.DocumentHierarchySearcher = this.DocumentHierarchyFactory.CreateDocumentHierarchySearcher(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
@@ -253,11 +262,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
             if (selectedItem.IsExcluded)
             {
-                this.FilesPatternProvider.ExcludePaths = ConfigHandler.RemoveConfigEnumerableValue("ExcludePaths", selectedItem.Path);
+                this.FilesPatternProvider.ExcludePaths = this.configHandler.RemoveConfigEnumerableValue("ExcludePaths", selectedItem.Path);
             }
             else
             {
-                this.FilesPatternProvider.ExcludePaths = ConfigHandler.AddConfigEnumerableValue("ExcludePaths", selectedItem.Path);
+                this.FilesPatternProvider.ExcludePaths = this.configHandler.AddConfigEnumerableValue("ExcludePaths", selectedItem.Path);
             }
             this.OnPropertyChanged();
             this.ReindexSearchTree();
@@ -274,9 +283,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 return null;
             }
-            string funcName = editorInfo.GetTokenFromCurrentPosition();
-            return funcName;
+            return this.PowershellTokenizerProvider.GetPowershellTokenizer().GetTokenAtColumn(editorInfo.CurrentLine, editorInfo.CurrentColumn);
         }
+
+        
 
         private void ReindexOnFileSystemChanged(object sender, FileSystemChangedInfo changedInfo)
         {

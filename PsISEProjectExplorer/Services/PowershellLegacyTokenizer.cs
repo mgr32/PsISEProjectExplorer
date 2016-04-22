@@ -1,4 +1,5 @@
 ﻿using NLog;
+using PsISEProjectExplorer.Config;
 using System.Management.Automation.Language;
 
 namespace PsISEProjectExplorer.Services
@@ -9,7 +10,7 @@ namespace PsISEProjectExplorer.Services
 
         private PowershellLegacyTokenVisitor tokenVisitor;
 
-        public PowershellLegacyTokenizer() : base()
+        public PowershellLegacyTokenizer(ConfigHandler configHandler) : base(configHandler)
         {
             this.tokenVisitor = new PowershellLegacyTokenVisitor(
                 this.OnFunctionVisit,

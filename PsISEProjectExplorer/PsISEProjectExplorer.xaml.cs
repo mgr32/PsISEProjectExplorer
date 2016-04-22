@@ -7,6 +7,7 @@ using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.UI.Helpers;
 using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.ViewModel;
+using SimpleInjector;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -27,9 +28,11 @@ namespace PsISEProjectExplorer
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private static string LogFileName;
+
         private readonly MainViewModel mainViewModel;
         private Point dragStartPoint;
         private ObjectModelRoot hostObject;
+        private Container dependencyInjectionContainer;
 
         // Entry point to the ISE object model.
         public ObjectModelRoot HostObject
@@ -45,11 +48,24 @@ namespace PsISEProjectExplorer
         public ProjectExplorerWindow()
         {
             this.ConfigureLogging();
-            this.mainViewModel = new MainViewModel();
+            this.ConfigureDependencyInjection();
+           
+            this.mainViewModel = this.dependencyInjectionContainer.GetInstance<MainViewModel>();
             this.mainViewModel.ActiveDocumentSyncEvent += OnActiveDocumentSyncEvent;
             this.DataContext = this.mainViewModel;
             InitializeComponent();
             this.Dispatcher.UnhandledException += DispatcherUnhandledExceptionHandler;
+        }
+
+        private void ConfigureDependencyInjection()
+        {
+            this.dependencyInjectionContainer = new Container();
+            var components = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && Attribute.IsDefined(t, typeof(Component)));
+
+            foreach (var component in components)
+            {
+                this.dependencyInjectionContainer.Register(component, component, Lifestyle.Singleton);
+            }
         }
 
         private static void DispatcherUnhandledExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)
