@@ -1,4 +1,5 @@
-﻿using PsISEProjectExplorer.UI.ViewModel;
+﻿using PsISEProjectExplorer.Commands;
+using PsISEProjectExplorer.UI.ViewModel;
 using System;
 using System.Collections.Generic;
 
@@ -19,12 +20,13 @@ namespace PsISEProjectExplorer.UI.Helpers
 
         private TreeViewModel TreeViewModel { get; set; }
 
-        private WorkspaceDirectoryModel WorkspaceDirectoryModel { get; set; }
 
-        public DragDropHandler(TreeViewModel treeViewModel, WorkspaceDirectoryModel workspaceDirectoryModel)
+        private CommandExecutor CommandExecutor { get; set; }
+
+        public DragDropHandler(TreeViewModel treeViewModel, CommandExecutor commandExecutor)
         {
             this.TreeViewModel = treeViewModel;
-            this.WorkspaceDirectoryModel = workspaceDirectoryModel;
+            this.CommandExecutor = commandExecutor;
         }
 
         public void ClearDragStartPoint()
@@ -107,7 +109,7 @@ namespace PsISEProjectExplorer.UI.Helpers
 
                 if (item != dropTarget)
                 {
-                    this.TreeViewModel.MoveTreeItem(item, dropTarget, this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory);
+                    this.CommandExecutor.ExecuteWithParam<MoveItemCommand, Tuple<TreeViewEntryItemModel, TreeViewEntryItemModel>>(Tuple.Create(item, dropTarget));
                 }
             }
             this.ClearDragStartPoint();

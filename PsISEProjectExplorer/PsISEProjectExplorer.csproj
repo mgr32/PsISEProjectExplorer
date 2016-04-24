@@ -77,6 +77,7 @@
   <ItemGroup>
     <Compile Include="Commands\AddNewTreeItemCommand.cs" />
     <Compile Include="Commands\ChangeWorkspaceCommand.cs" />
+    <Compile Include="Commands\UnsavedFileChecker.cs" />
     <Compile Include="Commands\CloseAllButThisCommand.cs" />
     <Compile Include="Commands\CollapseAllCommand.cs" />
     <Compile Include="Commands\Command.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Commands\FindInFilesCommand.cs" />
     <Compile Include="Commands\GoToDefinitionCommand.cs" />
     <Compile Include="Commands\LocateFileInTreeCommand.cs" />
+    <Compile Include="Commands\MoveItemCommand.cs" />
     <Compile Include="Commands\OpenBuiltinContextMenuCommand.cs" />
     <Compile Include="Commands\OpenExplorerContextMenuCommand.cs" />
     <Compile Include="Commands\OpenInExplorerCommand.cs" />

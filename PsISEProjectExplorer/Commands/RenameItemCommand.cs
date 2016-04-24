@@ -6,7 +6,9 @@ namespace PsISEProjectExplorer.Commands
     {
         private TreeViewModel TreeViewModel { get; set; }
 
-        public RenameItemCommand(TreeViewModel treeViewModel)
+        private UnsavedFileChecker UnsavedFileEnforcer { get; set; }
+
+        public RenameItemCommand(TreeViewModel treeViewModel, UnsavedFileChecker unsavedFileEnforcer)
         {
             this.TreeViewModel = treeViewModel;
         }
@@ -19,7 +21,11 @@ namespace PsISEProjectExplorer.Commands
                 return;
             }
 
-            this.TreeViewModel.StartEditingTreeItem(item);
+            if (!this.UnsavedFileEnforcer.EnsureCurrentlyOpenedFileIsSaved())
+            {
+                return;
+            }
+            item.IsBeingEdited = true;
         }
     }
 }

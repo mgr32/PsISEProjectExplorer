@@ -175,11 +175,11 @@ namespace PsISEProjectExplorer
             switch (e.Key)
             {
                 case Key.Escape:
-                    this.MainViewModel.TreeViewModel.EndTreeEdit(newValue, false, item, !this.MainViewModel.SearchInFiles);
+                    this.CommandExecutor.ExecuteWithParam<EndEditingTreeItemCommand, Tuple<string, bool>>(Tuple.Create(newValue, false));
                     e.Handled = true;
                     return;
                 case Key.Enter:
-                    this.MainViewModel.TreeViewModel.EndTreeEdit(newValue, true, item, !this.MainViewModel.SearchInFiles);
+                    this.CommandExecutor.ExecuteWithParam<EndEditingTreeItemCommand, Tuple<string, bool>>(Tuple.Create(newValue, true));
                     e.Handled = true;
                     return;
             }
@@ -228,7 +228,7 @@ namespace PsISEProjectExplorer
         private void SearchResults_EndEdit(object sender, RoutedEventArgs e)
         {
             var newValue = ((TextBox)sender).Text;
-            this.CommandExecutor.ExecuteWithParam<EndEditingTreeItemCommand, string>(newValue);
+            this.CommandExecutor.ExecuteWithParam<EndEditingTreeItemCommand, Tuple<string, bool>>(Tuple.Create(newValue, true));
         }
 
         private void SearchResults_PreviewMouseMove(object sender, MouseEventArgs e)

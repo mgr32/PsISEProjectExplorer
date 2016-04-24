@@ -26,8 +26,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        private IseIntegrator IseIntegrator { get; set; }
-
         private TreeViewEntryItemModel rootTreeViewEntryItem;
 
         public TreeViewEntryItemModel RootTreeViewEntryItem
@@ -67,40 +65,19 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        private string PathOfItemToSelectOnRefresh { get; set; }
-
-        private FileSystemChangeWatcher FileSystemChangeWatcher { get; set; }
-
-        private DocumentHierarchyFactory DocumentHierarchyFactory { get; set; }
-
-        private FilesPatternProvider FilesPatternProvider { get; set; }
-
-        private FileSystemOperationsService FileSystemOperationsService { get; set; }
+        public string PathOfItemToSelectOnRefresh { get; set; }
 
         private IDictionary<string, TreeViewEntryItemModel> ItemsMap { get; set; }
 
-        private TokenLocator TokenLocator { get; set; }
-
         private IconProvider IconProvider { get; set; }
 
-        private MessageBoxHelper MessageBoxHelper { get; set; }
-
-        // TODO: this is just to get SelectedItem
+        // TODO: this is just to get SelectedItem -> should be achievable by binding
         private ProjectExplorerWindow ProjectExplorerWindow { get; set; }
              
-        public TreeViewModel(FileSystemChangeWatcher fileSystemChangeWatcher, DocumentHierarchyFactory documentHierarchyFactory, FilesPatternProvider filesPatternProvider,
-            FileSystemOperationsService fileSystemOperationsService, TokenLocator tokenLocator, IconProvider iconProvider, IseIntegrator iseIntegrator, MessageBoxHelper messageBoxHelper, 
-            ProjectExplorerWindow projectExplorerWindow)
+        public TreeViewModel(IconProvider iconProvider, ProjectExplorerWindow projectExplorerWindow)
         {
-            this.FileSystemChangeWatcher = fileSystemChangeWatcher;
-            this.DocumentHierarchyFactory = documentHierarchyFactory;
-            this.FilesPatternProvider = filesPatternProvider;
-            this.FileSystemOperationsService = fileSystemOperationsService;
             this.ItemsMap = new Dictionary<string, TreeViewEntryItemModel>();
-            this.TokenLocator = tokenLocator;
             this.IconProvider = iconProvider;
-            this.IseIntegrator = iseIntegrator;
-            this.MessageBoxHelper = messageBoxHelper;
             this.ProjectExplorerWindow = projectExplorerWindow;
         }
 
@@ -224,330 +201,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        public void OpenItem(TreeViewEntryItemModel item, SearchOptions searchOptions)
-        {
-            if (this.IseIntegrator == null)
-            {
-                throw new InvalidOperationException("IseIntegrator has not ben set yet.");
-            }
-            if (item == null)
-            {
-                return;
-            }
-
-            if (item.Node.NodeType == NodeType.File)
-            {
-                bool wasOpen = (this.IseIntegrator.SelectedFilePath == item.Node.Path);
-                if (!wasOpen)
-                {
-                    this.IseIntegrator.GoToFile(item.Node.Path);
-                }
-                else
-                {
-                    this.IseIntegrator.SetFocusOnCurrentTab();
-                }
-                if (searchOptions.SearchText != null && searchOptions.SearchText.Length > 2)
-                {
-                    EditorInfo editorInfo = (wasOpen ? this.IseIntegrator.GetCurrentLineWithColumnIndex() : null);
-                    TokenPosition tokenPos = this.TokenLocator.LocateNextToken(item.Node.Path, searchOptions, editorInfo);
-                    if (tokenPos.MatchLength > 2)
-                    {
-                        this.IseIntegrator.SelectText(tokenPos.Line, tokenPos.Column, tokenPos.MatchLength);
-                    }
-                    else if (string.IsNullOrEmpty(this.IseIntegrator.SelectedText))
-                    {
-                        tokenPos = this.TokenLocator.LocateSubtoken(item.Node.Path, searchOptions);
-                        if (tokenPos.MatchLength > 2)
-                        {
-                            this.IseIntegrator.SelectText(tokenPos.Line, tokenPos.Column, tokenPos.MatchLength);
-                        }
-                    }
-                }
-            }
-            else if (item.Node.NodeType == NodeType.Directory)
-            {
-                item.IsExpanded = !item.IsExpanded;
-            }
-            else if (item.Node.NodeType != NodeType.Intermediate)
-            {
-                var node = ((PowershellItemNode)item.Node);
-                this.IseIntegrator.GoToFile(node.FilePath);
-                this.IseIntegrator.SelectText(node.PowershellItem.StartLine, node.PowershellItem.StartColumn, node.PowershellItem.EndColumn - node.PowershellItem.StartColumn);
-            }
-            
-        }
-
-        public void DeleteTreeItem(TreeViewEntryItemModel selectedItem)
-        {
-            if (selectedItem == null)
-            {
-                return;
-            }
-            if (!this.HandleUnsavedFileManipulation(selectedItem))
-            {
-                return;
-            }
-            int numFilesInside = 0;
-            try
-            {
-                numFilesInside = Directory.GetFileSystemEntries(selectedItem.Path).Count();
-            }
-            catch (Exception)
-            {
-                // ignore - this only has impact on message
-            }
-            string message = numFilesInside == 0 ?
-                String.Format("'{0}' will be deleted permanently.", selectedItem.Path) :
-                String.Format("'{0}' will be deleted permanently (together with {1} items inside).", selectedItem.Path, numFilesInside);
-            if (this.MessageBoxHelper.ShowConfirmMessage(message))
-            {
-                try
-                {
-                    this.IseIntegrator.CloseFile(selectedItem.Path);
-                    this.FilesPatternProvider.RemoveAdditionalPath(selectedItem.Path);
-                    FileSystemOperationsService.DeleteFileOrDirectory(selectedItem.Path);
-                }
-                catch (Exception e)
-                {
-                    this.MessageBoxHelper.ShowError("Failed to delete: " + e.Message);
-                }
-            }
-        }
-
-        public void AddNewTreeItem(TreeViewEntryItemModel parent, NodeType nodeType)
-        {
-            if (this.DocumentHierarchyFactory == null)
-            {
-                return;
-            }
-            if (parent == null)
-            {
-                parent = this.RootTreeViewEntryItem;
-            }
-            parent.IsExpanded = true;
-            INode newNode = this.DocumentHierarchyFactory.CreateTemporaryNode(parent.Node, nodeType);
-            if (newNode == null)
-            {
-                return;
-            }
-            var newItem = this.CreateTreeViewEntryItemModel(newNode, parent, true);
-            newItem.IsBeingEdited = true;
-            newItem.IsBeingAdded = true;
-        }
-
-        public void StartEditingTreeItem(TreeViewEntryItemModel item)
-        {
-            if (!this.HandleUnsavedFileManipulation(item))
-            {
-                return;
-            }
-            item.IsBeingEdited = true;
-        }
-
-        public void MoveTreeItem(TreeViewEntryItemModel movedItem, TreeViewEntryItemModel destinationItem, string rootDirectory)
-        {
-            if (movedItem == destinationItem || movedItem == null)
-            {
-                return;
-            }
-            if (!this.HandleUnsavedFileManipulation(movedItem))
-            {
-                return;
-            }
-            string destPath = destinationItem != null ? destinationItem.Path : rootDirectory;
-            if (!this.MessageBoxHelper.ShowConfirmMessage(String.Format("Please confirm you want to move '{0}' to '{1}'.", movedItem.Path, destPath)))
-            {
-                return;
-            }
-            try
-            {
-                string newPath;
-                // moved to the empty place, i.e. to the workspace directory
-                if (destinationItem == null)
-                {
-                    newPath = this.GenerateNewPathForDir(rootDirectory, movedItem.Name);
-                }
-                else if (destinationItem.NodeType == NodeType.File)
-                {
-                    newPath = this.GenerateNewPath(destinationItem.Path, movedItem.Name);
-                }
-                else if (destinationItem.NodeType == NodeType.Directory)
-                {
-                    newPath = this.GenerateNewPathForDir(destinationItem.Path, movedItem.Name);
-                }
-                else
-                {
-                    return;
-                }
-                this.FilesPatternProvider.RemoveAdditionalPath(movedItem.Path);
-                this.FilesPatternProvider.AddAdditionalPath(newPath);
-                bool closed = this.IseIntegrator.CloseFile(movedItem.Path);
-                FileSystemOperationsService.RenameFileOrDirectory(movedItem.Path, newPath);
-                if (closed)
-                {
-                    this.IseIntegrator.GoToFile(newPath);
-                }
-                if (destinationItem != null)
-                {
-                    destinationItem.IsExpanded = true;
-                }
-            }
-            catch (Exception e)
-            {
-                this.PathOfItemToSelectOnRefresh = null;
-                this.MessageBoxHelper.ShowError("Failed to move: " + e.Message);
-            }
-        }
-
-        public void EndTreeEdit(string newValue, bool save, TreeViewEntryItemModel selectedItem, bool addFileExtension)
-        {
-            if (selectedItem == null)
-            {
-                return;
-            }
-            selectedItem.IsBeingEdited = false;
-
-            if (selectedItem.NodeType == NodeType.File && addFileExtension && !String.IsNullOrEmpty(newValue) && !this.FilesPatternProvider.DoesFileMatch(newValue))
-            {
-                newValue += ".ps1";
-            }
-            if (selectedItem.IsBeingAdded)
-            {
-                selectedItem.IsBeingAdded = false;
-                this.EndAddingTreeItem(newValue, save, selectedItem);
-            }
-            else
-            {
-                this.EndRenamingTreeItem(newValue, save, selectedItem);
-            }
-        }
-
-        private void EndRenamingTreeItem(string newValue, bool save, TreeViewEntryItemModel selectedItem)
-        {
-            if (!save || String.IsNullOrEmpty(newValue)|| selectedItem == null)
-            {
-                return;
-            }
-
-            try
-            {
-                string oldPath = selectedItem.Path;
-                string newPath = this.GenerateNewPath(selectedItem.Path, newValue);
-                bool closed = this.IseIntegrator.CloseFile(oldPath);
-                FileSystemOperationsService.RenameFileOrDirectory(oldPath, newPath);
-                if (closed)
-                {
-                    this.IseIntegrator.GoToFile(newPath);
-                }
-            }
-            catch (Exception e)
-            {
-                this.PathOfItemToSelectOnRefresh = null;
-                this.MessageBoxHelper.ShowError("Failed to rename: " + e.Message);
-            }
-
-        }
-
-        private void EndAddingTreeItem(string newValue, bool save, TreeViewEntryItemModel selectedItem)
-        {
-            if (selectedItem == null)
-            {
-                return;
-            }
-            if (!save || String.IsNullOrEmpty(newValue))
-            {
-                this.DocumentHierarchyFactory.RemoveTemporaryNode(selectedItem.Node);
-                this.DeleteTreeViewEntryItemModel(selectedItem);
-                return;
-            }
-            var newPath = this.GenerateNewPath(selectedItem.Path, newValue);
-            INode newNode = null;
-            if (this.FindTreeViewEntryItemByPath(newPath) != null)
-            {
-                this.DocumentHierarchyFactory.RemoveTemporaryNode(selectedItem.Node);
-                this.DeleteTreeViewEntryItemModel(selectedItem);
-                this.MessageBoxHelper.ShowError("Item '" + newPath + "' already exists.");
-                return;
-            }
-            if (selectedItem.NodeType == NodeType.Directory)
-            {
-                try
-                {
-                    newNode = this.DocumentHierarchyFactory.UpdateTemporaryNode(selectedItem.Node, newPath);
-                    var parent = selectedItem.Parent;
-                    this.DeleteTreeViewEntryItemModel(selectedItem);
-                    selectedItem = this.CreateTreeViewEntryItemModel(newNode, parent, true);
-                    this.FilesPatternProvider.AddAdditionalPath(newPath);
-                    FileSystemOperationsService.CreateDirectory(newPath);
-                }
-                catch (Exception e)
-                {
-                    if (newNode != null)
-                    {
-                        newNode.Remove();
-                    }
-                    if (selectedItem != null)
-                    {
-                        this.DeleteTreeViewEntryItemModel(selectedItem);
-                    }
-                    this.PathOfItemToSelectOnRefresh = null;
-                    this.MessageBoxHelper.ShowError("Failed to create directory '" + newPath + "': " + e.Message);
-                }
-            }
-            else if (selectedItem.NodeType == NodeType.File)
-            {
-                try
-                {
-                    newNode = this.DocumentHierarchyFactory.UpdateTemporaryNode(selectedItem.Node, newPath);
-                    var parent = selectedItem.Parent;
-                    this.DeleteTreeViewEntryItemModel(selectedItem);
-                    selectedItem = this.CreateTreeViewEntryItemModel(newNode, parent, true);
-                    this.FilesPatternProvider.AddAdditionalPath(newPath);
-                    FileSystemOperationsService.CreateFile(newPath);
-                    this.IseIntegrator.GoToFile(newPath);
-                }
-                catch (Exception e)
-                {
-                    if (newNode != null)
-                    {
-                        newNode.Remove();
-                    }
-                    if (selectedItem != null)
-                    {
-                        this.DeleteTreeViewEntryItemModel(selectedItem);
-                    }
-                    this.PathOfItemToSelectOnRefresh = null;
-                    this.MessageBoxHelper.ShowError("Failed to create file '" + newPath + "': " + e.Message);
-                }
-            }
-        }
-
-        private string GenerateNewPath(string currentPath, string newValue)
-        {
-            var newPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(currentPath), newValue);
-            this.PathOfItemToSelectOnRefresh = newPath;
-            return newPath;
-        }
-
-        private string GenerateNewPathForDir(string currentPath, string newValue)
-        {
-            var newPath = System.IO.Path.Combine(currentPath, newValue);
-            this.PathOfItemToSelectOnRefresh = newPath;
-            return newPath;
-        }
-
-        private bool HandleUnsavedFileManipulation(TreeViewEntryItemModel selectedItem)
-        {
-            if (selectedItem != null && selectedItem.NodeType == NodeType.File && this.IseIntegrator.OpenFiles.Contains(selectedItem.Path) && !this.IseIntegrator.IsFileSaved(selectedItem.Path))
-            {
-                this.IseIntegrator.GoToFile(selectedItem.Path);
-                this.MessageBoxHelper.ShowInfo("Please save your changes or close the file first.");
-                return false;
-            }
-            return true;
-        }
-
-        private TreeViewEntryItemModel CreateTreeViewEntryItemModel(INode node, TreeViewEntryItemModel parent, bool isSelected)
+        public TreeViewEntryItemModel CreateTreeViewEntryItemModel(INode node, TreeViewEntryItemModel parent, bool isSelected)
         {
             if (node == null)
             {
@@ -588,7 +242,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             return item;
         }
 
-        private void DeleteTreeViewEntryItemModel(TreeViewEntryItemModel item, bool first = true)
+        public void DeleteTreeViewEntryItemModel(TreeViewEntryItemModel item, bool first = true)
         {
             if (item == this.RootTreeViewEntryItem || item == null)
             {
