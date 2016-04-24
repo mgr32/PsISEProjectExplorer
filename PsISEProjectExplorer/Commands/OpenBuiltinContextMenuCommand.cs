@@ -1,21 +1,17 @@
 ﻿using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.UI.Helpers;
 using PsISEProjectExplorer.UI.ViewModel;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace PsISEProjectExplorer.Commands
 {
-    public class OpenContextMenuCommand : ParameterizedCommand<DependencyObject>
+    public class OpenBuiltinContextMenuCommand : ParameterizedCommand<DependencyObject>
     {
         private ProjectExplorerWindow ProjectExplorerWindow { get; set; }
 
-        public OpenContextMenuCommand(ProjectExplorerWindow projectExplorerWindow)
+        public OpenBuiltinContextMenuCommand(ProjectExplorerWindow projectExplorerWindow)
         {
             this.ProjectExplorerWindow = projectExplorerWindow;
         }

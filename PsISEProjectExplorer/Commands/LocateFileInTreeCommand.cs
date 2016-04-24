@@ -1,11 +1,6 @@
 ﻿using PsISEProjectExplorer.UI.Helpers;
 using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Commands
 {
@@ -32,7 +27,7 @@ namespace PsISEProjectExplorer.Commands
                 return;
             }
 
-            var selectedItem = this.ProjectExplorerWindow.SearchResultsTreeView.SelectedItem as TreeViewEntryItemModel;
+            var selectedItem = this.TreeViewModel.SelectedItem;
             if (selectedItem != null && selectedItem.Path.StartsWith(path))
             {
                 return;

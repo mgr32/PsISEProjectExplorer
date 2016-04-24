@@ -1,12 +1,7 @@
 ﻿using Ookii.Dialogs.Wpf;
 using PsISEProjectExplorer.UI.Helpers;
 using PsISEProjectExplorer.UI.ViewModel;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Commands
 {

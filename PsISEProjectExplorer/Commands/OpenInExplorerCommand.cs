@@ -2,29 +2,25 @@
 using PsISEProjectExplorer.UI.Helpers;
 using PsISEProjectExplorer.UI.ViewModel;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PsISEProjectExplorer.Commands
 {
     public class OpenInExplorerCommand : Command
     {
-        private ProjectExplorerWindow ProjectExplorerWindow { get; set; }
+        private TreeViewModel TreeViewModel { get; set; }
 
         private MessageBoxHelper MessageBoxHelper { get; set; }
 
-        public OpenInExplorerCommand(ProjectExplorerWindow projectExplorerWindow, MessageBoxHelper messageBoxHelper)
+        public OpenInExplorerCommand(TreeViewModel TreeViewModel, MessageBoxHelper messageBoxHelper)
         {
-            this.ProjectExplorerWindow = projectExplorerWindow;
+            this.TreeViewModel = TreeViewModel;
             this.MessageBoxHelper = messageBoxHelper;
         }
 
         public void Execute()
         {
-            var item = (TreeViewEntryItemModel)this.ProjectExplorerWindow.SearchResultsTreeView.SelectedItem;
+            var item = this.TreeViewModel.SelectedItem;
             if (item == null)
             {
                 return;

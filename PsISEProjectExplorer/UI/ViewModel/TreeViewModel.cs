@@ -26,7 +26,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        public IseIntegrator IseIntegrator { private get; set; }
+        private IseIntegrator IseIntegrator { get; set; }
 
         private TreeViewEntryItemModel rootTreeViewEntryItem;
 
@@ -59,6 +59,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        public TreeViewEntryItemModel SelectedItem
+        {
+            get
+            {
+                return (TreeViewEntryItemModel) this.ProjectExplorerWindow.SearchResultsTreeView.SelectedItem;
+            }
+        }
+
         private string PathOfItemToSelectOnRefresh { get; set; }
 
         private FileSystemChangeWatcher FileSystemChangeWatcher { get; set; }
@@ -76,9 +84,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private IconProvider IconProvider { get; set; }
 
         private MessageBoxHelper MessageBoxHelper { get; set; }
+
+        // TODO: this is just to get SelectedItem
+        private ProjectExplorerWindow ProjectExplorerWindow { get; set; }
              
         public TreeViewModel(FileSystemChangeWatcher fileSystemChangeWatcher, DocumentHierarchyFactory documentHierarchyFactory, FilesPatternProvider filesPatternProvider,
-            FileSystemOperationsService fileSystemOperationsService, TokenLocator tokenLocator, IconProvider iconProvider, IseIntegrator iseIntegrator, MessageBoxHelper messageBoxHelper)
+            FileSystemOperationsService fileSystemOperationsService, TokenLocator tokenLocator, IconProvider iconProvider, IseIntegrator iseIntegrator, MessageBoxHelper messageBoxHelper, 
+            ProjectExplorerWindow projectExplorerWindow)
         {
             this.FileSystemChangeWatcher = fileSystemChangeWatcher;
             this.DocumentHierarchyFactory = documentHierarchyFactory;
@@ -89,6 +101,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.IconProvider = iconProvider;
             this.IseIntegrator = iseIntegrator;
             this.MessageBoxHelper = messageBoxHelper;
+            this.ProjectExplorerWindow = projectExplorerWindow;
         }
 
         public void ReRoot(INode rootNode)

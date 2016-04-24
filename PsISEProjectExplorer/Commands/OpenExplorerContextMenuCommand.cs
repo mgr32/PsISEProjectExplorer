@@ -11,13 +11,13 @@ namespace PsISEProjectExplorer.Commands
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private ProjectExplorerWindow ProjectExplorerWindow { get; set; }
+        private TreeViewModel TreeViewModel { get; set; }
 
         private WorkspaceDirectoryModel WorkspaceDirectoryModel { get; set; }
 
-        public OpenExplorerContextMenuCommand(ProjectExplorerWindow projectExplorerWindow, WorkspaceDirectoryModel workspaceDirectoryModel)
+        public OpenExplorerContextMenuCommand(TreeViewModel treeViewModel, WorkspaceDirectoryModel workspaceDirectoryModel)
         {
-            this.ProjectExplorerWindow = projectExplorerWindow;
+            this.TreeViewModel = treeViewModel;
             this.WorkspaceDirectoryModel = workspaceDirectoryModel;
         }
 
@@ -25,7 +25,7 @@ namespace PsISEProjectExplorer.Commands
         {
             // otherwise, show Windows Explorer context menu
             string path;
-            var selectedItem = this.ProjectExplorerWindow.SearchResultsTreeView.SelectedItem as TreeViewEntryItemModel;
+            var selectedItem = this.TreeViewModel.SelectedItem;
             if (selectedItem == null)
             {
                 path = this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory;
@@ -40,7 +40,7 @@ namespace PsISEProjectExplorer.Commands
                 return;
             }
 
-            var uri = new System.Uri(path);
+            var uri = new Uri(path);
             ShellItem shellItem = new ShellItem(uri);
             ShellContextMenu menu = new ShellContextMenu(shellItem);
             try
