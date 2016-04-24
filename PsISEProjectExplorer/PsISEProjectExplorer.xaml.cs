@@ -47,7 +47,6 @@ namespace PsISEProjectExplorer
             BootstrapConfig bootstrapConfig = new BootstrapConfig();
             bootstrapConfig.ConfigureApplication(this);
             this.MainViewModel = bootstrapConfig.GetInstance<MainViewModel>();
-            this.MainViewModel.ActiveDocumentSyncEvent += OnActiveDocumentSyncEvent;
             this.CommandExecutor = bootstrapConfig.GetInstance<CommandExecutor>();
             this.DragDropHandler = bootstrapConfig.GetInstance<DragDropHandler>();
             this.DataContext = this.MainViewModel;
@@ -57,14 +56,6 @@ namespace PsISEProjectExplorer
         public void FocusOnTextBoxSearchText()
         {
             this.TextBoxSearchText.Focus();
-        }
-
-        private void OnActiveDocumentSyncEvent(object sender, IseEventArgs args)
-        {
-            if (this.MainViewModel.SyncWithActiveDocument)
-            {
-                this.LocateFileInTree();
-            }
         }
 
         public void GoToDefinition()

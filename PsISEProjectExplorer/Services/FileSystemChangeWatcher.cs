@@ -20,9 +20,10 @@ namespace PsISEProjectExplorer.Services
 
         private string RootPath { get; set; }
 
-        public FileSystemChangeWatcher(FileSystemOperationsService fileSystemOperationsService)
+        public FileSystemChangeWatcher(FileSystemOperationsService fileSystemOperationsService, FilesPatternProvider filesPatternProvider)
         {
             this.FileSystemOperationsService = fileSystemOperationsService;
+            this.FilesPatternProvider = filesPatternProvider;
         }
 
         public void RegisterOnChangeCallback(EventHandler<FileSystemChangedInfo> fileSystemChangedEvent)
@@ -42,7 +43,7 @@ namespace PsISEProjectExplorer.Services
             }
         }
 
-        public void Watch(string path, FilesPatternProvider filesPatternProvider)
+        public void Watch(string path)
         {
             lock (FileSystemChangeNotifier)
             {
@@ -56,7 +57,6 @@ namespace PsISEProjectExplorer.Services
                 {
                     return;
                 }
-                this.FilesPatternProvider = filesPatternProvider;
                 this.Watcher.Path = path;
                 this.Watcher.InternalBufferSize = 65536;
                 this.Watcher.NotifyFilter = NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Security;

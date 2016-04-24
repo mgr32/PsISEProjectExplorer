@@ -8,13 +8,13 @@ namespace PsISEProjectExplorer.Commands
     public class ChangeWorkspaceCommand : Command
     {
 
-        private MainViewModel MainViewModel { get; set; }
+        private WorkspaceDirectoryModel WorkspaceDirectoryModel { get; set; }
 
         private MessageBoxHelper MessageBoxHelper { get; set; }
 
-        public ChangeWorkspaceCommand(MainViewModel mainViewModel, MessageBoxHelper messageBoxHelper)
+        public ChangeWorkspaceCommand(WorkspaceDirectoryModel workspaceDirectoryModel, MessageBoxHelper messageBoxHelper)
         {
-            this.MainViewModel = mainViewModel;
+            this.WorkspaceDirectoryModel = workspaceDirectoryModel;
             this.MessageBoxHelper = messageBoxHelper;
         }
 
@@ -22,7 +22,7 @@ namespace PsISEProjectExplorer.Commands
         {
             var dialog = new VistaFolderBrowserDialog
             {
-                SelectedPath = this.MainViewModel.WorkspaceDirectoryModel.CurrentWorkspaceDirectory,
+                SelectedPath = this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory,
                 Description = "Please select the new workspace folder.",
                 UseDescriptionForTitle = true
             };
@@ -36,8 +36,8 @@ namespace PsISEProjectExplorer.Commands
                 }
                 else
                 {
-                    this.MainViewModel.WorkspaceDirectoryModel.SetWorkspaceDirectory(dialog.SelectedPath);
-                    this.MainViewModel.WorkspaceDirectoryModel.AutoUpdateRootDirectory = false;
+                    this.WorkspaceDirectoryModel.SetWorkspaceDirectory(dialog.SelectedPath);
+                    this.WorkspaceDirectoryModel.AutoUpdateRootDirectory = false;
                 }
             }
         }
