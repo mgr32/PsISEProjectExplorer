@@ -2,9 +2,10 @@
 
 namespace PsISEProjectExplorer.UI.Helpers
 {
-    public static class MessageBoxHelper
+    [Component]
+    public class MessageBoxHelper
     {
-        public static void ShowError(string message)
+        public void ShowError(string message)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -12,7 +13,7 @@ namespace PsISEProjectExplorer.UI.Helpers
             });
         }
 
-        public static void ShowInfo(string message)
+        public void ShowInfo(string message)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -20,7 +21,7 @@ namespace PsISEProjectExplorer.UI.Helpers
             });
         }
 
-        public static bool ShowConfirmMessage(string message)
+        public bool ShowConfirmMessage(string message)
         {
             return Application.Current.Dispatcher.Invoke(() =>
             {
@@ -29,7 +30,7 @@ namespace PsISEProjectExplorer.UI.Helpers
             });
         }
 
-        public static bool ShowQuestion(string header, string message)
+        public bool ShowQuestion(string header, string message)
         {
             return Application.Current.Dispatcher.Invoke(() =>
             {

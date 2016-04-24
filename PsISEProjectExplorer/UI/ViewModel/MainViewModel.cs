@@ -3,6 +3,7 @@ using NLog;
 using PsISEProjectExplorer.Config;
 using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
+using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI.IseIntegration;
@@ -61,7 +62,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.OnPropertyChanged();
                 this.SearchOptions.SearchRegex = this.searchRegex;
                 this.configHandler.SaveConfigValue("SearchRegex", value.ToString());
-                this.DocumentHierarchySearcher = this.DocumentHierarchyFactory.CreateDocumentHierarchySearcher(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
+                this.DocumentHierarchy = this.DocumentHierarchyFactory.CreateDocumentHierarchy(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
                 this.ReindexSearchTree();
             }
         }
@@ -158,7 +159,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private FileSystemChangeWatcher FileSystemChangeWatcher { get; set; }
 
-        private DocumentHierarchySearcher DocumentHierarchySearcher { get; set; }
+        private DocumentHierarchy DocumentHierarchy { get; set; }
 
         private PowershellTokenizerProvider PowershellTokenizerProvider { get; set; }
 
@@ -188,6 +189,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.IseFileReloader = iseFileReloader;
             this.TreeViewModel.PropertyChanged += (s, e) => { if (e.PropertyName == "NumberOfFiles") this.OnPropertyChanged("TreeItemsResultString"); };
 
+
             fileSystemChangeWatcher.RegisterOnChangeCallback(this.ReindexOnFileSystemChanged);
             indexingSearchingModel.RegisterHandlers(this.OnSearchingFinished, this.OnIndexingFinished, this.OnIndexingProgress);
 
@@ -204,7 +206,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
             if (this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory != null)
             {
-                this.DocumentHierarchySearcher = this.DocumentHierarchyFactory.CreateDocumentHierarchySearcher(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
+                this.DocumentHierarchy = this.DocumentHierarchyFactory.CreateDocumentHierarchy(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
             }
             this.WorkspaceDirectoryModel.PropertyChanged += this.OnWorkspaceDirectoryChanged;
 
@@ -221,41 +223,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        public void GoToDefinition()
-        {
-            string funcName = this.GetFunctionNameAtCurrentPosition();
-            if (funcName == null || this.DocumentHierarchySearcher == null)
-            {
-                return;
-            }
-            var node = (PowershellItemNode)this.DocumentHierarchySearcher.GetFunctionNodeByName(funcName);
-            if (node == null)
-            {
-                return;
-            }
-            this.IseIntegrator.GoToFile(node.FilePath);
-            this.IseIntegrator.SetCursor(node.PowershellItem.StartLine, node.PowershellItem.StartColumn);
-        }
-
-        public void FindAllOccurrences()
-        {
-            string funcName = this.GetFunctionNameAtCurrentPosition();
-            if (funcName == null)
-            {
-                return;
-            }
-
-            // TODO: this is hacky...
-            this.SearchOptions.SearchText = string.Empty;
-            this.SearchInFiles = true;
-            this.SearchText = funcName;
-        }
-
-        public void FindInFiles()
-        {
-            this.SearchOptions.SearchText = string.Empty;
-            this.SearchInFiles = true;
-        }
+ 
 
         public void ExcludeOrIncludeItem(TreeViewEntryItemModel selectedItem)
         {
@@ -274,23 +242,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.OnPropertyChanged();
             this.ReindexSearchTree();
         }
-
-        private string GetFunctionNameAtCurrentPosition()
-        {
-            if (this.DocumentHierarchySearcher == null)
-            {
-                return null;
-            }
-            EditorInfo editorInfo = this.IseIntegrator.GetCurrentLineWithColumnIndex();
-            if (editorInfo == null)
-            {
-                return null;
-            }
-            return this.PowershellTokenizerProvider.GetPowershellTokenizer().GetTokenAtColumn(editorInfo.CurrentLine, editorInfo.CurrentColumn);
-        }
-
-        
-
+     
         private void ReindexOnFileSystemChanged(object sender, FileSystemChangedInfo changedInfo)
         {
             var workspaceDirectory = this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory;
@@ -327,7 +279,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private void ClearTreeView()
         {
-            var rootNode = this.DocumentHierarchySearcher == null ? null : this.DocumentHierarchySearcher.RootNode;
+            var rootNode = this.DocumentHierarchy == null ? null : this.DocumentHierarchy.RootNode;
             this.TreeViewModel.ReRoot(rootNode);
             this.FileSystemChangeWatcher.StopWatching();
             if (rootNode != null)
@@ -348,7 +300,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             if (e.PropertyName == "CurrentWorkspaceDirectory")
             {
-                this.DocumentHierarchySearcher = this.DocumentHierarchyFactory.CreateDocumentHierarchySearcher(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
+                this.DocumentHierarchy = this.DocumentHierarchyFactory.CreateDocumentHierarchy(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
                 this.ReindexSearchTree();
             }
         }
@@ -375,7 +327,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.ClearTreeView();
             }
-            var searcherParams = new BackgroundSearcherParams(this.DocumentHierarchySearcher, this.SearchOptions, path);
+            var searcherParams = new BackgroundSearcherParams(this.DocumentHierarchy, this.SearchOptions, path);
             this.IndexingSearchingModel.RunSearch(searcherParams);
         }
 

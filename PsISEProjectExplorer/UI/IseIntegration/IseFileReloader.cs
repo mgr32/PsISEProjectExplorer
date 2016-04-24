@@ -25,10 +25,13 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         private FileSystemOperationsService FileSystemOperationsService { get; set; }
 
-        public IseFileReloader(IseIntegrator iseIntegrator, FileSystemOperationsService fileSystemOperationsService)
+        private MessageBoxHelper MessageBoxHelper { get; set; }
+
+        public IseFileReloader(IseIntegrator iseIntegrator, FileSystemOperationsService fileSystemOperationsService, MessageBoxHelper messageBoxHelper)
         {
             this.IseIntegrator = iseIntegrator;
             this.FileSystemOperationsService = fileSystemOperationsService;
+            this.MessageBoxHelper = messageBoxHelper;
             this.IseFileWatchers = new Dictionary<string, IseFileWatcher>();
             this.PathsToIgnore = new HashSet<string>();
         }
@@ -164,7 +167,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                 {
                     question = String.Format("File '{0}' has been deleted.\n\nDo you want to close it?", path);
                 }
-                if (MessageBoxHelper.ShowQuestion("Reload file", question))
+                if (this.MessageBoxHelper.ShowQuestion("Reload file", question))
                 {
                     this.IseIntegrator.CloseFile(path);
                     if (changeEntry.PathAfterRename != null)
@@ -193,7 +196,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                 {
                     message = String.Format("File '{0}' has been deleted. Since the file had been changed in ISE editor, you will need to reload it manually.", path);
                 }
-                MessageBoxHelper.ShowInfo(message);
+                this.MessageBoxHelper.ShowInfo(message);
             }
         }
 

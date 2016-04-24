@@ -1,5 +1,6 @@
 ﻿using NLog;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
+using PsISEProjectExplorer.Services;
 using System;
 using System.ComponentModel;
 using System.Threading;
@@ -14,8 +15,11 @@ namespace PsISEProjectExplorer.UI.Workers
 
         public DateTime StartTimestamp { get; private set; }
 
-        public BackgroundSearcher()
+        private DocumentHierarchySearcher DocumentHierarchySearcher { get; set; }
+
+        public BackgroundSearcher(DocumentHierarchySearcher documentHierarchySearcher)
         {
+            this.DocumentHierarchySearcher = documentHierarchySearcher;
             this.StartTimestamp = DateTime.Now;
             this.DoWork += RunSearching;
             this.WorkerSupportsCancellation = true;
@@ -35,7 +39,7 @@ namespace PsISEProjectExplorer.UI.Workers
                 Thread.CurrentThread.Name = "PsISEPE-Searcher";
             }
             var searcherParams = (BackgroundSearcherParams)e.Argument;
-            if (searcherParams.DocumentHierarchySearcher == null)
+            if (searcherParams.DocumentHierarchy == null)
             {
                 e.Result = null;
                 return;
@@ -64,7 +68,7 @@ namespace PsISEProjectExplorer.UI.Workers
             Logger.Info(string.Format("Searching started, path: {0}, text: {1} ", searcherParams.Path ?? "null", searcherParams.SearchOptions.SearchText));
             try
             {
-                INode result = searcherParams.DocumentHierarchySearcher.GetDocumentHierarchyViewNodeProjection(searcherParams.Path, searcherParams.SearchOptions, this);
+                INode result = this.DocumentHierarchySearcher.GetDocumentHierarchyViewNodeProjection(searcherParams.DocumentHierarchy, searcherParams.Path, searcherParams.SearchOptions, this);
                 e.Result = new SearcherResult(this.StartTimestamp, result, searcherParams.Path, searcherParams.SearchOptions);
             }
             catch (OperationCanceledException)

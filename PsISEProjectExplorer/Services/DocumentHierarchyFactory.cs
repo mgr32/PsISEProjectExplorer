@@ -14,9 +14,11 @@ namespace PsISEProjectExplorer.Services
     [Component]
     public class DocumentHierarchyFactory
     {
-        private DocumentHierarchy DocumentHierarchy { get; set; }
+        public DocumentHierarchy DocumentHierarchy { get; private set; }
 
         private PowershellFileParser PowershellFileParser { get; set; }
+
+        private DocumentHierarchyIndexer DocumentHierarchyIndexer { get; set; }
 
         public string CurrentDocumentHierarchyPath
         {
@@ -26,19 +28,20 @@ namespace PsISEProjectExplorer.Services
             }
         }
 
-        public DocumentHierarchyFactory(PowershellFileParser powershellFileParser)
+        public DocumentHierarchyFactory(PowershellFileParser powershellFileParser, DocumentHierarchyIndexer documentHierarchyIndexer)
         {
             this.PowershellFileParser = powershellFileParser;
+            this.DocumentHierarchyIndexer = documentHierarchyIndexer;
         }
 
-        public DocumentHierarchySearcher CreateDocumentHierarchySearcher(string path, bool analyzeContents)
+        public DocumentHierarchy CreateDocumentHierarchy(string path, bool analyzeContents)
         {
             if (string.IsNullOrEmpty(path))
             {
                 return null;
             }
             this.DocumentHierarchy = new DocumentHierarchy(new RootNode(path), analyzeContents);
-            return new DocumentHierarchySearcher(this.DocumentHierarchy);           
+            return this.DocumentHierarchy;
         }
 
         public INode CreateTemporaryNode(INode parent, NodeType nodeType)
@@ -91,7 +94,6 @@ namespace PsISEProjectExplorer.Services
             {
                 return false;
             }
-            var documentHierarchyIndexer = new DocumentHierarchyIndexer(this.DocumentHierarchy);
             bool changed = false;
             foreach (string path in pathsToUpdate)
             {
@@ -107,7 +109,7 @@ namespace PsISEProjectExplorer.Services
                         this.DocumentHierarchy.RemoveNode(node);
                         nodeShouldBeRemoved = false;
                     }
-                    documentHierarchyIndexer.AddFileSystemNode(fileSystemEntry);
+                    this.DocumentHierarchyIndexer.AddFileSystemNode(this.DocumentHierarchy, fileSystemEntry);
                     changed = true;
                 }
                 if (nodeShouldBeRemoved)

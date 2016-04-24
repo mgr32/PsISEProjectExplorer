@@ -58,11 +58,15 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private RootDirectoryProvider RootDirectoryProvider { get; set; }
 
-        public WorkspaceDirectoryModel(ConfigHandler configHandler, FileSystemOperationsService fileSystemOperationsService, RootDirectoryProvider rootDirectoryProvider)
+        private MessageBoxHelper MessageBoxHelper { get; set; }
+
+        public WorkspaceDirectoryModel(ConfigHandler configHandler, FileSystemOperationsService fileSystemOperationsService, RootDirectoryProvider rootDirectoryProvider,
+            MessageBoxHelper messageBoxHelper)
         {
             this.ConfigHandler = configHandler;
             this.FileSystemOperationsService = fileSystemOperationsService;
             this.RootDirectoryProvider = rootDirectoryProvider;
+            this.MessageBoxHelper = messageBoxHelper;
 
             this.MaxNumOfWorkspaceDirectories = configHandler.ReadConfigIntValue("MaxNumOfWorkspaceDirectories", 5);
             var workspaceDirs = configHandler.ReadConfigStringEnumerableValue("WorkspaceDirectories");

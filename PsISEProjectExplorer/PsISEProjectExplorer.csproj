@@ -75,7 +75,24 @@
     <Reference Include="System.Management.Automation" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\ChangeWorkspaceCommand.cs" />
+    <Compile Include="Commands\CloseAllButThisCommand.cs" />
+    <Compile Include="Commands\CollapseAllCommand.cs" />
+    <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\CommandExecutor.cs" />
+    <Compile Include="Commands\FindAllOccurrencesCommand.cs" />
+    <Compile Include="Commands\FindInFilesCommand.cs" />
+    <Compile Include="Commands\GoToDefinitionCommand.cs" />
+    <Compile Include="Commands\LocateFileInTreeCommand.cs" />
+    <Compile Include="Commands\OpenContextMenuCommand.cs" />
+    <Compile Include="Commands\OpenExplorerContextMenuCommand.cs" />
+    <Compile Include="Commands\OpenInExplorerCommand.cs" />
+    <Compile Include="Commands\OpenItemCommand.cs" />
+    <Compile Include="Commands\ParameterizedCommand.cs" />
+    <Compile Include="Commands\RefreshDirectoryStructureCommand.cs" />
+    <Compile Include="Commands\SelectItemCommand.cs" />
     <Compile Include="Component.cs" />
+    <Compile Include="Config\BootstrapConfig.cs" />
     <Compile Include="Config\ConfigHandler.cs" />
     <Compile Include="Contrib\Regex\CSharpRegexCapabilities.cs" />
     <Compile Include="Contrib\Regex\IRegexCapabilities.cs" />

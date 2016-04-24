@@ -74,9 +74,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private TokenLocator TokenLocator { get; set; }
 
         private IconProvider IconProvider { get; set; }
+
+        private MessageBoxHelper MessageBoxHelper { get; set; }
              
         public TreeViewModel(FileSystemChangeWatcher fileSystemChangeWatcher, DocumentHierarchyFactory documentHierarchyFactory, FilesPatternProvider filesPatternProvider,
-            FileSystemOperationsService fileSystemOperationsService, TokenLocator tokenLocator, IconProvider iconProvider, IseIntegrator iseIntegrator)
+            FileSystemOperationsService fileSystemOperationsService, TokenLocator tokenLocator, IconProvider iconProvider, IseIntegrator iseIntegrator, MessageBoxHelper messageBoxHelper)
         {
             this.FileSystemChangeWatcher = fileSystemChangeWatcher;
             this.DocumentHierarchyFactory = documentHierarchyFactory;
@@ -86,6 +88,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.TokenLocator = tokenLocator;
             this.IconProvider = iconProvider;
             this.IseIntegrator = iseIntegrator;
+            this.MessageBoxHelper = messageBoxHelper;
         }
 
         public void ReRoot(INode rootNode)
@@ -283,7 +286,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             string message = numFilesInside == 0 ?
                 String.Format("'{0}' will be deleted permanently.", selectedItem.Path) :
                 String.Format("'{0}' will be deleted permanently (together with {1} items inside).", selectedItem.Path, numFilesInside);
-            if (MessageBoxHelper.ShowConfirmMessage(message))
+            if (this.MessageBoxHelper.ShowConfirmMessage(message))
             {
                 try
                 {
@@ -293,7 +296,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 }
                 catch (Exception e)
                 {
-                    MessageBoxHelper.ShowError("Failed to delete: " + e.Message);
+                    this.MessageBoxHelper.ShowError("Failed to delete: " + e.Message);
                 }
             }
         }
@@ -339,7 +342,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 return;
             }
             string destPath = destinationItem != null ? destinationItem.Path : rootDirectory;
-            if (!MessageBoxHelper.ShowConfirmMessage(String.Format("Please confirm you want to move '{0}' to '{1}'.", movedItem.Path, destPath)))
+            if (!this.MessageBoxHelper.ShowConfirmMessage(String.Format("Please confirm you want to move '{0}' to '{1}'.", movedItem.Path, destPath)))
             {
                 return;
             }
@@ -379,7 +382,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             catch (Exception e)
             {
                 this.PathOfItemToSelectOnRefresh = null;
-                MessageBoxHelper.ShowError("Failed to move: " + e.Message);
+                this.MessageBoxHelper.ShowError("Failed to move: " + e.Message);
             }
         }
 
@@ -427,7 +430,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             catch (Exception e)
             {
                 this.PathOfItemToSelectOnRefresh = null;
-                MessageBoxHelper.ShowError("Failed to rename: " + e.Message);
+                this.MessageBoxHelper.ShowError("Failed to rename: " + e.Message);
             }
 
         }
@@ -450,7 +453,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.DocumentHierarchyFactory.RemoveTemporaryNode(selectedItem.Node);
                 this.DeleteTreeViewEntryItemModel(selectedItem);
-                MessageBoxHelper.ShowError("Item '" + newPath + "' already exists.");
+                this.MessageBoxHelper.ShowError("Item '" + newPath + "' already exists.");
                 return;
             }
             if (selectedItem.NodeType == NodeType.Directory)
@@ -475,7 +478,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                         this.DeleteTreeViewEntryItemModel(selectedItem);
                     }
                     this.PathOfItemToSelectOnRefresh = null;
-                    MessageBoxHelper.ShowError("Failed to create directory '" + newPath + "': " + e.Message);
+                    this.MessageBoxHelper.ShowError("Failed to create directory '" + newPath + "': " + e.Message);
                 }
             }
             else if (selectedItem.NodeType == NodeType.File)
@@ -501,7 +504,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                         this.DeleteTreeViewEntryItemModel(selectedItem);
                     }
                     this.PathOfItemToSelectOnRefresh = null;
-                    MessageBoxHelper.ShowError("Failed to create file '" + newPath + "': " + e.Message);
+                    this.MessageBoxHelper.ShowError("Failed to create file '" + newPath + "': " + e.Message);
                 }
             }
         }
@@ -525,7 +528,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             if (selectedItem != null && selectedItem.NodeType == NodeType.File && this.IseIntegrator.OpenFiles.Contains(selectedItem.Path) && !this.IseIntegrator.IsFileSaved(selectedItem.Path))
             {
                 this.IseIntegrator.GoToFile(selectedItem.Path);
-                MessageBoxHelper.ShowInfo("Please save your changes or close the file first.");
+                this.MessageBoxHelper.ShowInfo("Please save your changes or close the file first.");
                 return false;
             }
             return true;

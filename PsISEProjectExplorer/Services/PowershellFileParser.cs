@@ -13,7 +13,7 @@ namespace PsISEProjectExplorer.Services
 
         public PowershellFileParser(PowershellTokenizerProvider powershellTokenizerProvider, FileReader fileReader)
         {
-            this.PowershellTokenizer = powershellTokenizerProvider.GetPowershellTokenizer();
+            this.PowershellTokenizer = powershellTokenizerProvider.PowershellTokenizer;
             this.FileReader = fileReader;
         }
 

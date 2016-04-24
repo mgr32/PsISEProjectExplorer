@@ -1,23 +1,15 @@
-﻿using GongSolutions.Shell;
-using Microsoft.PowerShell.Host.ISE;
+﻿using Microsoft.PowerShell.Host.ISE;
 using NLog;
-using NLog.Targets;
-using Ookii.Dialogs.Wpf;
+using PsISEProjectExplorer.Commands;
+using PsISEProjectExplorer.Config;
 using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.UI.Helpers;
 using PsISEProjectExplorer.UI.IseIntegration;
 using PsISEProjectExplorer.UI.ViewModel;
-using SimpleInjector;
 using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Threading;
 
 namespace PsISEProjectExplorer
 {
@@ -27,11 +19,11 @@ namespace PsISEProjectExplorer
     public partial class ProjectExplorerWindow : IAddOnToolHostObject
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private static string LogFileName;
 
         private readonly MainViewModel mainViewModel;
+        private readonly CommandExecutor commandExecutor;
         private Point dragStartPoint;
-        private Container dependencyInjectionContainer;
+
 
         // Entry point to the ISE object model.
         public ObjectModelRoot HostObject
@@ -43,241 +35,96 @@ namespace PsISEProjectExplorer
             }
         }
 
+        public StretchingTreeView SearchResultsTreeView
+        {
+            get
+            {
+                return this.SearchResults;
+            }
+        }
+
         public ProjectExplorerWindow()
         {
-            this.ConfigureLogging();
-            this.ConfigureDependencyInjection();
-           
-            this.mainViewModel = this.dependencyInjectionContainer.GetInstance<MainViewModel>();
+            BootstrapConfig bootstrapConfig = new BootstrapConfig();
+            bootstrapConfig.ConfigureApplication(this);
+            this.mainViewModel = bootstrapConfig.GetInstance<MainViewModel>();
             this.mainViewModel.ActiveDocumentSyncEvent += OnActiveDocumentSyncEvent;
+            this.commandExecutor = bootstrapConfig.GetInstance<CommandExecutor>();
             this.DataContext = this.mainViewModel;
             InitializeComponent();
-            this.Dispatcher.UnhandledException += DispatcherUnhandledExceptionHandler;
         }
 
-        private void ConfigureDependencyInjection()
+        public void FocusOnTextBoxSearchText()
         {
-            this.dependencyInjectionContainer = new Container();
-            var components = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && Attribute.IsDefined(t, typeof(Component)));
-
-            foreach (var component in components)
-            {
-                this.dependencyInjectionContainer.Register(component, component, Lifestyle.Singleton);
-            }
-        }
-
-        private static void DispatcherUnhandledExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)
-        {
-            Exception e = args.Exception;
-            Logger.Error(e, "Unhandled Dispatcher exception");
-
-            StringBuilder sources = new StringBuilder().Append("Sources: ");
-            string firstSource = null;
-            var innerException = e.InnerException;
-
-            while (innerException != null)
-            {
-                if (firstSource == null)
-                {
-                    firstSource = innerException.Source;
-                }
-
-                sources.Append(innerException.Source).Append(",");
-                innerException = innerException.InnerException;
-            }
-
-            Logger.Error(sources.ToString());
-            args.Handled = true;
+            this.TextBoxSearchText.Focus();
         }
 
         private void OnActiveDocumentSyncEvent(object sender, IseEventArgs args)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            if (this.mainViewModel.SyncWithActiveDocument)
             {
-                if (this.mainViewModel.SyncWithActiveDocument)
-                {
-                    this.LocateFileInTree();
-                }
-            });
+                this.LocateFileInTree();
+            }
         }
 
         public void GoToDefinition()
         {
-            Application.Current.Dispatcher.Invoke(() => this.mainViewModel.GoToDefinition());
+            this.commandExecutor.Execute<GoToDefinitionCommand>();
         }
 
         public void FindAllOccurrences()
         {
-            Application.Current.Dispatcher.Invoke(() => this.mainViewModel.FindAllOccurrences());
+            this.commandExecutor.Execute<FindAllOccurrencesCommand>();
         }
 
         public void LocateFileInTree()
         {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                string path = this.mainViewModel.IseIntegrator.SelectedFilePath;
-                if (path == null)
-                {
-                    return;
-                }
-
-                var selectedItem = this.SearchResults.SelectedItem as TreeViewEntryItemModel;
-                if (selectedItem != null && selectedItem.Path.StartsWith(path))
-                {
-                    return;
-                }
-
-                TreeViewEntryItemModel item = this.mainViewModel.TreeViewModel.FindTreeViewEntryItemByPath(path);
-                if (item == null)
-                {
-                    return;
-                }
-
-                SearchResults.ExpandAndSelectItem(item);
-            });
+            this.commandExecutor.Execute<LocateFileInTreeCommand>();
         }
 
         public void FindInFiles()
         {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                this.mainViewModel.FindInFiles();
-                this.TextBoxSearchText.Focus();
-            });
+            this.commandExecutor.Execute<FindInFilesCommand>();
         }
 
         public void CloseAllButThis()
         {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                this.mainViewModel.IseIntegrator.CloseAllButThis();
-            });
+            this.commandExecutor.Execute<CloseAllButThisCommand>();
         }
 
         private void ChangeWorkspace_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new VistaFolderBrowserDialog
-            {
-                SelectedPath = this.mainViewModel.WorkspaceDirectoryModel.CurrentWorkspaceDirectory,
-                Description = "Please select the new workspace folder.",
-                UseDescriptionForTitle = true
-            };
-
-            bool? dialogResult = dialog.ShowDialog();
-            if (dialogResult != null && dialogResult.Value)
-            {
-                if (dialog.SelectedPath == Path.GetPathRoot(dialog.SelectedPath))
-                {
-                    MessageBoxHelper.ShowError("Cannot use root directory ('" + dialog.SelectedPath + "'). Please select another path.");
-                }
-                else
-                {
-                    this.mainViewModel.WorkspaceDirectoryModel.SetWorkspaceDirectory(dialog.SelectedPath);
-                    this.mainViewModel.WorkspaceDirectoryModel.AutoUpdateRootDirectory = false;
-                }
-            }
+            this.commandExecutor.Execute<ChangeWorkspaceCommand>();
         }
 
         private void RefreshDirectoryStructure_Click(object sender, RoutedEventArgs e)
         {
-            this.mainViewModel.ReindexSearchTree();
+            this.commandExecutor.Execute<RefreshDirectoryStructureCommand>();
         }
 
         private void CollapseAll_Click(object sender, RoutedEventArgs e)
         {
-            this.SearchResults.CollapseAll();
-        }
-
-        private void ConfigureLogging()
-        {
-            string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            LogFileName = Path.Combine(assemblyFolder, "NLog.config");
-            var config = new NLog.Config.XmlLoggingConfiguration(LogFileName);
-            LogManager.Configuration = config;
-
-            var targets = config.AllTargets;
-            if (targets != null && targets.Any() && targets.First() is FileTarget)
-            {
-                LogFileName = ((FileTarget)targets.First()).FileName.Render(new LogEventInfo());
-            }
+            this.commandExecutor.Execute<CollapseAllCommand>();
         }
 
         private void SearchResults_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var item = this.SearchResults.FindItemFromSource((DependencyObject)e.OriginalSource);
-            if (item == null && this.SearchResults.SelectedItem != null)
-            {
-                ((TreeViewEntryItemModel)this.SearchResults.SelectedItem).IsSelected = false;
-            }
-
+            var originalSource = (DependencyObject)e.OriginalSource;
+            this.commandExecutor.ExecuteWithParam<SelectItemCommand, DependencyObject>(originalSource);
             this.dragStartPoint = e.GetPosition(null);
-
             if (e.ClickCount > 1)
             {
-                this.mainViewModel.TreeViewModel.OpenItem((TreeViewEntryItemModel)this.SearchResults.SelectedItem, this.mainViewModel.SearchOptions);
+                this.commandExecutor.Execute<OpenItemCommand>();
                 e.Handled = true;
             }
         }
 
         private void SearchResults_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            TreeViewEntryItemModel item;
-            if (!this.SearchResults.SelectItemFromSource((DependencyObject)e.OriginalSource))
-            {
-                this.SearchResults.ContextMenu = this.SearchResults.Resources["EmptyContext"] as ContextMenu;
-
-                item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
-                if (item != null)
-                {
-                    item.IsSelected = false;
-                }
-
-                return;
-            }
-
-            item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
-            if (item == null)
-            {
-                // should not happen
-                this.SearchResults.ContextMenu = null;
-            }
-            else
-                switch (item.NodeType)
-                {
-                    case NodeType.Directory:
-                        this.SearchResults.ContextMenu = this.SearchResults.Resources["DirectoryContext"] as ContextMenu;
-                        break;
-                    case NodeType.File:
-                        this.SearchResults.ContextMenu = this.SearchResults.Resources["FileContext"] as ContextMenu;
-                        break;
-                    default:
-                        this.SearchResults.ContextMenu = null;
-                        break;
-                }
-
-            if (this.SearchResults.ContextMenu != null)
-            {
-                MenuItem includeMenuItem = this.FindMenuItem(this.SearchResults.ContextMenu.Items, "Include");
-                MenuItem excludeMenuItem = this.FindMenuItem(this.SearchResults.ContextMenu.Items, "Exclude");
-
-                if (item.IsExcluded)
-                {
-                    includeMenuItem.Visibility = Visibility.Visible;
-                    excludeMenuItem.Visibility = Visibility.Collapsed;
-                } else
-                {
-                    includeMenuItem.Visibility = Visibility.Collapsed;
-                    excludeMenuItem.Visibility = Visibility.Visible;
-                }
-            }
-
+            var originalSource = (DependencyObject)e.OriginalSource;
+            this.commandExecutor.ExecuteWithParam<OpenContextMenuCommand, DependencyObject>(originalSource);
         }
 
-        private MenuItem FindMenuItem(ItemCollection itemCollection, string header)
-        {
-            return (MenuItem)itemCollection.Cast<object>().Where(item => item is MenuItem && ((MenuItem)item).Header.ToString() == header).FirstOrDefault();
-        }
-            
 
         private void SearchResults_KeyUp(object sender, KeyEventArgs e)
         {
@@ -542,29 +389,7 @@ namespace PsISEProjectExplorer
 
         private void SearchResults_OpenInExplorer(object sender, RoutedEventArgs e)
         {
-            var item = (TreeViewEntryItemModel)this.SearchResults.SelectedItem;
-            if (item == null)
-            {
-                return;
-            }
-
-            try
-            {
-                switch (item.NodeType)
-                {
-                    case NodeType.Directory:
-                        Process.Start(item.Path);
-                        break;
-                    case NodeType.File:
-                        Process.Start("explorer.exe", "/select, \"" + item.Path + "\"");
-                        break;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                MessageBoxHelper.ShowError(string.Format("Cannot open path: '{0}' - {1}.", item.Path, ex.Message));
-            }
+            this.commandExecutor.Execute<OpenInExplorerCommand>();
         }
 
         private void SearchResults_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
@@ -576,32 +401,7 @@ namespace PsISEProjectExplorer
                 return;
             }
 
-            // otherwise, show Windows Explorer context menu
-            string path;
-            var selectedItem = this.SearchResults.SelectedItem as TreeViewEntryItemModel;
-            if (selectedItem == null)
-            {
-                path = this.mainViewModel.WorkspaceDirectoryModel.CurrentWorkspaceDirectory;
-            } 
-            else
-            {
-                path = selectedItem.Path;
-            }
-
-            if (String.IsNullOrEmpty(path) || (!File.Exists(path) && !Directory.Exists(path)))
-            {
-                return;
-            }
-
-            var uri = new System.Uri(path);
-            ShellItem shellItem = new ShellItem(uri);
-            ShellContextMenu menu = new ShellContextMenu(shellItem);
-            try {
-                menu.ShowContextMenu(System.Windows.Forms.Control.MousePosition);
-            } catch (Exception ex)
-            {
-                Logger.Error(ex, "Failed to show Windows Explorer Context Menu");
-            }
+            this.commandExecutor.Execute<OpenExplorerContextMenuCommand>();
         }
     }
 }

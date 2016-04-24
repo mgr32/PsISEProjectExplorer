@@ -9,36 +9,23 @@ using System.Linq;
 
 namespace PsISEProjectExplorer.Services
 {
+    [Component]
     public class DocumentHierarchySearcher
     {
-        private DocumentHierarchy DocumentHierarchy { get; set; }
-
-        public INode RootNode
-        {
-            get
-            {
-                return this.DocumentHierarchy == null ? null : this.DocumentHierarchy.RootNode;
-            }
-        }
-
-        public DocumentHierarchySearcher(DocumentHierarchy documentHierarchy)
-        {
-            this.DocumentHierarchy = documentHierarchy;
-        }
-
+        
         // note: can be invoked by multiple threads simultaneously
-        public INode GetDocumentHierarchyViewNodeProjection(string path, SearchOptions searchOptions, BackgroundWorker worker)
+        public INode GetDocumentHierarchyViewNodeProjection(DocumentHierarchy documentHierarchy, string path, SearchOptions searchOptions, BackgroundWorker worker)
         {
-            if (this.DocumentHierarchy == null)
+            if (documentHierarchy == null)
             {
                 return null;
             }
-            var node = path == null ? this.DocumentHierarchy.RootNode : this.DocumentHierarchy.GetNode(path);
+            var node = path == null ? documentHierarchy.RootNode : documentHierarchy.GetNode(path);
             if (node == null || String.IsNullOrWhiteSpace(searchOptions.SearchText))
             {
                 return node;
             }
-            IList<INode> filteredNodes = this.DocumentHierarchy
+            IList<INode> filteredNodes = documentHierarchy
                 .SearchNodesFullText(searchOptions)
                 .Where(result => result.Path.StartsWith(node.Path)) // TODO: filter it earlier for performance
                 .Select(result => result.Node)
@@ -47,13 +34,13 @@ namespace PsISEProjectExplorer.Services
             return this.FillNewFilteredDocumentHierarchyRecursively(filteredNodes, node, null, worker);
         }
 
-        public INode GetFunctionNodeByName(string name)
+        public INode GetFunctionNodeByName(DocumentHierarchy documentHierarchy, string name)
         {
-            if (this.DocumentHierarchy == null)
+            if (documentHierarchy == null)
             {
                 return null;
             }
-            return this.DocumentHierarchy
+            return documentHierarchy
                 .SearchNodesByTerm(name, FullTextFieldType.NameNotAnalyzed)
                 .Select(result => result.Node)
                 .FirstOrDefault(node => node.NodeType != NodeType.Directory && node.NodeType != NodeType.File && node.NodeType != NodeType.Intermediate);

@@ -1,4 +1,5 @@
 ﻿using NLog;
+using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI.Workers;
 using System;
 using System.Collections.Generic;
@@ -21,8 +22,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private EventHandler<SearcherResult> SearcherResultHandler { get; set; }
 
-        public IndexingSearchingModel()
+        private DocumentHierarchySearcher DocumentHierarchySearcher { get; set; }
+
+        public IndexingSearchingModel(DocumentHierarchySearcher documentHierarchySearcher)
         {
+            this.DocumentHierarchySearcher = documentHierarchySearcher;
             this.BackgroundIndexers = new List<BackgroundIndexer>();
             this.BackgroundSearchers = new List<BackgroundSearcher>();
         }
@@ -73,7 +77,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     this.BackgroundSearchers.Clear();
                 }
             }
-            var searcher = new BackgroundSearcher();
+            var searcher = new BackgroundSearcher(this.DocumentHierarchySearcher);
             searcher.RunWorkerCompleted += this.BackgroundSearcherWorkCompleted;
             if (searcherParams.Path != null)
             {

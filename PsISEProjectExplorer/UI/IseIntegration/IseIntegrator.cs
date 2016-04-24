@@ -56,6 +56,13 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         private string CurrentSelectedFile { get; set; }
 
+        private MessageBoxHelper MessageBoxHelper { get; set; }
+
+        public IseIntegrator(MessageBoxHelper messageBoxHelper)
+        {
+            this.MessageBoxHelper = messageBoxHelper;
+        }
+
         public void setHostObject(ObjectModelRoot hostObject)
         {
             if (hostObject == null)
@@ -76,7 +83,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             }
             catch (Exception e)
             {
-                MessageBoxHelper.ShowError(String.Format("Cannot open file due to Powershell ISE error: '{0}'", e.Message));
+                this.MessageBoxHelper.ShowError(String.Format("Cannot open file due to Powershell ISE error: '{0}'", e.Message));
             }
         }
 
@@ -178,7 +185,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                 }
                 catch (Exception e)
                 {
-                    MessageBoxHelper.ShowError(String.Format("Cannot close file '{0}': {1}", file.FullPath, e.Message));
+                    this.MessageBoxHelper.ShowError(String.Format("Cannot close file '{0}': {1}", file.FullPath, e.Message));
                 }
             }
             return false;
