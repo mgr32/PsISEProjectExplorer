@@ -1,18 +1,13 @@
-﻿using Microsoft.PowerShell.Host.ISE;
-using NLog;
+﻿using NLog;
 using PsISEProjectExplorer.Commands;
 using PsISEProjectExplorer.Config;
 using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
-using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Services;
-using PsISEProjectExplorer.UI.IseIntegration;
-using PsISEProjectExplorer.UI.Workers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
@@ -33,7 +28,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.SearchOptions.SearchText = value;
                 Logger.Debug("Search text changed to: " + this.SearchOptions.SearchText);
                 this.OnPropertyChanged();
-                this.RunSearch();
+                this.commandExecutor.ExecuteWithParam<RunSearchCommand, string>(null);
             }
         }
 
@@ -58,8 +53,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.OnPropertyChanged();
                 this.SearchOptions.SearchRegex = this.searchRegex;
                 this.configHandler.SaveConfigValue("SearchRegex", value.ToString());
-                this.DocumentHierarchy = this.DocumentHierarchyFactory.CreateDocumentHierarchy(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
-                this.ReindexSearchTree();
+                this.documentHierarchyFactory.CreateDocumentHierarchy(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
+                this.commandExecutor.ExecuteWithParam<ReindexSearchTreeCommand, IEnumerable<string>>(null);
             }
         }
 
@@ -75,7 +70,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.SearchOptions.SearchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
                 if (!String.IsNullOrEmpty(this.SearchText))
                 {
-                    this.RunSearch();
+                    this.commandExecutor.ExecuteWithParam<RunSearchCommand, string>(null);
                 }
                 this.configHandler.SaveConfigValue("SearchInFiles", value.ToString());
             }
@@ -89,10 +84,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
             set
             {
                 this.showAllFiles = value;
-                this.FilesPatternProvider.IncludeAllFiles = value;
+                this.filesPatternProvider.IncludeAllFiles = value;
                 this.OnPropertyChanged();
                 this.configHandler.SaveConfigValue("ShowAllFiles", value.ToString());
-                this.ReindexSearchTree();
+                this.commandExecutor.ExecuteWithParam<ReindexSearchTreeCommand, IEnumerable<string>>(null);
             }
         }
 
@@ -110,33 +105,25 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        private int numOfSearchingThreads;
+        private int NumOfSearchingThreads { get; set; }
 
-        private int NumOfSearchingThreads
+        private int NumOfIndexingThreads { get; set; }
+
+        public void AddNumOfSearchingThreads(int value)
         {
-            get
+            lock (this)
             {
-                return this.numOfSearchingThreads;
-            }
-            set
-            {
-                this.numOfSearchingThreads = value;
+                this.NumOfSearchingThreads = this.NumOfSearchingThreads + value;
                 this.OnPropertyChanged();
                 this.OnPropertyChanged("TreeItemsResultString");
             }
         }
 
-        private int numOfIndexingThreads;
-
-        private int NumOfIndexingThreads
+        public void AddNumOfIndexingThreads(int value)
         {
-            get
+            lock (this)
             {
-                return this.numOfIndexingThreads;
-            }
-            set
-            {
-                this.numOfIndexingThreads = value;
+                this.NumOfIndexingThreads = this.NumOfIndexingThreads + value;
                 this.OnPropertyChanged();
                 this.OnPropertyChanged("TreeItemsResultString");
             }
@@ -145,25 +132,13 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public SearchOptions SearchOptions { get; private set; }
 
-        public IseIntegrator IseIntegrator { get; private set; }
+        private readonly DocumentHierarchyFactory documentHierarchyFactory;
 
-        private DocumentHierarchyFactory DocumentHierarchyFactory { get; set; }
+        private readonly FilesPatternProvider filesPatternProvider;
 
-        private IseFileReloader IseFileReloader { get; set; }
+        private readonly FileSystemChangeWatcher fileSystemChangeWatcher;
 
-        private FilesPatternProvider FilesPatternProvider { get; set; }
-
-        private FileSystemChangeWatcher FileSystemChangeWatcher { get; set; }
-
-        private DocumentHierarchy DocumentHierarchy { get; set; }
-
-        private PowershellTokenizerProvider PowershellTokenizerProvider { get; set; }
-
-        private IndexingRunner IndexingRunner { get; set; }
-
-        private SearchRunner SearchRunner { get; set; }
-
-        private CommandExecutor CommandExecutor { get; set; }
+        private readonly CommandExecutor commandExecutor;
 
         private bool AnalyzeDocumentContents
         {
@@ -176,36 +151,25 @@ namespace PsISEProjectExplorer.UI.ViewModel
         private readonly ConfigHandler configHandler;
 
         public MainViewModel(ConfigHandler configHandler, WorkspaceDirectoryModel workspaceDirectoryModel, DocumentHierarchyFactory documentHierarchyFactory,
-            PowershellTokenizerProvider powershellTokenizerProvider, FileSystemChangeWatcher fileSystemChangeWatcher, IndexingRunner indexingRunner,
-            SearchRunner searchRunner,
-            TreeViewModel treeViewModel, FilesPatternProvider filesPatternProvider, IseIntegrator iseIntegrator, IseFileReloader iseFileReloader,
-            CommandExecutor commandExecutor)
+            FileSystemChangeWatcher fileSystemChangeWatcher, TreeViewModel treeViewModel, FilesPatternProvider filesPatternProvider, CommandExecutor commandExecutor)
         {
             this.configHandler = configHandler;
             this.WorkspaceDirectoryModel = workspaceDirectoryModel;
-            this.DocumentHierarchyFactory = documentHierarchyFactory;
-            this.PowershellTokenizerProvider = powershellTokenizerProvider;
-            this.FileSystemChangeWatcher = fileSystemChangeWatcher;
-            this.IndexingRunner = indexingRunner;
-            this.SearchRunner = searchRunner;
+            this.documentHierarchyFactory = documentHierarchyFactory;
+            this.fileSystemChangeWatcher = fileSystemChangeWatcher;
             this.TreeViewModel = treeViewModel;
-            this.FilesPatternProvider = filesPatternProvider;
-            this.IseIntegrator = iseIntegrator;
-            this.IseFileReloader = iseFileReloader;
-            this.CommandExecutor = commandExecutor;
+            this.filesPatternProvider = filesPatternProvider;
+            this.commandExecutor = commandExecutor;
             this.TreeViewModel.PropertyChanged += (s, e) => { if (e.PropertyName == "NumberOfFiles") this.OnPropertyChanged("TreeItemsResultString"); };
 
-
             fileSystemChangeWatcher.RegisterOnChangeCallback(this.ReindexOnFileSystemChanged);
-            this.IndexingRunner.RegisterHandlers(this.OnIndexingFinished, this.OnIndexingProgress);
-            this.SearchRunner.RegisterHandlers(this.OnSearchingFinished);
 
             this.searchRegex = configHandler.ReadConfigBoolValue("SearchRegex", false);
             this.searchInFiles = configHandler.ReadConfigBoolValue("SearchInFiles", true);
             this.showAllFiles = configHandler.ReadConfigBoolValue("ShowAllFiles", true);
             IEnumerable<string> excludePaths = configHandler.ReadConfigStringEnumerableValue("ExcludePaths");
-            this.FilesPatternProvider.IncludeAllFiles = this.showAllFiles;
-            this.FilesPatternProvider.ExcludePaths = excludePaths;
+            this.filesPatternProvider.IncludeAllFiles = this.showAllFiles;
+            this.filesPatternProvider.ExcludePaths = excludePaths;
             
             this.syncWithActiveDocument = configHandler.ReadConfigBoolValue("SyncWithActiveDocument", false);
             var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
@@ -213,21 +177,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
             if (this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory != null)
             {
-                this.DocumentHierarchy = this.DocumentHierarchyFactory.CreateDocumentHierarchy(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
+                this.documentHierarchyFactory.CreateDocumentHierarchy(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
             }
             this.WorkspaceDirectoryModel.PropertyChanged += this.OnWorkspaceDirectoryChanged;
 
-        }
-
-        public void setIseHostObject(ObjectModelRoot hostObject)
-        {
-            this.IseIntegrator.setHostObject(hostObject);
-            this.IseIntegrator.FileTabChanged += OnFileTabChanged;
-            this.IseFileReloader.startWatching();
-            if (!this.WorkspaceDirectoryModel.ResetWorkspaceDirectoryIfRequired())
-            {
-                this.ReindexSearchTree();
-            }
         }
 
         private void ReindexOnFileSystemChanged(object sender, FileSystemChangedInfo changedInfo)
@@ -243,44 +196,16 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 pathsChanged = null;
             }
             Logger.Debug("OnFileSystemChanged: " + (pathsChanged == null ? "root" : string.Join(",", pathsChanged)));
-            Application.Current.Dispatcher.Invoke(() => this.ReindexSearchTree(pathsChanged));
+            this.commandExecutor.ExecuteWithParam<ReindexSearchTreeCommand, IEnumerable<string>>(pathsChanged);
         }
 
-        private void OnFileTabChanged(object sender, IseEventArgs args)
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                this.WorkspaceDirectoryModel.ResetWorkspaceDirectoryIfRequired();
-            });
-            this.ActiveDocumentPotentiallyChanged();
-        }
-
-        public void ReindexSearchTree()
-        {
-            lock (this)
-            {
-                this.ClearTreeView();
-                this.ReindexSearchTree(null);
-            }
-        }
-
-        private void ClearTreeView()
-        {
-            var rootNode = this.DocumentHierarchy == null ? null : this.DocumentHierarchy.RootNode;
-            this.TreeViewModel.ReRoot(rootNode);
-            this.FileSystemChangeWatcher.StopWatching();
-            if (rootNode != null)
-            {
-                this.FileSystemChangeWatcher.Watch(rootNode.Path);
-            }
-        }
-
-        private void ActiveDocumentPotentiallyChanged()
+        // TODO: get it out of here
+        public void ActiveDocumentPotentiallyChanged()
         {
             if (this.SyncWithActiveDocument)
             {
                 // TODO: this should be suppressed during indexing
-                this.CommandExecutor.Execute<LocateFileInTreeCommand>();
+                this.commandExecutor.Execute<LocateFileInTreeCommand>();
             }
         }
 
@@ -288,80 +213,10 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             if (e.PropertyName == "CurrentWorkspaceDirectory")
             {
-                this.DocumentHierarchy = this.DocumentHierarchyFactory.CreateDocumentHierarchy(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
-                this.ReindexSearchTree();
+                this.documentHierarchyFactory.CreateDocumentHierarchy(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
+                this.commandExecutor.ExecuteWithParam<ReindexSearchTreeCommand, IEnumerable<string>>(null);
             }
         }
-
-        // running in UI thread
-        private void ReindexSearchTree(IEnumerable<string> pathsChanged)
-        {
-            lock (this)
-            {
-                this.NumOfIndexingThreads++;
-            }
-            var indexerParams = new BackgroundIndexerParams(this.DocumentHierarchyFactory, this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, pathsChanged, this.FilesPatternProvider);
-            this.IndexingRunner.ReindexSearchTree(indexerParams);
-        }
-
-        // running in Indexing or UI thread
-        private void RunSearch(string path = null)
-        {
-            lock (this)
-            {
-                this.NumOfSearchingThreads++;
-            }
-            if (path == null)
-            {
-                this.ClearTreeView();
-            }
-            var searcherParams = new BackgroundSearcherParams(this.DocumentHierarchy, this.SearchOptions, path);
-            this.SearchRunner.RunSearch(searcherParams);
-        }
-
-        // running in Indexing or UI thread
-        private void OnSearchingFinished(object sender, SearcherResult result)
-        {
-            try
-            {
-                if (result == null || result.SearchOptions == null || !result.SearchOptions.Equals(this.SearchOptions))
-                {
-                    // this means that the thread was cancelled or SearchOptions have been changed in the meantime, so we need to ignore the result.
-                    return;
-                }
-                bool expandNewNodes = !String.IsNullOrWhiteSpace(this.SearchText);
-                if (Application.Current != null)
-                {
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        this.TreeViewModel.RefreshFromNode(result.ResultNode, result.Path, expandNewNodes);
-                        // when 'Sync with active document' is enabled and search results changed, we need to try to locate current document in the new search results
-                        this.ActiveDocumentPotentiallyChanged();
-                    });
-                }
-            }
-            finally
-            {
-                lock (this)
-                {
-                    this.NumOfSearchingThreads--;
-                }
-            }
-        }
-
-        // running in Indexing thread
-        private void OnIndexingProgress(object sender, string path)
-        {
-            this.RunSearch(path);
-        }
-
-        // running in UI thread
-        private void OnIndexingFinished(object sender, IndexerResult result)
-        {
-            lock (this)
-            {
-                this.NumOfIndexingThreads--;
-            }
-        }
+        
     }
 }

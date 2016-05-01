@@ -6,29 +6,28 @@ using System.IO;
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class OpenExplorerContextMenuCommand : Command
     {
-
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private TreeViewModel TreeViewModel { get; set; }
+        private readonly TreeViewModel treeViewModel;
 
-        private WorkspaceDirectoryModel WorkspaceDirectoryModel { get; set; }
+        private readonly WorkspaceDirectoryModel workspaceDirectoryModel;
 
         public OpenExplorerContextMenuCommand(TreeViewModel treeViewModel, WorkspaceDirectoryModel workspaceDirectoryModel)
         {
-            this.TreeViewModel = treeViewModel;
-            this.WorkspaceDirectoryModel = workspaceDirectoryModel;
+            this.treeViewModel = treeViewModel;
+            this.workspaceDirectoryModel = workspaceDirectoryModel;
         }
 
         public void Execute()
         {
-            // otherwise, show Windows Explorer context menu
             string path;
-            var selectedItem = this.TreeViewModel.SelectedItem;
+            var selectedItem = this.treeViewModel.SelectedItem;
             if (selectedItem == null)
             {
-                path = this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory;
+                path = this.workspaceDirectoryModel.CurrentWorkspaceDirectory;
             }
             else
             {

@@ -6,14 +6,14 @@ namespace PsISEProjectExplorer.FullText
 {
     public class DocumentFactory
     {
-        private IndexWriter IndexWriter { get; set; }
+        private readonly IndexWriter indexWriter;
 
-        private bool AnalyzeContents { get; set; }
+        private readonly bool analyzeContents;
 
         public DocumentFactory(IndexWriter indexWriter, bool analyzeContents)
         {
-            this.IndexWriter = indexWriter;
-            this.AnalyzeContents = analyzeContents;
+            this.indexWriter = indexWriter;
+            this.analyzeContents = analyzeContents;
         }
 
         public void AddDirectoryEntry(string path, string segment)
@@ -46,10 +46,10 @@ namespace PsISEProjectExplorer.FullText
                 OmitTermFreqAndPositions = true
             };
             doc.Add(field);
-            field = new Field(FullTextFieldType.CatchAll.ToString(), name + " " + contents, Field.Store.NO, this.AnalyzeContents ? Field.Index.ANALYZED : Field.Index.NOT_ANALYZED);
+            field = new Field(FullTextFieldType.CatchAll.ToString(), name + " " + contents, Field.Store.NO, this.analyzeContents ? Field.Index.ANALYZED : Field.Index.NOT_ANALYZED);
             doc.Add(field);
-            this.IndexWriter.AddDocument(doc);
-            this.IndexWriter.Commit();
+            this.indexWriter.AddDocument(doc);
+            this.indexWriter.Commit();
         }
     }
 }

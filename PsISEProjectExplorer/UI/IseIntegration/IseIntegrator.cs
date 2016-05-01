@@ -19,7 +19,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         { 
             get
             {
-                var file = this.HostObject.CurrentPowerShellTab.Files.SelectedFile;
+                var file = this.hostObject.CurrentPowerShellTab.Files.SelectedFile;
                 return (file == null ? null : file.FullPath);
             }
         }
@@ -28,7 +28,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         {
             get
             {
-                var file = this.HostObject.CurrentPowerShellTab.Files.SelectedFile;
+                var file = this.hostObject.CurrentPowerShellTab.Files.SelectedFile;
                 return (file == null ? null : file.Editor.SelectedText);
             }
         }
@@ -37,7 +37,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         {
             get
             {
-                var files = this.HostObject.CurrentPowerShellTab.Files;
+                var files = this.hostObject.CurrentPowerShellTab.Files;
                 return files == null ? new List<ISEFile>() : files.ToList();
             }
         }
@@ -52,15 +52,15 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         public event EventHandler<IseEventArgs> FileTabChanged;
 
-        private ObjectModelRoot HostObject { get; set; }
+        private ObjectModelRoot hostObject;
 
-        private string CurrentSelectedFile { get; set; }
+        private string currentSelectedFile;
 
-        private MessageBoxHelper MessageBoxHelper { get; set; }
+        private readonly MessageBoxHelper messageBoxHelper;
 
         public IseIntegrator(MessageBoxHelper messageBoxHelper)
         {
-            this.MessageBoxHelper = messageBoxHelper;
+            this.messageBoxHelper = messageBoxHelper;
         }
 
         public void setHostObject(ObjectModelRoot hostObject)
@@ -70,8 +70,8 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                 throw new ArgumentNullException("hostObject");
             }
   
-            this.HostObject = hostObject;
-            this.HostObject.CurrentPowerShellTab.PropertyChanged += OnIseTabChanged;
+            this.hostObject = hostObject;
+            this.hostObject.CurrentPowerShellTab.PropertyChanged += OnIseTabChanged;
         }
 
         public void GoToFile(string filePath)
@@ -79,20 +79,20 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             try
             {
                 Logger.Debug("ISEIntegrator - opening file " + filePath);
-                this.HostObject.CurrentPowerShellTab.Files.Add(filePath);
+                this.hostObject.CurrentPowerShellTab.Files.Add(filePath);
             }
             catch (Exception e)
             {
-                this.MessageBoxHelper.ShowError(String.Format("Cannot open file due to Powershell ISE error: '{0}'", e.Message));
+                this.messageBoxHelper.ShowError(String.Format("Cannot open file due to Powershell ISE error: '{0}'", e.Message));
             }
         }
 
         public void SetCursor(int line, int column)
         {
-            if (this.HostObject.CurrentPowerShellTab.Files.SelectedFile != null)
+            if (this.hostObject.CurrentPowerShellTab.Files.SelectedFile != null)
             {
                 Logger.Debug("ISEIntegrator - setting cursor to line " + line + ", column " + column);
-                var editor = this.HostObject.CurrentPowerShellTab.Files.SelectedFile.Editor;
+                var editor = this.hostObject.CurrentPowerShellTab.Files.SelectedFile.Editor;
                 if (editor.LineCount > line)
                 {
                     try
@@ -109,10 +109,10 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         public void SelectText(int line, int column, int length)
         {
-            if (this.HostObject.CurrentPowerShellTab.Files.SelectedFile != null)
+            if (this.hostObject.CurrentPowerShellTab.Files.SelectedFile != null)
             {
                 Logger.Debug("IseIntegrator - selecting text at line " + line + ", column " + column + ", length " + length);
-                var editor = this.HostObject.CurrentPowerShellTab.Files.SelectedFile.Editor;
+                var editor = this.hostObject.CurrentPowerShellTab.Files.SelectedFile.Editor;
                 if (editor.LineCount > line)
                 {
                     try
@@ -129,7 +129,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         public EditorInfo GetCurrentLineWithColumnIndex()
         {
-            var file = this.HostObject.CurrentPowerShellTab.Files.SelectedFile;
+            var file = this.hostObject.CurrentPowerShellTab.Files.SelectedFile;
             if (file == null)
             {
                 return null;
@@ -140,7 +140,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         public void SetFocusOnCurrentTab()
         {
             Logger.Debug("IseIntegrator - setting focus on current tab");
-            var file = this.HostObject.CurrentPowerShellTab.Files.SelectedFile;
+            var file = this.hostObject.CurrentPowerShellTab.Files.SelectedFile;
             if (file == null)
             {
                 return;
@@ -150,20 +150,20 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         public void CloseAllButThis()
         {
-            if (this.HostObject.CurrentPowerShellTab == null || this.HostObject.CurrentPowerShellTab.Files == null)
+            if (this.hostObject.CurrentPowerShellTab == null || this.hostObject.CurrentPowerShellTab.Files == null)
             {
                 return;
             }
             Logger.Debug("IseIntegrator - closing all but this");
-            var filesToRemove = new List<ISEFile>(this.HostObject.CurrentPowerShellTab.Files);
-            var selectedFile = this.HostObject.CurrentPowerShellTab.Files.SelectedFile;
+            var filesToRemove = new List<ISEFile>(this.hostObject.CurrentPowerShellTab.Files);
+            var selectedFile = this.hostObject.CurrentPowerShellTab.Files.SelectedFile;
             foreach (var file in filesToRemove)
             {
                 if (file != selectedFile)
                 {
                     try
                     {
-                        this.HostObject.CurrentPowerShellTab.Files.Remove(file);
+                        this.hostObject.CurrentPowerShellTab.Files.Remove(file);
                     }
                     catch
                     {
@@ -181,11 +181,11 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             {
                 try
                 {
-                    return this.HostObject.CurrentPowerShellTab.Files.Remove(file);
+                    return this.hostObject.CurrentPowerShellTab.Files.Remove(file);
                 }
                 catch (Exception e)
                 {
-                    this.MessageBoxHelper.ShowError(String.Format("Cannot close file '{0}': {1}", file.FullPath, e.Message));
+                    this.messageBoxHelper.ShowError(String.Format("Cannot close file '{0}': {1}", file.FullPath, e.Message));
                 }
             }
             return false;
@@ -199,8 +199,8 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         public void AttachFileCollectionChangedHandler(NotifyCollectionChangedEventHandler handler)
         {
-            this.HostObject.CurrentPowerShellTab.Files.CollectionChanged += handler;
-            var openFiles = this.HostObject.CurrentPowerShellTab.Files;
+            this.hostObject.CurrentPowerShellTab.Files.CollectionChanged += handler;
+            var openFiles = this.hostObject.CurrentPowerShellTab.Files;
             if (openFiles.Any())
             {
                 handler(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, openFiles));
@@ -211,8 +211,8 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         {
             if (e.PropertyName == "LastEditorWithFocus")
             {
-                if (this.SelectedFilePath != this.CurrentSelectedFile) {
-                    this.CurrentSelectedFile = this.SelectedFilePath;
+                if (this.SelectedFilePath != this.currentSelectedFile) {
+                    this.currentSelectedFile = this.SelectedFilePath;
                     if (this.FileTabChanged != null)
                     {
                         this.FileTabChanged(this, new IseEventArgs()); 
@@ -223,11 +223,11 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         private ISEFile GetIseFile(string path)
         {
-            if (this.HostObject.CurrentPowerShellTab == null || this.HostObject.CurrentPowerShellTab.Files == null)
+            if (this.hostObject.CurrentPowerShellTab == null || this.hostObject.CurrentPowerShellTab.Files == null)
             {
                 return null;
             }
-            return this.HostObject.CurrentPowerShellTab.Files.FirstOrDefault(f => f.FullPath.Equals(path, StringComparison.InvariantCultureIgnoreCase));
+            return this.hostObject.CurrentPowerShellTab.Files.FirstOrDefault(f => f.FullPath.Equals(path, StringComparison.InvariantCultureIgnoreCase));
         }
 
     }

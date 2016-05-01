@@ -8,40 +8,41 @@ using System.Linq;
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class DeleteItemCommand : Command
     {
-        private TreeViewModel TreeViewModel { get; set; }
+        private readonly TreeViewModel treeViewModel;
 
-        private MessageBoxHelper MessageBoxHelper { get; set; }
+        private readonly MessageBoxHelper messageBoxHelper;
 
-        private IseIntegrator IseIntegrator { get; set; }
+        private readonly IseIntegrator iseIntegrator;
 
-        private FilesPatternProvider FilesPatternProvider { get; set; }
+        private readonly FilesPatternProvider filesPatternProvider;
 
-        private FileSystemOperationsService FileSystemOperationsService { get; set; }
+        private readonly FileSystemOperationsService fileSystemOperationsService;
 
-        private UnsavedFileChecker UnsavedFileEnforcer { get; set; }
+        private readonly UnsavedFileChecker unsavedFileEnforcer;
 
         public DeleteItemCommand(TreeViewModel treeViewModel, MessageBoxHelper messageBoxHelper, IseIntegrator iseIntegrator, 
             FilesPatternProvider filesPatternProvider, FileSystemOperationsService fileSystemOperationsService, UnsavedFileChecker unsavedFileEnforcer)
         {
-            this.TreeViewModel = treeViewModel;
-            this.MessageBoxHelper = messageBoxHelper;
-            this.IseIntegrator = iseIntegrator;
-            this.FilesPatternProvider = filesPatternProvider;
-            this.FileSystemOperationsService = fileSystemOperationsService;
-            this.UnsavedFileEnforcer = unsavedFileEnforcer;
+            this.treeViewModel = treeViewModel;
+            this.messageBoxHelper = messageBoxHelper;
+            this.iseIntegrator = iseIntegrator;
+            this.filesPatternProvider = filesPatternProvider;
+            this.fileSystemOperationsService = fileSystemOperationsService;
+            this.unsavedFileEnforcer = unsavedFileEnforcer;
         }
 
         public void Execute()
         {
-            var selectedItem = this.TreeViewModel.SelectedItem;
+            var selectedItem = this.treeViewModel.SelectedItem;
             if (selectedItem == null)
             {
                 return;
             }
 
-            if (!this.UnsavedFileEnforcer.EnsureCurrentlyOpenedFileIsSaved())
+            if (!this.unsavedFileEnforcer.EnsureCurrentlyOpenedFileIsSaved())
             {
                 return;
             }
@@ -57,17 +58,17 @@ namespace PsISEProjectExplorer.Commands
             string message = numFilesInside == 0 ?
                 String.Format("'{0}' will be deleted permanently.", selectedItem.Path) :
                 String.Format("'{0}' will be deleted permanently (together with {1} items inside).", selectedItem.Path, numFilesInside);
-            if (this.MessageBoxHelper.ShowConfirmMessage(message))
+            if (this.messageBoxHelper.ShowConfirmMessage(message))
             {
                 try
                 {
-                    this.IseIntegrator.CloseFile(selectedItem.Path);
-                    this.FilesPatternProvider.RemoveAdditionalPath(selectedItem.Path);
-                    FileSystemOperationsService.DeleteFileOrDirectory(selectedItem.Path);
+                    this.iseIntegrator.CloseFile(selectedItem.Path);
+                    this.filesPatternProvider.RemoveAdditionalPath(selectedItem.Path);
+                    fileSystemOperationsService.DeleteFileOrDirectory(selectedItem.Path);
                 }
                 catch (Exception e)
                 {
-                    this.MessageBoxHelper.ShowError("Failed to delete: " + e.Message);
+                    this.messageBoxHelper.ShowError("Failed to delete: " + e.Message);
                 }
             }
         }

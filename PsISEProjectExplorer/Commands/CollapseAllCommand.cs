@@ -2,18 +2,19 @@
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class CollapseAllCommand : Command
     {
-        private ProjectExplorerWindow ProjectExplorerWindow { get; set; }
+        private readonly ProjectExplorerWindow projectExplorerWindow;
 
         public CollapseAllCommand(ProjectExplorerWindow projectExplorerWindow)
         {
-            this.ProjectExplorerWindow = projectExplorerWindow;
+            this.projectExplorerWindow = projectExplorerWindow;
         }
 
         public void Execute()
         {
-            this.ProjectExplorerWindow.SearchResultsTreeView.CollapseAll();
+            this.projectExplorerWindow.SearchResultsTreeView.CollapseAll();
         }
     }
 }

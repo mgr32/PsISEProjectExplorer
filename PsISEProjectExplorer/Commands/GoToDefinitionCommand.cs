@@ -6,28 +6,29 @@ using PsISEProjectExplorer.UI.IseIntegration;
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class GoToDefinitionCommand : Command
     {
-        private IseIntegrator IseIntegrator { get; set; }
+        private readonly IseIntegrator iseIntegrator;
 
-        private PowershellTokenizerProvider PowershellTokenizerProvider { get; set; }
+        private readonly PowershellTokenizerProvider powershellTokenizerProvider;
 
-        private DocumentHierarchyFactory DocumentHierarchyFactory { get; set; }
+        private readonly DocumentHierarchyFactory documentHierarchyFactory;
 
-        private DocumentHierarchySearcher DocumentHierarchySearcher { get; set; }
+        private readonly DocumentHierarchySearcher documentHierarchySearcher;
 
         public GoToDefinitionCommand(IseIntegrator iseIntegrator, PowershellTokenizerProvider powershellTokenizerProvider, 
             DocumentHierarchyFactory documentHierarchyFactory, DocumentHierarchySearcher documentHierarchySearcher)
         {
-            this.IseIntegrator = iseIntegrator;
-            this.PowershellTokenizerProvider = powershellTokenizerProvider;
-            this.DocumentHierarchyFactory = documentHierarchyFactory;
-            this.DocumentHierarchySearcher = documentHierarchySearcher;
+            this.iseIntegrator = iseIntegrator;
+            this.powershellTokenizerProvider = powershellTokenizerProvider;
+            this.documentHierarchyFactory = documentHierarchyFactory;
+            this.documentHierarchySearcher = documentHierarchySearcher;
         }
 
         public void Execute()
         {
-            DocumentHierarchy documentHierarchy = this.DocumentHierarchyFactory.DocumentHierarchy;
+            DocumentHierarchy documentHierarchy = this.documentHierarchyFactory.DocumentHierarchy;
             if (documentHierarchy == null)
             {
                 return;
@@ -37,23 +38,23 @@ namespace PsISEProjectExplorer.Commands
             {
                 return;
             }
-            var node = (PowershellItemNode)this.DocumentHierarchySearcher.GetFunctionNodeByName(documentHierarchy, funcName);
+            var node = (PowershellItemNode)this.documentHierarchySearcher.GetFunctionNodeByName(documentHierarchy, funcName);
             if (node == null)
             {
                 return;
             }
-            this.IseIntegrator.GoToFile(node.FilePath);
-            this.IseIntegrator.SetCursor(node.PowershellItem.StartLine, node.PowershellItem.StartColumn);
+            this.iseIntegrator.GoToFile(node.FilePath);
+            this.iseIntegrator.SetCursor(node.PowershellItem.StartLine, node.PowershellItem.StartColumn);
         }
 
         private string GetFunctionNameAtCurrentPosition()
         {
-            EditorInfo editorInfo = this.IseIntegrator.GetCurrentLineWithColumnIndex();
+            EditorInfo editorInfo = this.iseIntegrator.GetCurrentLineWithColumnIndex();
             if (editorInfo == null)
             {
                 return null;
             }
-            return this.PowershellTokenizerProvider.PowershellTokenizer.GetTokenAtColumn(editorInfo.CurrentLine, editorInfo.CurrentColumn);
+            return this.powershellTokenizerProvider.PowershellTokenizer.GetTokenAtColumn(editorInfo.CurrentLine, editorInfo.CurrentColumn);
         }
     }
 }

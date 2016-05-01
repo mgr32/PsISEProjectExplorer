@@ -5,24 +5,24 @@ using System.IO;
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class ChangeWorkspaceCommand : Command
     {
+        private readonly WorkspaceDirectoryModel workspaceDirectoryModel;
 
-        private WorkspaceDirectoryModel WorkspaceDirectoryModel { get; set; }
-
-        private MessageBoxHelper MessageBoxHelper { get; set; }
+        private readonly MessageBoxHelper messageBoxHelper;
 
         public ChangeWorkspaceCommand(WorkspaceDirectoryModel workspaceDirectoryModel, MessageBoxHelper messageBoxHelper)
         {
-            this.WorkspaceDirectoryModel = workspaceDirectoryModel;
-            this.MessageBoxHelper = messageBoxHelper;
+            this.workspaceDirectoryModel = workspaceDirectoryModel;
+            this.messageBoxHelper = messageBoxHelper;
         }
 
         public void Execute()
         {
             var dialog = new VistaFolderBrowserDialog
             {
-                SelectedPath = this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory,
+                SelectedPath = this.workspaceDirectoryModel.CurrentWorkspaceDirectory,
                 Description = "Please select the new workspace folder.",
                 UseDescriptionForTitle = true
             };
@@ -32,12 +32,12 @@ namespace PsISEProjectExplorer.Commands
             {
                 if (dialog.SelectedPath == Path.GetPathRoot(dialog.SelectedPath))
                 {
-                    this.MessageBoxHelper.ShowError("Cannot use root directory ('" + dialog.SelectedPath + "'). Please select another path.");
+                    this.messageBoxHelper.ShowError("Cannot use root directory ('" + dialog.SelectedPath + "'). Please select another path.");
                 }
                 else
                 {
-                    this.WorkspaceDirectoryModel.SetWorkspaceDirectory(dialog.SelectedPath);
-                    this.WorkspaceDirectoryModel.AutoUpdateRootDirectory = false;
+                    this.workspaceDirectoryModel.SetWorkspaceDirectory(dialog.SelectedPath);
+                    this.workspaceDirectoryModel.AutoUpdateRootDirectory = false;
                 }
             }
         }

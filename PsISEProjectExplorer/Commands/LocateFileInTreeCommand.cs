@@ -4,42 +4,43 @@ using PsISEProjectExplorer.UI.ViewModel;
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class LocateFileInTreeCommand : Command
     {
-        private ProjectExplorerWindow ProjectExplorerWindow { get; set; }
+        private readonly ProjectExplorerWindow projectExplorerWindow;
 
-        private IseIntegrator IseIntegrator { get; set; }
+        private readonly IseIntegrator iseIntegrator;
 
-        private TreeViewModel TreeViewModel { get; set; }
+        private readonly TreeViewModel treeViewModel;
 
         public LocateFileInTreeCommand(ProjectExplorerWindow projectExplorerWindow, IseIntegrator iseIntegrator, TreeViewModel treeViewModel)
         {
-            this.ProjectExplorerWindow = projectExplorerWindow;
-            this.IseIntegrator = iseIntegrator;
-            this.TreeViewModel = treeViewModel;
+            this.projectExplorerWindow = projectExplorerWindow;
+            this.iseIntegrator = iseIntegrator;
+            this.treeViewModel = treeViewModel;
         }
 
         public void Execute()
         {
-            string path = this.IseIntegrator.SelectedFilePath;
+            string path = this.iseIntegrator.SelectedFilePath;
             if (path == null)
             {
                 return;
             }
 
-            var selectedItem = this.TreeViewModel.SelectedItem;
+            var selectedItem = this.treeViewModel.SelectedItem;
             if (selectedItem != null && selectedItem.Path.StartsWith(path))
             {
                 return;
             }
 
-            TreeViewEntryItemModel item = this.TreeViewModel.FindTreeViewEntryItemByPath(path);
+            TreeViewEntryItemModel item = this.treeViewModel.FindTreeViewEntryItemByPath(path);
             if (item == null)
             {
                 return;
             }
 
-            this.ProjectExplorerWindow.SearchResultsTreeView.ExpandAndSelectItem(item);
+            this.projectExplorerWindow.SearchResultsTreeView.ExpandAndSelectItem(item);
         }
     }
 }

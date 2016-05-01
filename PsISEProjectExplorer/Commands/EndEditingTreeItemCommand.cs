@@ -8,50 +8,50 @@ using System;
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class EndEditingTreeItemCommand : ParameterizedCommand<Tuple<string, bool>>
     {
+        private readonly MainViewModel mainViewModel;
 
-        private MainViewModel MainViewModel { get; set; }
+        private readonly TreeViewModel treeViewModel;
 
-        private TreeViewModel TreeViewModel { get; set; }
+        private readonly FilesPatternProvider filesPatternProvider;
 
-        private FilesPatternProvider FilesPatternProvider { get; set; }
+        private readonly IseIntegrator iseIntegrator;
 
-        private IseIntegrator IseIntegrator { get; set; }
+        private readonly FileSystemOperationsService fileSystemOperationsService;
 
-        private FileSystemOperationsService FileSystemOperationsService { get; set; }
+        private readonly MessageBoxHelper messageBoxHelper;
 
-        private MessageBoxHelper MessageBoxHelper { get; set; }
-
-        private DocumentHierarchyFactory DocumentHierarchyFactory { get; set; }
+        private readonly DocumentHierarchyFactory documentHierarchyFactory;
 
         public EndEditingTreeItemCommand(MainViewModel mainViewModel, TreeViewModel treeViewModel, FilesPatternProvider filesPatternProvider,
             IseIntegrator iseIntegrator, FileSystemOperationsService fileSystemOperationsService, MessageBoxHelper messageBoxHelper,
             DocumentHierarchyFactory documentHierarchyFactory)
         {
-            this.MainViewModel = mainViewModel;
-            this.TreeViewModel = treeViewModel;
-            this.FilesPatternProvider = filesPatternProvider;
-            this.IseIntegrator = iseIntegrator;
-            this.FileSystemOperationsService = fileSystemOperationsService;
-            this.MessageBoxHelper = messageBoxHelper;
-            this.DocumentHierarchyFactory = documentHierarchyFactory;
+            this.mainViewModel = mainViewModel;
+            this.treeViewModel = treeViewModel;
+            this.filesPatternProvider = filesPatternProvider;
+            this.iseIntegrator = iseIntegrator;
+            this.fileSystemOperationsService = fileSystemOperationsService;
+            this.messageBoxHelper = messageBoxHelper;
+            this.documentHierarchyFactory = documentHierarchyFactory;
         }
 
         public void Execute(Tuple<string, bool> param)
         {
             string newValue = param.Item1;
             bool save = param.Item2;
-            var selectedItem = this.TreeViewModel.SelectedItem;
+            var selectedItem = this.treeViewModel.SelectedItem;
             if (selectedItem == null)
             {
                 return;
             }
 
-            var addFileExtension = !this.MainViewModel.SearchInFiles;
+            var addFileExtension = !this.mainViewModel.SearchInFiles;
             selectedItem.IsBeingEdited = false;
 
-            if (selectedItem.NodeType == NodeType.File && addFileExtension && !String.IsNullOrEmpty(newValue) && !this.FilesPatternProvider.DoesFileMatch(newValue))
+            if (selectedItem.NodeType == NodeType.File && addFileExtension && !String.IsNullOrEmpty(newValue) && !this.filesPatternProvider.DoesFileMatch(newValue))
             {
                 newValue += ".ps1";
             }
@@ -77,17 +77,17 @@ namespace PsISEProjectExplorer.Commands
             {
                 string oldPath = selectedItem.Path;
                 string newPath = this.GenerateNewPath(selectedItem.Path, newValue);
-                bool closed = this.IseIntegrator.CloseFile(oldPath);
-                FileSystemOperationsService.RenameFileOrDirectory(oldPath, newPath);
+                bool closed = this.iseIntegrator.CloseFile(oldPath);
+                fileSystemOperationsService.RenameFileOrDirectory(oldPath, newPath);
                 if (closed)
                 {
-                    this.IseIntegrator.GoToFile(newPath);
+                    this.iseIntegrator.GoToFile(newPath);
                 }
             }
             catch (Exception e)
             {
-                this.TreeViewModel.PathOfItemToSelectOnRefresh = null;
-                this.MessageBoxHelper.ShowError("Failed to rename: " + e.Message);
+                this.treeViewModel.PathOfItemToSelectOnRefresh = null;
+                this.messageBoxHelper.ShowError("Failed to rename: " + e.Message);
             }
 
         }
@@ -100,29 +100,29 @@ namespace PsISEProjectExplorer.Commands
             }
             if (!save || String.IsNullOrEmpty(newValue))
             {
-                this.DocumentHierarchyFactory.RemoveTemporaryNode(selectedItem.Node);
-                this.TreeViewModel.DeleteTreeViewEntryItemModel(selectedItem);
+                this.documentHierarchyFactory.RemoveTemporaryNode(selectedItem.Node);
+                this.treeViewModel.DeleteTreeViewEntryItemModel(selectedItem);
                 return;
             }
             var newPath = this.GenerateNewPath(selectedItem.Path, newValue);
             INode newNode = null;
-            if (this.TreeViewModel.FindTreeViewEntryItemByPath(newPath) != null)
+            if (this.treeViewModel.FindTreeViewEntryItemByPath(newPath) != null)
             {
-                this.DocumentHierarchyFactory.RemoveTemporaryNode(selectedItem.Node);
-                this.TreeViewModel.DeleteTreeViewEntryItemModel(selectedItem);
-                this.MessageBoxHelper.ShowError("Item '" + newPath + "' already exists.");
+                this.documentHierarchyFactory.RemoveTemporaryNode(selectedItem.Node);
+                this.treeViewModel.DeleteTreeViewEntryItemModel(selectedItem);
+                this.messageBoxHelper.ShowError("Item '" + newPath + "' already exists.");
                 return;
             }
             if (selectedItem.NodeType == NodeType.Directory)
             {
                 try
                 {
-                    newNode = this.DocumentHierarchyFactory.UpdateTemporaryNode(selectedItem.Node, newPath);
+                    newNode = this.documentHierarchyFactory.UpdateTemporaryNode(selectedItem.Node, newPath);
                     var parent = selectedItem.Parent;
-                    this.TreeViewModel.DeleteTreeViewEntryItemModel(selectedItem);
-                    selectedItem = this.TreeViewModel.CreateTreeViewEntryItemModel(newNode, parent, true);
-                    this.FilesPatternProvider.AddAdditionalPath(newPath);
-                    FileSystemOperationsService.CreateDirectory(newPath);
+                    this.treeViewModel.DeleteTreeViewEntryItemModel(selectedItem);
+                    selectedItem = this.treeViewModel.CreateTreeViewEntryItemModel(newNode, parent, true);
+                    this.filesPatternProvider.AddAdditionalPath(newPath);
+                    fileSystemOperationsService.CreateDirectory(newPath);
                 }
                 catch (Exception e)
                 {
@@ -132,23 +132,23 @@ namespace PsISEProjectExplorer.Commands
                     }
                     if (selectedItem != null)
                     {
-                        this.TreeViewModel.DeleteTreeViewEntryItemModel(selectedItem);
+                        this.treeViewModel.DeleteTreeViewEntryItemModel(selectedItem);
                     }
-                    this.TreeViewModel.PathOfItemToSelectOnRefresh = null;
-                    this.MessageBoxHelper.ShowError("Failed to create directory '" + newPath + "': " + e.Message);
+                    this.treeViewModel.PathOfItemToSelectOnRefresh = null;
+                    this.messageBoxHelper.ShowError("Failed to create directory '" + newPath + "': " + e.Message);
                 }
             }
             else if (selectedItem.NodeType == NodeType.File)
             {
                 try
                 {
-                    newNode = this.DocumentHierarchyFactory.UpdateTemporaryNode(selectedItem.Node, newPath);
+                    newNode = this.documentHierarchyFactory.UpdateTemporaryNode(selectedItem.Node, newPath);
                     var parent = selectedItem.Parent;
-                    this.TreeViewModel.DeleteTreeViewEntryItemModel(selectedItem);
-                    selectedItem = this.TreeViewModel.CreateTreeViewEntryItemModel(newNode, parent, true);
-                    this.FilesPatternProvider.AddAdditionalPath(newPath);
-                    FileSystemOperationsService.CreateFile(newPath);
-                    this.IseIntegrator.GoToFile(newPath);
+                    this.treeViewModel.DeleteTreeViewEntryItemModel(selectedItem);
+                    selectedItem = this.treeViewModel.CreateTreeViewEntryItemModel(newNode, parent, true);
+                    this.filesPatternProvider.AddAdditionalPath(newPath);
+                    fileSystemOperationsService.CreateFile(newPath);
+                    this.iseIntegrator.GoToFile(newPath);
                 }
                 catch (Exception e)
                 {
@@ -158,10 +158,10 @@ namespace PsISEProjectExplorer.Commands
                     }
                     if (selectedItem != null)
                     {
-                        this.TreeViewModel.DeleteTreeViewEntryItemModel(selectedItem);
+                        this.treeViewModel.DeleteTreeViewEntryItemModel(selectedItem);
                     }
-                    this.TreeViewModel.PathOfItemToSelectOnRefresh = null;
-                    this.MessageBoxHelper.ShowError("Failed to create file '" + newPath + "': " + e.Message);
+                    this.treeViewModel.PathOfItemToSelectOnRefresh = null;
+                    this.messageBoxHelper.ShowError("Failed to create file '" + newPath + "': " + e.Message);
                 }
             }
         }
@@ -169,7 +169,7 @@ namespace PsISEProjectExplorer.Commands
         private string GenerateNewPath(string currentPath, string newValue)
         {
             var newPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(currentPath), newValue);
-            this.TreeViewModel.PathOfItemToSelectOnRefresh = newPath;
+            this.treeViewModel.PathOfItemToSelectOnRefresh = newPath;
             return newPath;
         }
 

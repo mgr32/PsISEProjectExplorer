@@ -12,26 +12,28 @@ namespace PsISEProjectExplorer.FullText
     // note: one instance of this class can be used by many threads
     public class FullTextDirectory
     {
-        private Analyzer Analyzer { get; set; }
+        private readonly Analyzer analyzer;
 
-        private Directory LuceneDirectory { get; set; }
+        private readonly Directory luceneDirectory;
 
-        private IndexWriter IndexWriter { get; set; }
+        private readonly IndexWriter indexWriter;
 
-        private IndexReader IndexReader { get; set; }
+        private IndexReader indexReader;
 
-        private CustomQueryParser CustomQueryParser { get; set; }
+        private readonly CustomQueryParser customQueryParser;
 
-        public DocumentFactory DocumentCreator { get; private set; }
+        private readonly DocumentFactory documentFactory;
+
+        public DocumentFactory DocumentFactory { get { return this.documentFactory; } }
 
         public FullTextDirectory(bool analyzeContents)
         {
-            this.Analyzer = new CustomAnalyzer();
-            this.LuceneDirectory = new RAMDirectory();
-            this.IndexWriter = new IndexWriter(this.LuceneDirectory, this.Analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
-            this.IndexReader = this.IndexWriter.GetReader();
-            this.CustomQueryParser = new CustomQueryParser();
-            this.DocumentCreator = new DocumentFactory(this.IndexWriter, analyzeContents);
+            this.analyzer = new CustomAnalyzer();
+            this.luceneDirectory = new RAMDirectory();
+            this.indexWriter = new IndexWriter(this.luceneDirectory, this.analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
+            this.indexReader = this.indexWriter.GetReader();
+            this.customQueryParser = new CustomQueryParser();
+            this.documentFactory = new DocumentFactory(this.indexWriter, analyzeContents);
         }
 
         public IList<SearchResult> SearchTerm(string searchTerm, FullTextFieldType field)
@@ -42,14 +44,14 @@ namespace PsISEProjectExplorer.FullText
 
         public IList<SearchResult> Search(SearchOptions searchOptions)
         {
-            Query query = this.CustomQueryParser.Parse(searchOptions);
+            Query query = this.customQueryParser.Parse(searchOptions);
             return this.RunQuery(query);
             
         }
 
         public void DeleteDocument(string path)
         {
-            this.IndexWriter.DeleteDocuments(new Term(FullTextFieldType.Path.ToString(), path));
+            this.indexWriter.DeleteDocuments(new Term(FullTextFieldType.Path.ToString(), path));
         }
 
         private IList<SearchResult> RunQuery(Query query)
@@ -58,11 +60,11 @@ namespace PsISEProjectExplorer.FullText
             // Alternatively, there could be one RAMDirectory per filesystem directory.
             lock (this)
             {
-                IndexReader newReader = this.IndexReader.Reopen();
-                if (newReader != this.IndexReader)
+                IndexReader newReader = this.indexReader.Reopen();
+                if (newReader != this.indexReader)
                 {
-                    this.IndexReader.Dispose();
-                    this.IndexReader = newReader;
+                    this.indexReader.Dispose();
+                    this.indexReader = newReader;
                 }
 
                 IndexSearcher searcher; searcher = new IndexSearcher(newReader);

@@ -1,6 +1,4 @@
-﻿using PsISEProjectExplorer.Services;
-
-namespace PsISEProjectExplorer.Model
+﻿namespace PsISEProjectExplorer.Model
 {
     public class EditorInfo
     {

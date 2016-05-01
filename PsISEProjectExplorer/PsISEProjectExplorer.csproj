@@ -77,6 +77,11 @@
   <ItemGroup>
     <Compile Include="Commands\AddNewTreeItemCommand.cs" />
     <Compile Include="Commands\ChangeWorkspaceCommand.cs" />
+    <Compile Include="Commands\ClearTreeViewCommand.cs" />
+    <Compile Include="Commands\ReindexSearchTreeCommand.cs" />
+    <Compile Include="Commands\ResetWorkspaceDirectoryCommand.cs" />
+    <Compile Include="Commands\RunSearchCommand.cs" />
+    <Compile Include="Commands\SetIseHostObjectCommand.cs" />
     <Compile Include="Commands\UnsavedFileChecker.cs" />
     <Compile Include="Commands\CloseAllButThisCommand.cs" />
     <Compile Include="Commands\CollapseAllCommand.cs" />
@@ -95,7 +100,6 @@
     <Compile Include="Commands\OpenInExplorerCommand.cs" />
     <Compile Include="Commands\OpenItemCommand.cs" />
     <Compile Include="Commands\ParameterizedCommand.cs" />
-    <Compile Include="Commands\RefreshDirectoryStructureCommand.cs" />
     <Compile Include="Commands\RenameItemCommand.cs" />
     <Compile Include="Commands\SelectItemCommand.cs" />
     <Compile Include="Component.cs" />
@@ -212,10 +216,8 @@
     <Compile Include="Model\DocHierarchy\Nodes\AbstractNode.cs" />
     <Compile Include="FullText\FullTextDirectory.cs" />
     <Compile Include="UI\Workers\BackgroundSearcherParams.cs" />
-    <Compile Include="UI\Workers\IndexingRunner.cs" />
     <Compile Include="UI\Workers\SearcherResult.cs" />
     <Compile Include="UI\Workers\IndexerResult.cs" />
-    <Compile Include="UI\Workers\SearchRunner.cs" />
     <Page Include="PsISEProjectExplorer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

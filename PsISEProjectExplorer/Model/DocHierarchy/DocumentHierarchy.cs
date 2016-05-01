@@ -11,23 +11,25 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
     {
         public static object RootLockObject = new object();
 
-        public INode RootNode { get; private set; }
+        private INode rootNode;
 
-        private FullTextDirectory FullTextDirectory { get; set; }
+        public INode RootNode { get { return this.rootNode; } }
 
-        private IDictionary<string, INode> NodeMap { get; set; }
+        private readonly FullTextDirectory fullTextDirectory;
+
+        private readonly IDictionary<string, INode> nodeMap;
 
         public DocumentHierarchy(INode rootNode, bool analyzeContents)
         {
-            this.RootNode = rootNode;
-            this.FullTextDirectory = new FullTextDirectory(analyzeContents);
-            this.NodeMap = new Dictionary<string, INode> {{rootNode.Path, rootNode}};
+            this.rootNode = rootNode;
+            this.fullTextDirectory = new FullTextDirectory(analyzeContents);
+            this.nodeMap = new Dictionary<string, INode> {{rootNode.Path, rootNode}};
         }
 
         public INode GetNode(string path)
         {
             INode value;
-            this.NodeMap.TryGetValue(path, out value);
+            this.nodeMap.TryGetValue(path, out value);
             return value;
         }
 
@@ -43,8 +45,8 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             {
                 if (node.Path != this.RootNode.Path)
                 {
-                    this.NodeMap.Remove(node.Path);
-                    this.FullTextDirectory.DeleteDocument(node.Path);
+                    this.nodeMap.Remove(node.Path);
+                    this.fullTextDirectory.DeleteDocument(node.Path);
                     node.Remove();
                 }
                 itemsToBeRemoved = new List<INode>(node.Children);
@@ -64,8 +66,8 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
                 string name = absolutePath.Substring(absolutePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
                 INode node;
                 node = new DirectoryNode(absolutePath, name, parent, isExcluded, errorMessage);
-                this.NodeMap.Add(absolutePath, node);
-                this.FullTextDirectory.DocumentCreator.AddDirectoryEntry(absolutePath, name);
+                this.nodeMap.Add(absolutePath, node);
+                this.fullTextDirectory.DocumentFactory.AddDirectoryEntry(absolutePath, name);
                 return node;
             }
         }
@@ -77,8 +79,8 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
             {
                 string fileName = Path.GetFileName(absolutePath);
                 FileNode fileNode = new FileNode(absolutePath, fileName, parent, isExcluded, errorMessage);
-                this.NodeMap.Add(absolutePath, fileNode);
-                this.FullTextDirectory.DocumentCreator.AddFileEntry(absolutePath, fileName, fileContents);
+                this.nodeMap.Add(absolutePath, fileNode);
+                this.fullTextDirectory.DocumentFactory.AddFileEntry(absolutePath, fileName, fileContents);
                 return fileNode;
             }
         }
@@ -91,8 +93,8 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
                 lock (lockObject)
                 {
                     var newNode = new PowershellItemNode(filePath, item, parent);
-                    this.NodeMap.Add(newNode.Path, newNode);
-                    this.FullTextDirectory.DocumentCreator.AddPowershellItemEntry(newNode.Path, item.Name);
+                    this.nodeMap.Add(newNode.Path, newNode);
+                    this.fullTextDirectory.DocumentFactory.AddPowershellItemEntry(newNode.Path, item.Name);
                     parent = newNode;
                 }
             }
@@ -133,14 +135,14 @@ namespace PsISEProjectExplorer.Model.DocHierarchy
 
         public IEnumerable<SearchResult> SearchNodesFullText(SearchOptions searchOptions)
         {
-            IList<SearchResult> searchResults = this.FullTextDirectory.Search(searchOptions);
+            IList<SearchResult> searchResults = this.fullTextDirectory.Search(searchOptions);
             this.AddNodesToSearchResults(searchResults);
             return searchResults;
         }
 
         public IEnumerable<SearchResult> SearchNodesByTerm(string filter, FullTextFieldType fieldType)
         {
-            IList<SearchResult> searchResults = this.FullTextDirectory.SearchTerm(filter, fieldType);
+            IList<SearchResult> searchResults = this.fullTextDirectory.SearchTerm(filter, fieldType);
             this.AddNodesToSearchResults(searchResults);
             return searchResults;
         }

@@ -6,28 +6,29 @@ using PsISEProjectExplorer.UI.ViewModel;
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class FindAllOccurrencesCommand : Command
     {
-        private IseIntegrator IseIntegrator { get; set; }
+        private readonly IseIntegrator iseIntegrator;
 
-        private PowershellTokenizerProvider PowershellTokenizerProvider { get; set; }
+        private readonly PowershellTokenizerProvider powershellTokenizerProvider;
 
-        private MainViewModel MainViewModel { get; set; }
+        private readonly MainViewModel mainViewModel;
 
-        private DocumentHierarchyFactory DocumentHierarchyFactory { get; set; }
+        private readonly DocumentHierarchyFactory documentHierarchyFactory;
 
         public FindAllOccurrencesCommand(IseIntegrator iseIntegrator, PowershellTokenizerProvider powershellTokenizerProvider, MainViewModel mainViewModel,
             DocumentHierarchyFactory documentHierarchyFactory)
         {
-            this.IseIntegrator = iseIntegrator;
-            this.PowershellTokenizerProvider = powershellTokenizerProvider;
-            this.MainViewModel = mainViewModel;
-            this.DocumentHierarchyFactory = documentHierarchyFactory;
+            this.iseIntegrator = iseIntegrator;
+            this.powershellTokenizerProvider = powershellTokenizerProvider;
+            this.mainViewModel = mainViewModel;
+            this.documentHierarchyFactory = documentHierarchyFactory;
         }
 
         public void Execute()
         {
-            DocumentHierarchy documentHierarchy = this.DocumentHierarchyFactory.DocumentHierarchy;
+            DocumentHierarchy documentHierarchy = this.documentHierarchyFactory.DocumentHierarchy;
             if (documentHierarchy == null)
             {
                 return;
@@ -39,19 +40,19 @@ namespace PsISEProjectExplorer.Commands
             }
 
             // TODO: this is hacky...
-            this.MainViewModel.SearchOptions.SearchText = string.Empty;
-            this.MainViewModel.SearchInFiles = true;
-            this.MainViewModel.SearchText = funcName;
+            this.mainViewModel.SearchOptions.SearchText = string.Empty;
+            this.mainViewModel.SearchInFiles = true;
+            this.mainViewModel.SearchText = funcName;
         }
 
         private string GetFunctionNameAtCurrentPosition()
         {
-            EditorInfo editorInfo = this.IseIntegrator.GetCurrentLineWithColumnIndex();
+            EditorInfo editorInfo = this.iseIntegrator.GetCurrentLineWithColumnIndex();
             if (editorInfo == null)
             {
                 return null;
             }
-            return this.PowershellTokenizerProvider.PowershellTokenizer.GetTokenAtColumn(editorInfo.CurrentLine, editorInfo.CurrentColumn);
+            return this.powershellTokenizerProvider.PowershellTokenizer.GetTokenAtColumn(editorInfo.CurrentLine, editorInfo.CurrentColumn);
         }
     }
 }

@@ -8,28 +8,29 @@ using System;
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class OpenItemCommand : Command
     {
-        private TreeViewModel TreeViewModel { get; set; }
+        private readonly TreeViewModel treeViewModel;
 
-        private MainViewModel MainViewModel { get; set; }
+        private readonly MainViewModel mainViewModel;
 
-        private IseIntegrator IseIntegrator { get; set; }
+        private readonly IseIntegrator iseIntegrator;
 
-        private TokenLocator TokenLocator { get; set; }
+        private readonly TokenLocator tokenLocator;
 
         public OpenItemCommand(TreeViewModel treeViewModel, MainViewModel mainViewModel, IseIntegrator iseIntegrator, TokenLocator tokenLocator)
         {
-            this.TreeViewModel = treeViewModel;
-            this.MainViewModel = mainViewModel;
-            this.IseIntegrator = iseIntegrator;
-            this.TokenLocator = tokenLocator;
+            this.treeViewModel = treeViewModel;
+            this.mainViewModel = mainViewModel;
+            this.iseIntegrator = iseIntegrator;
+            this.tokenLocator = tokenLocator;
         }
 
         public void Execute()
         {
-            var item = this.TreeViewModel.SelectedItem;
-            var searchOptions = this.MainViewModel.SearchOptions;
+            var item = this.treeViewModel.SelectedItem;
+            var searchOptions = this.mainViewModel.SearchOptions;
             if (item == null)
             {
                 return;
@@ -37,29 +38,29 @@ namespace PsISEProjectExplorer.Commands
 
             if (item.Node.NodeType == NodeType.File)
             {
-                bool wasOpen = (this.IseIntegrator.SelectedFilePath == item.Node.Path);
+                bool wasOpen = (this.iseIntegrator.SelectedFilePath == item.Node.Path);
                 if (!wasOpen)
                 {
-                    this.IseIntegrator.GoToFile(item.Node.Path);
+                    this.iseIntegrator.GoToFile(item.Node.Path);
                 }
                 else
                 {
-                    this.IseIntegrator.SetFocusOnCurrentTab();
+                    this.iseIntegrator.SetFocusOnCurrentTab();
                 }
                 if (searchOptions.SearchText != null && searchOptions.SearchText.Length > 2)
                 {
-                    EditorInfo editorInfo = (wasOpen ? this.IseIntegrator.GetCurrentLineWithColumnIndex() : null);
-                    TokenPosition tokenPos = this.TokenLocator.LocateNextToken(item.Node.Path, searchOptions, editorInfo);
+                    EditorInfo editorInfo = (wasOpen ? this.iseIntegrator.GetCurrentLineWithColumnIndex() : null);
+                    TokenPosition tokenPos = this.tokenLocator.LocateNextToken(item.Node.Path, searchOptions, editorInfo);
                     if (tokenPos.MatchLength > 2)
                     {
-                        this.IseIntegrator.SelectText(tokenPos.Line, tokenPos.Column, tokenPos.MatchLength);
+                        this.iseIntegrator.SelectText(tokenPos.Line, tokenPos.Column, tokenPos.MatchLength);
                     }
-                    else if (string.IsNullOrEmpty(this.IseIntegrator.SelectedText))
+                    else if (string.IsNullOrEmpty(this.iseIntegrator.SelectedText))
                     {
-                        tokenPos = this.TokenLocator.LocateSubtoken(item.Node.Path, searchOptions);
+                        tokenPos = this.tokenLocator.LocateSubtoken(item.Node.Path, searchOptions);
                         if (tokenPos.MatchLength > 2)
                         {
-                            this.IseIntegrator.SelectText(tokenPos.Line, tokenPos.Column, tokenPos.MatchLength);
+                            this.iseIntegrator.SelectText(tokenPos.Line, tokenPos.Column, tokenPos.MatchLength);
                         }
                     }
                 }
@@ -71,8 +72,8 @@ namespace PsISEProjectExplorer.Commands
             else if (item.Node.NodeType != NodeType.Intermediate)
             {
                 var node = ((PowershellItemNode)item.Node);
-                this.IseIntegrator.GoToFile(node.FilePath);
-                this.IseIntegrator.SelectText(node.PowershellItem.StartLine, node.PowershellItem.StartColumn, node.PowershellItem.EndColumn - node.PowershellItem.StartColumn);
+                this.iseIntegrator.GoToFile(node.FilePath);
+                this.iseIntegrator.SelectText(node.PowershellItem.StartLine, node.PowershellItem.StartColumn, node.PowershellItem.EndColumn - node.PowershellItem.StartColumn);
             }
 
         }

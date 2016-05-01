@@ -1,11 +1,6 @@
 ﻿using PsISEProjectExplorer.Commands;
 using PsISEProjectExplorer.UI.ViewModel;
 using System;
-using System.Collections.Generic;
-
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -15,18 +10,16 @@ namespace PsISEProjectExplorer.UI.Helpers
     [Component]
     public class DragDropHandler
     {
-
         public Point DragStartPoint { get; set; }
 
-        private TreeViewModel TreeViewModel { get; set; }
+        private readonly TreeViewModel treeViewModel;
 
-
-        private CommandExecutor CommandExecutor { get; set; }
+        private readonly CommandExecutor commandExecutor;
 
         public DragDropHandler(TreeViewModel treeViewModel, CommandExecutor commandExecutor)
         {
-            this.TreeViewModel = treeViewModel;
-            this.CommandExecutor = commandExecutor;
+            this.treeViewModel = treeViewModel;
+            this.commandExecutor = commandExecutor;
         }
 
         public void ClearDragStartPoint()
@@ -38,7 +31,7 @@ namespace PsISEProjectExplorer.UI.Helpers
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                var selectedItem = this.TreeViewModel.SelectedItem;
+                var selectedItem = this.treeViewModel.SelectedItem;
                 if ((selectedItem != null && selectedItem.IsBeingEdited))
                 {
                     return;
@@ -109,7 +102,7 @@ namespace PsISEProjectExplorer.UI.Helpers
 
                 if (item != dropTarget)
                 {
-                    this.CommandExecutor.ExecuteWithParam<MoveItemCommand, Tuple<TreeViewEntryItemModel, TreeViewEntryItemModel>>(Tuple.Create(item, dropTarget));
+                    this.commandExecutor.ExecuteWithParam<MoveItemCommand, Tuple<TreeViewEntryItemModel, TreeViewEntryItemModel>>(Tuple.Create(item, dropTarget));
                 }
             }
             this.ClearDragStartPoint();

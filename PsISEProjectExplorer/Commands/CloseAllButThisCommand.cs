@@ -2,19 +2,19 @@
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class CloseAllButThisCommand : Command
     {
-
-        private IseIntegrator IseIntegrator { get; set; }
+        private readonly IseIntegrator iseIntegrator;
 
         public CloseAllButThisCommand(IseIntegrator iseIntegrator)
         {
-            this.IseIntegrator = IseIntegrator;
+            this.iseIntegrator = iseIntegrator;
         }
 
         public void Execute()
         {
-            this.IseIntegrator.CloseAllButThis();
+            this.iseIntegrator.CloseAllButThis();
         }
     }
 }

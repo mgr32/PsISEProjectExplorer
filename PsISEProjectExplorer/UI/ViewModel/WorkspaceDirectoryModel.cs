@@ -1,9 +1,7 @@
-﻿using PsISEProjectExplorer.Config;
-using PsISEProjectExplorer.Services;
+﻿using PsISEProjectExplorer.Commands;
+using PsISEProjectExplorer.Config;
 using PsISEProjectExplorer.UI.Helpers;
-using PsISEProjectExplorer.UI.IseIntegration;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -43,37 +41,37 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.autoUpdateRootDirectory = value;
                 this.OnPropertyChanged();
-                this.ResetWorkspaceDirectoryIfRequired();
-                ConfigHandler.SaveConfigValue("AutoUpdateRootDirectory", value.ToString());
+                this.commandExecutor.ExecuteWithParam<ResetWorkspaceDirectoryCommand, bool>(false);
+                configHandler.SaveConfigValue("AutoUpdateRootDirectory", value.ToString());
             }
         }
 
-        public IseIntegrator IseIntegrator { get; set; }
+        private readonly int maxNumOfWorkspaceDirectories;
 
-        private int MaxNumOfWorkspaceDirectories { get; set; }
+        private readonly ConfigHandler configHandler;
 
-        private ConfigHandler ConfigHandler { get; set; }
+        private readonly CommandExecutor commandExecutor;
 
-        private FileSystemOperationsService FileSystemOperationsService { get; set; }
+        private readonly MessageBoxHelper messageBoxHelper;
 
-        private RootDirectoryProvider RootDirectoryProvider { get; set; }
-
-        private MessageBoxHelper MessageBoxHelper { get; set; }
-
-        public WorkspaceDirectoryModel(ConfigHandler configHandler, FileSystemOperationsService fileSystemOperationsService, RootDirectoryProvider rootDirectoryProvider,
-            MessageBoxHelper messageBoxHelper)
+        public WorkspaceDirectoryModel(ConfigHandler configHandler, CommandExecutor commandExecutor, MessageBoxHelper messageBoxHelper)
         {
-            this.ConfigHandler = configHandler;
-            this.FileSystemOperationsService = fileSystemOperationsService;
-            this.RootDirectoryProvider = rootDirectoryProvider;
-            this.MessageBoxHelper = messageBoxHelper;
+            this.configHandler = configHandler;
+            this.commandExecutor = commandExecutor;
+            this.messageBoxHelper = messageBoxHelper;
 
-            this.MaxNumOfWorkspaceDirectories = configHandler.ReadConfigIntValue("MaxNumOfWorkspaceDirectories", 5);
+            this.maxNumOfWorkspaceDirectories = configHandler.ReadConfigIntValue("MaxNumOfWorkspaceDirectories", 5);
             var workspaceDirs = configHandler.ReadConfigStringEnumerableValue("WorkspaceDirectories");
             this.WorkspaceDirectories = new ObservableCollection<string>(workspaceDirs);
             this.autoUpdateRootDirectory = configHandler.ReadConfigBoolValue("AutoUpdateRootDirectory", true);
 
             this.SanitizeWorkspaceDirectories();
+        }
+
+        public void TriggerWorkspaceDirectoryChange()
+        {
+            this.OnPropertyChanged("WorkspaceDirectories");
+            this.OnPropertyChanged("CurrentWorkspaceDirectory");
         }
 
         public void SetWorkspaceDirectory(string path)
@@ -91,23 +89,21 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
             if (!Directory.Exists(path))
             {
-                MessageBoxHelper.ShowError(String.Format("Directory {0} does not exist.", path));
-                this.OnPropertyChanged("WorkspaceDirectories");
-                this.OnPropertyChanged("CurrentWorkspaceDirectory");
+                messageBoxHelper.ShowError(String.Format("Directory {0} does not exist.", path));
+                this.TriggerWorkspaceDirectoryChange();
                 return;
             }
             this.WorkspaceDirectories.Insert(0, path);
             var cnt = this.WorkspaceDirectories.Count;
-            while (cnt > this.MaxNumOfWorkspaceDirectories)
+            while (cnt > this.maxNumOfWorkspaceDirectories)
             {
                 this.WorkspaceDirectories.RemoveAt(cnt - 1);
                 cnt = this.WorkspaceDirectories.Count;
             }
 
-            ConfigHandler.SaveConfigEnumerableValue("WorkspaceDirectories", this.WorkspaceDirectories);
+            configHandler.SaveConfigEnumerableValue("WorkspaceDirectories", this.WorkspaceDirectories);
 
-            this.OnPropertyChanged("WorkspaceDirectories");
-            this.OnPropertyChanged("CurrentWorkspaceDirectory");
+            this.TriggerWorkspaceDirectoryChange();
         }
 
         private void SanitizeWorkspaceDirectories()
@@ -117,32 +113,6 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.WorkspaceDirectories.Remove(item);
             }
-        }
-
-        public bool ResetWorkspaceDirectoryIfRequired()
-        {
-            if (this.IseIntegrator == null)
-            {
-                return false;
-            }
-            var currentPath = this.IseIntegrator.SelectedFilePath;
-            if (String.IsNullOrEmpty(currentPath) || currentPath == this.CurrentWorkspaceDirectory)
-            {
-                return false;
-            }
-            if (!this.AutoUpdateRootDirectory && this.CurrentWorkspaceDirectory != null)
-            {
-                return false;
-            }
-            string newRootDirectoryToSearch = this.RootDirectoryProvider.GetRootDirectoryToSearch(currentPath);
-            if (newRootDirectoryToSearch == null || newRootDirectoryToSearch == this.CurrentWorkspaceDirectory || 
-                FileSystemOperationsService.IsSubdirectory(this.CurrentWorkspaceDirectory, newRootDirectoryToSearch) ||
-                !Directory.Exists(newRootDirectoryToSearch))
-            {
-                return false;
-            }
-            this.SetWorkspaceDirectory(newRootDirectoryToSearch);
-            return true;
         }
 
     }

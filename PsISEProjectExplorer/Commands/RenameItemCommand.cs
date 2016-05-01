@@ -2,26 +2,27 @@
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class RenameItemCommand : Command
     {
-        private TreeViewModel TreeViewModel { get; set; }
+        private readonly TreeViewModel treeViewModel;
 
-        private UnsavedFileChecker UnsavedFileEnforcer { get; set; }
+        private readonly UnsavedFileChecker unsavedFileEnforcer;
 
         public RenameItemCommand(TreeViewModel treeViewModel, UnsavedFileChecker unsavedFileEnforcer)
         {
-            this.TreeViewModel = treeViewModel;
+            this.treeViewModel = treeViewModel;
         }
 
         public void Execute()
         {
-            var item = this.TreeViewModel.SelectedItem;
+            var item = this.treeViewModel.SelectedItem;
             if (item == null)
             {
                 return;
             }
 
-            if (!this.UnsavedFileEnforcer.EnsureCurrentlyOpenedFileIsSaved())
+            if (!this.unsavedFileEnforcer.EnsureCurrentlyOpenedFileIsSaved())
             {
                 return;
             }

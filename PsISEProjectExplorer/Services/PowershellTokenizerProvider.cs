@@ -13,7 +13,9 @@ namespace PsISEProjectExplorer.Services
 
         private readonly ConfigHandler configHandler;
 
-        public IPowershellTokenizer PowershellTokenizer { get; private set; }
+        private IPowershellTokenizer powershellTokenizer;
+
+        public IPowershellTokenizer PowershellTokenizer { get { return this.powershellTokenizer; } }
 
         public PowershellTokenizerProvider(ConfigHandler configHandler) {
             this.configHandler = configHandler;
@@ -23,12 +25,12 @@ namespace PsISEProjectExplorer.Services
             if (this.isPowershell5Available)
             {
                 Logger.Info("Using Powershell5Tokenizer");
-                this.PowershellTokenizer = new Powershell5Tokenizer(this.configHandler);
+                this.powershellTokenizer = new Powershell5Tokenizer(this.configHandler);
             }
             else
             {
                 Logger.Info("Using PowershellLegacyTokenizer");
-                this.PowershellTokenizer = new PowershellLegacyTokenizer(this.configHandler);
+                this.powershellTokenizer = new PowershellLegacyTokenizer(this.configHandler);
             }
         }
     }

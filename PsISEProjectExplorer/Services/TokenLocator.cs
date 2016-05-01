@@ -6,12 +6,11 @@ namespace PsISEProjectExplorer.Services
     [Component]
     public class TokenLocator
     {
-
-        private FileReader FileReader { get; set; }
+        private readonly FileReader fileReader;
 
         public TokenLocator(FileReader fileReader)
         {
-            this.FileReader = fileReader;
+            this.fileReader = fileReader;
         }
 
         public TokenPosition LocateNextToken(string filePath, SearchOptions searchOptions, EditorInfo editorInfo)
@@ -43,7 +42,7 @@ namespace PsISEProjectExplorer.Services
             var bestSubtokenPosition = new TokenPosition(-1, 0, 0);
             Regex regex = searchOptions.SearchRegex ? new Regex(searchText, RegexOptions.Compiled | RegexOptions.IgnoreCase) : null;
             bool firstLine = true;
-            foreach (LineInfo lineInfo in FileReader.ReadFileAsEnumerableWithWrap(filePath, startLine))
+            foreach (LineInfo lineInfo in fileReader.ReadFileAsEnumerableWithWrap(filePath, startLine))
             {
                 int columnsToIgnore = (firstLine ? startColumnInFirstLine : 0);
                 firstLine = false;

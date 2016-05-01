@@ -5,36 +5,37 @@ using PsISEProjectExplorer.UI.ViewModel;
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class AddNewTreeItemCommand : ParameterizedCommand<NodeType>
     {
-        private TreeViewModel TreeViewModel { get; set; }
+        private readonly TreeViewModel treeViewModel;
 
-        private DocumentHierarchyFactory DocumentHierarchyFactory { get; set; }
+        private readonly DocumentHierarchyFactory documentHierarchyFactory;
 
         public AddNewTreeItemCommand(TreeViewModel treeViewModel, DocumentHierarchyFactory documentHierarchyFactory)
         {
-            this.TreeViewModel = treeViewModel;
-            this.DocumentHierarchyFactory = documentHierarchyFactory;
+            this.treeViewModel = treeViewModel;
+            this.documentHierarchyFactory = documentHierarchyFactory;
         }
 
         public void Execute(NodeType nodeType)
         {
-            var parent = this.TreeViewModel.SelectedItem;
-            if (this.DocumentHierarchyFactory == null)
+            var parent = this.treeViewModel.SelectedItem;
+            if (this.documentHierarchyFactory == null)
             {
                 return;
             }
             if (parent == null)
             {
-                parent = this.TreeViewModel.RootTreeViewEntryItem;
+                parent = this.treeViewModel.RootTreeViewEntryItem;
             }
             parent.IsExpanded = true;
-            INode newNode = this.DocumentHierarchyFactory.CreateTemporaryNode(parent.Node, nodeType);
+            INode newNode = this.documentHierarchyFactory.CreateTemporaryNode(parent.Node, nodeType);
             if (newNode == null)
             {
                 return;
             }
-            var newItem = this.TreeViewModel.CreateTreeViewEntryItemModel(newNode, parent, true);
+            var newItem = this.treeViewModel.CreateTreeViewEntryItemModel(newNode, parent, true);
             newItem.IsBeingEdited = true;
             newItem.IsBeingAdded = true;
         }

@@ -14,17 +14,17 @@ namespace PsISEProjectExplorer.Services
 
         public event EventHandler<FileSystemChangedInfo> FileSystemChanged;
 
-        private readonly ISet<ChangePoolEntry> ChangePool = new HashSet<ChangePoolEntry>();
+        private readonly ISet<ChangePoolEntry> changePool = new HashSet<ChangePoolEntry>();
 
-        private readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
-        private string Name;
+        private readonly string Name;
 
-        private FileSystemOperationsService FileSystemOperationsService { get; set; }
+        private readonly FileSystemOperationsService fileSystemOperationsService;
 
         public FileSystemChangeNotifier(string name, FileSystemOperationsService fileSystemOperationsService)
         {
-            this.FileSystemOperationsService = fileSystemOperationsService;
+            this.fileSystemOperationsService = fileSystemOperationsService;
             this.Name = name;
             Task.Factory.StartNew(ChangeNotifier);
         }
@@ -33,7 +33,7 @@ namespace PsISEProjectExplorer.Services
         {
             lock (this)
             {
-                this.ChangePool.Add(changePoolEntry);
+                this.changePool.Add(changePoolEntry);
             }
         }
 
@@ -41,7 +41,7 @@ namespace PsISEProjectExplorer.Services
         {
             lock (this)
             {
-                this.ChangePool.Clear();
+                this.changePool.Clear();
             }
         }
 
@@ -55,18 +55,18 @@ namespace PsISEProjectExplorer.Services
             while (true)
             {
                 Thread.Sleep(200);
-                if (CancellationTokenSource.Token.IsCancellationRequested)
+                if (cancellationTokenSource.Token.IsCancellationRequested)
                 {
                     return;
                 }
                 FileSystemChangedInfo changedInfo = null;
                 lock (this)
                 {
-                    if (this.ChangePool.Any())
+                    if (this.changePool.Any())
                     {
-                        IList<ChangePoolEntry> pathsChanged = RemoveSubdirectories(ChangePool);
+                        IList<ChangePoolEntry> pathsChanged = RemoveSubdirectories(changePool);
                         changedInfo = new FileSystemChangedInfo(pathsChanged);
-                        this.ChangePool.Clear();
+                        this.changePool.Clear();
                     }
                 }
                 if (changedInfo != null && this.FileSystemChanged != null)
@@ -82,7 +82,7 @@ namespace PsISEProjectExplorer.Services
             foreach (ChangePoolEntry entry in dirList)
             {
                 string dir = entry.PathChanged;
-                if (dirList.Select(d => d.PathChanged).Where(d => d != dir).All(d => !FileSystemOperationsService.IsSubdirectory(d, dir)))
+                if (dirList.Select(d => d.PathChanged).Where(d => d != dir).All(d => !fileSystemOperationsService.IsSubdirectory(d, dir)))
                 {
                     result.Add(entry);
                 }

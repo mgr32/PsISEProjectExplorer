@@ -14,33 +14,32 @@ namespace PsISEProjectExplorer.UI.IseIntegration
     [Component]
     public class IseFileReloader
     {
+        private readonly IseIntegrator iseIntegrator;
 
-        private IseIntegrator IseIntegrator { get; set; }
+        private readonly IDictionary<string, IseFileWatcher> iseFileWatchers;
 
-        private IDictionary<string, IseFileWatcher> IseFileWatchers { get; set; }
+        private readonly ISet<string> pathsToIgnore;
 
-        private ISet<string> PathsToIgnore { get; set; }
+        private FileSystemChangeNotifier fileSystemChangeNotifier;
 
-        private FileSystemChangeNotifier FileSystemChangeNotifier { get; set; }
+        private readonly FileSystemOperationsService fileSystemOperationsService;
 
-        private FileSystemOperationsService FileSystemOperationsService { get; set; }
-
-        private MessageBoxHelper MessageBoxHelper { get; set; }
+        private readonly MessageBoxHelper messageBoxHelper;
 
         public IseFileReloader(IseIntegrator iseIntegrator, FileSystemOperationsService fileSystemOperationsService, MessageBoxHelper messageBoxHelper)
         {
-            this.IseIntegrator = iseIntegrator;
-            this.FileSystemOperationsService = fileSystemOperationsService;
-            this.MessageBoxHelper = messageBoxHelper;
-            this.IseFileWatchers = new Dictionary<string, IseFileWatcher>();
-            this.PathsToIgnore = new HashSet<string>();
+            this.iseIntegrator = iseIntegrator;
+            this.fileSystemOperationsService = fileSystemOperationsService;
+            this.messageBoxHelper = messageBoxHelper;
+            this.iseFileWatchers = new Dictionary<string, IseFileWatcher>();
+            this.pathsToIgnore = new HashSet<string>();
         }
 
         public void startWatching()
         {
-            this.FileSystemChangeNotifier = new FileSystemChangeNotifier("PsISEPE-FileSystemNotifierIseReloader", this.FileSystemOperationsService);
-            this.FileSystemChangeNotifier.FileSystemChanged += OnIseFileChangedBatch;
-            this.IseIntegrator.AttachFileCollectionChangedHandler(this.OnIseFilesCollectionChanged);
+            this.fileSystemChangeNotifier = new FileSystemChangeNotifier("PsISEPE-FileSystemNotifierIseReloader", this.fileSystemOperationsService);
+            this.fileSystemChangeNotifier.FileSystemChanged += OnIseFileChangedBatch;
+            this.iseIntegrator.AttachFileCollectionChangedHandler(this.OnIseFilesCollectionChanged);
         }
 
         private void OnIseFilesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -52,10 +51,10 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                     if (e.NewItems == null || !e.NewItems.Contains(oldItem))
                     {
                         var path = oldItem.FullPath;
-                        if (this.IseFileWatchers.ContainsKey(path))
+                        if (this.iseFileWatchers.ContainsKey(path))
                         {
-                            this.IseFileWatchers[path].StopWatching();
-                            this.IseFileWatchers.Remove(path);
+                            this.iseFileWatchers[path].StopWatching();
+                            this.iseFileWatchers.Remove(path);
                         }
                         oldItem.PropertyChanged -= OnIseFilePropertyChanged;
                     }
@@ -69,9 +68,9 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                     if (e.OldItems == null || !e.OldItems.Contains(newItem))
                     {
                         var path = newItem.FullPath;
-                        if (File.Exists(path) && !this.IseFileWatchers.ContainsKey(path))
+                        if (File.Exists(path) && !this.iseFileWatchers.ContainsKey(path))
                         {
-                            this.IseFileWatchers.Add(path, new IseFileWatcher(this.FileSystemChangeNotifier, path, newItem));
+                            this.iseFileWatchers.Add(path, new IseFileWatcher(this.fileSystemChangeNotifier, path, newItem));
                         }
                         newItem.PropertyChanged -= OnIseFilePropertyChanged;
                         newItem.PropertyChanged += OnIseFilePropertyChanged;
@@ -82,12 +81,12 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         private void RefreshWatchers()
         {
-            foreach (var watcher in this.IseFileWatchers.Values)
+            foreach (var watcher in this.iseFileWatchers.Values)
             {
                 watcher.StopWatching();
             }
-            this.IseFileWatchers.Clear();
-            this.OnIseFilesCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, this.IseIntegrator.OpenIseFiles.ToList()));
+            this.iseFileWatchers.Clear();
+            this.OnIseFilesCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, this.iseIntegrator.OpenIseFiles.ToList()));
         }
 
         private void OnIseFilePropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -99,15 +98,15 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             }
             if (e.PropertyName == "IsSaved")
             {
-                lock (this.PathsToIgnore)
+                lock (this.pathsToIgnore)
                 {
                     if (file.IsSaved)
                     {
-                        this.PathsToIgnore.Add(file.FullPath);
+                        this.pathsToIgnore.Add(file.FullPath);
                     }
                     else
                     {
-                        this.PathsToIgnore.Remove(file.FullPath);
+                        this.pathsToIgnore.Remove(file.FullPath);
                     }
                 }
             }
@@ -124,9 +123,9 @@ namespace PsISEProjectExplorer.UI.IseIntegration
             {
                 var pathChanged = changePoolEntry.PathChanged;
                 bool pathIgnored;
-                lock (this.PathsToIgnore)
+                lock (this.pathsToIgnore)
                 {
-                    pathIgnored = this.PathsToIgnore.Remove(pathChanged);
+                    pathIgnored = this.pathsToIgnore.Remove(pathChanged);
                 }
                 if (!pathIgnored)
                 {
@@ -138,13 +137,13 @@ namespace PsISEProjectExplorer.UI.IseIntegration
         private void ReloadFileOpenInIse(ChangePoolEntry changeEntry)
         {
             string path = changeEntry.PathChanged;
-            var iseFile = this.IseIntegrator.OpenIseFiles.FirstOrDefault(f => f.FullPath == path);
+            var iseFile = this.iseIntegrator.OpenIseFiles.FirstOrDefault(f => f.FullPath == path);
             if (iseFile == null)
             {
                 return;
             }
             var fileExists = File.Exists(path);
-            if (this.IseIntegrator.IsFileSaved(path))
+            if (this.iseIntegrator.IsFileSaved(path))
             {
                 if (fileExists)
                 {
@@ -152,7 +151,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                     {
                         return;
                     }
-                    this.IseIntegrator.GoToFile(path);
+                    this.iseIntegrator.GoToFile(path);
                 }
                 string question;
                 if (fileExists)
@@ -167,16 +166,16 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                 {
                     question = String.Format("File '{0}' has been deleted.\n\nDo you want to close it?", path);
                 }
-                if (this.MessageBoxHelper.ShowQuestion("Reload file", question))
+                if (this.messageBoxHelper.ShowQuestion("Reload file", question))
                 {
-                    this.IseIntegrator.CloseFile(path);
+                    this.iseIntegrator.CloseFile(path);
                     if (changeEntry.PathAfterRename != null)
                     {
-                        this.IseIntegrator.GoToFile(changeEntry.PathAfterRename);
+                        this.iseIntegrator.GoToFile(changeEntry.PathAfterRename);
                     }
                     else if (fileExists)
                     {
-                        this.IseIntegrator.GoToFile(path);
+                        this.iseIntegrator.GoToFile(path);
                     }
                 }
             }
@@ -185,7 +184,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                 string message;
                 if (fileExists)
                 {
-                    this.IseIntegrator.GoToFile(path);
+                    this.iseIntegrator.GoToFile(path);
                     message = String.Format("File '{0}' has been modified by another program.\n\nSince the file had been changed in ISE editor, you will need to reload it manually.", path);
                 }
                 else if (changeEntry.PathAfterRename != null)
@@ -196,7 +195,7 @@ namespace PsISEProjectExplorer.UI.IseIntegration
                 {
                     message = String.Format("File '{0}' has been deleted. Since the file had been changed in ISE editor, you will need to reload it manually.", path);
                 }
-                this.MessageBoxHelper.ShowInfo(message);
+                this.messageBoxHelper.ShowInfo(message);
             }
         }
 

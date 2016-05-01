@@ -1,12 +1,6 @@
 ﻿using PsISEProjectExplorer.Enums;
-using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
-using PsISEProjectExplorer.Services;
-using PsISEProjectExplorer.UI.Helpers;
-using PsISEProjectExplorer.UI.IseIntegration;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace PsISEProjectExplorer.UI.ViewModel
@@ -61,31 +55,31 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                return (TreeViewEntryItemModel) this.ProjectExplorerWindow.SearchResultsTreeView.SelectedItem;
+                return (TreeViewEntryItemModel) this.projectExplorerWindow.SearchResultsTreeView.SelectedItem;
             }
         }
 
         public string PathOfItemToSelectOnRefresh { get; set; }
 
-        private IDictionary<string, TreeViewEntryItemModel> ItemsMap { get; set; }
+        private readonly IDictionary<string, TreeViewEntryItemModel> itemsMap;
 
-        private IconProvider IconProvider { get; set; }
+        private readonly IconProvider iconProvider;
 
         // TODO: this is just to get SelectedItem -> should be achievable by binding
-        private ProjectExplorerWindow ProjectExplorerWindow { get; set; }
+        private readonly ProjectExplorerWindow projectExplorerWindow;
              
         public TreeViewModel(IconProvider iconProvider, ProjectExplorerWindow projectExplorerWindow)
         {
-            this.ItemsMap = new Dictionary<string, TreeViewEntryItemModel>();
-            this.IconProvider = iconProvider;
-            this.ProjectExplorerWindow = projectExplorerWindow;
+            this.itemsMap = new Dictionary<string, TreeViewEntryItemModel>();
+            this.iconProvider = iconProvider;
+            this.projectExplorerWindow = projectExplorerWindow;
         }
 
         public void ReRoot(INode rootNode)
         {
             lock (TreeViewEntryItemModel.RootLockObject)
             {
-                this.ItemsMap.Clear();
+                this.itemsMap.Clear();
                 this.RootTreeViewEntryItem = rootNode == null ? null : this.CreateTreeViewEntryItemModel(rootNode, null, false);
                 this.NumberOfFiles = 0;
             }
@@ -96,7 +90,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             lock (TreeViewEntryItemModel.RootLockObject)
             {
                 TreeViewEntryItemModel result;
-                this.ItemsMap.TryGetValue(path, out result);
+                this.itemsMap.TryGetValue(path, out result);
                 return result;
             }
         }
@@ -210,8 +204,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
             var lockObject = parent == null ? TreeViewEntryItemModel.RootLockObject : parent;
             lock (lockObject)
             {
-                var item = new TreeViewEntryItemModel(node, parent, isSelected, this.IconProvider);
-                this.ItemsMap[node.Path] = item;
+                var item = new TreeViewEntryItemModel(node, parent, isSelected, this.iconProvider);
+                this.itemsMap[node.Path] = item;
                 if (node.NodeType == NodeType.File)
                 {
                     lock (TreeViewEntryItemModel.RootLockObject)
@@ -252,7 +246,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             IList<TreeViewEntryItemModel> children;
             lock (lockObject)
             {
-                this.ItemsMap.Remove(item.Path);
+                this.itemsMap.Remove(item.Path);
                 if (item.NodeType == NodeType.File)
                 {
                     lock (TreeViewEntryItemModel.RootLockObject)

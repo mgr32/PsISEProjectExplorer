@@ -4,28 +4,32 @@ using PsISEProjectExplorer.UI.ViewModel;
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class ExcludeOrIncludeItemCommand : Command
     {
+        private readonly MainViewModel mainViewModel;
 
-        private MainViewModel MainViewModel { get; set; }
+        private readonly TreeViewModel treeViewModel;
 
-        private TreeViewModel TreeViewModel { get; set; }
+        private readonly FilesPatternProvider filesPatternProvider;
 
-        private FilesPatternProvider FilesPatternProvider { get; set; }
+        private readonly ConfigHandler configHandler;
 
-        private ConfigHandler ConfigHandler { get; set; }
+        private readonly ReindexSearchTreeCommand reindexSearchTreeCommand;
 
-        public ExcludeOrIncludeItemCommand(MainViewModel mainViewModel, TreeViewModel treeViewModel, FilesPatternProvider filesPatternProvider, ConfigHandler configHandler)
+        public ExcludeOrIncludeItemCommand(MainViewModel mainViewModel, TreeViewModel treeViewModel, FilesPatternProvider filesPatternProvider, ConfigHandler configHandler,
+            ReindexSearchTreeCommand reindexSearchTreeCommand)
         {
-            this.MainViewModel = mainViewModel;
-            this.TreeViewModel = treeViewModel;
-            this.FilesPatternProvider = filesPatternProvider;
-            this.ConfigHandler = configHandler;
+            this.mainViewModel = mainViewModel;
+            this.treeViewModel = treeViewModel;
+            this.filesPatternProvider = filesPatternProvider;
+            this.configHandler = configHandler;
+            this.reindexSearchTreeCommand = reindexSearchTreeCommand;
         }
 
         public void Execute()
         {
-            var selectedItem = this.TreeViewModel.SelectedItem;
+            var selectedItem = this.treeViewModel.SelectedItem;
             if (selectedItem == null || selectedItem.IsBeingEdited)
             {
                 return;
@@ -33,13 +37,13 @@ namespace PsISEProjectExplorer.Commands
 
             if (selectedItem.IsExcluded)
             {
-                this.FilesPatternProvider.ExcludePaths = this.ConfigHandler.RemoveConfigEnumerableValue("ExcludePaths", selectedItem.Path);
+                this.filesPatternProvider.ExcludePaths = this.configHandler.RemoveConfigEnumerableValue("ExcludePaths", selectedItem.Path);
             }
             else
             {
-                this.FilesPatternProvider.ExcludePaths = this.ConfigHandler.AddConfigEnumerableValue("ExcludePaths", selectedItem.Path);
+                this.filesPatternProvider.ExcludePaths = this.configHandler.AddConfigEnumerableValue("ExcludePaths", selectedItem.Path);
             }
-            this.MainViewModel.ReindexSearchTree();
+            this.reindexSearchTreeCommand.Execute(null);
         }
     }
 }

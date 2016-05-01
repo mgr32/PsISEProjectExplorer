@@ -9,26 +9,26 @@ namespace PsISEProjectExplorer.Commands
     [Component]
     public class UnsavedFileChecker
     {
-        private TreeViewModel TreeViewModel { get; set; }
-        
-        private IseIntegrator IseIntegrator { get; set; }
+        private readonly TreeViewModel treeViewModel;
 
-        private MessageBoxHelper MessageBoxHelper { get; set; }
+        private readonly IseIntegrator iseIntegrator;
+
+        private readonly MessageBoxHelper messageBoxHelper;
 
         public UnsavedFileChecker(TreeViewModel treeViewModel, IseIntegrator iseIntegrator, MessageBoxHelper messageBoxHelper)
         {
-            this.TreeViewModel = treeViewModel;
-            this.IseIntegrator = iseIntegrator;
-            this.MessageBoxHelper = messageBoxHelper;
+            this.treeViewModel = treeViewModel;
+            this.iseIntegrator = iseIntegrator;
+            this.messageBoxHelper = messageBoxHelper;
         }
 
         public bool EnsureCurrentlyOpenedFileIsSaved()
         {
-            var selectedItem = this.TreeViewModel.SelectedItem;
-            if (selectedItem != null && selectedItem.NodeType == NodeType.File && this.IseIntegrator.OpenFiles.Contains(selectedItem.Path) && !this.IseIntegrator.IsFileSaved(selectedItem.Path))
+            var selectedItem = this.treeViewModel.SelectedItem;
+            if (selectedItem != null && selectedItem.NodeType == NodeType.File && this.iseIntegrator.OpenFiles.Contains(selectedItem.Path) && !this.iseIntegrator.IsFileSaved(selectedItem.Path))
             {
-                this.IseIntegrator.GoToFile(selectedItem.Path);
-                this.MessageBoxHelper.ShowInfo("Please save your changes or close the file first.");
+                this.iseIntegrator.GoToFile(selectedItem.Path);
+                this.messageBoxHelper.ShowInfo("Please save your changes or close the file first.");
                 return false;
             }
             return true;

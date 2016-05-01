@@ -6,21 +6,22 @@ using System.Diagnostics;
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class OpenInExplorerCommand : Command
     {
-        private TreeViewModel TreeViewModel { get; set; }
+        private readonly TreeViewModel treeViewModel;
 
-        private MessageBoxHelper MessageBoxHelper { get; set; }
+        private readonly MessageBoxHelper messageBoxHelper;
 
         public OpenInExplorerCommand(TreeViewModel TreeViewModel, MessageBoxHelper messageBoxHelper)
         {
-            this.TreeViewModel = TreeViewModel;
-            this.MessageBoxHelper = messageBoxHelper;
+            this.treeViewModel = TreeViewModel;
+            this.messageBoxHelper = messageBoxHelper;
         }
 
         public void Execute()
         {
-            var item = this.TreeViewModel.SelectedItem;
+            var item = this.treeViewModel.SelectedItem;
             if (item == null)
             {
                 return;
@@ -41,7 +42,7 @@ namespace PsISEProjectExplorer.Commands
             }
             catch (Exception ex)
             {
-               this. MessageBoxHelper.ShowError(string.Format("Cannot open path: '{0}' - {1}.", item.Path, ex.Message));
+               this. messageBoxHelper.ShowError(string.Format("Cannot open path: '{0}' - {1}.", item.Path, ex.Message));
             }
         }
     }

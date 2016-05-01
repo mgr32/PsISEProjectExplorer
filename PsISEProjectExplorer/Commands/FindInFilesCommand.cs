@@ -2,24 +2,25 @@
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class FindInFilesCommand : Command
     {
-        private MainViewModel MainViewModel { get; set; }
+        private readonly MainViewModel mainViewModel;
 
-        private ProjectExplorerWindow ProjectExplorerWindow { get; set; }
+        private readonly ProjectExplorerWindow projectExplorerWindow;
 
         public FindInFilesCommand(MainViewModel mainViewModel, ProjectExplorerWindow projectExplorerWindow)
         {
-            this.MainViewModel = mainViewModel;
-            this.ProjectExplorerWindow = projectExplorerWindow;
+            this.mainViewModel = mainViewModel;
+            this.projectExplorerWindow = projectExplorerWindow;
         }
 
         public void Execute()
         {
-            this.MainViewModel.SearchOptions.SearchText = string.Empty;
-            this.MainViewModel.SearchInFiles = true;
+            this.mainViewModel.SearchOptions.SearchText = string.Empty;
+            this.mainViewModel.SearchInFiles = true;
 
-            this.ProjectExplorerWindow.FocusOnTextBoxSearchText();
+            this.projectExplorerWindow.FocusOnTextBoxSearchText();
         }
     }
 }

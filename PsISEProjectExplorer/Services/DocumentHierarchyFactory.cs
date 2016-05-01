@@ -1,5 +1,4 @@
-﻿using PsISEProjectExplorer.Config;
-using PsISEProjectExplorer.Enums;
+﻿using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Model.DocHierarchy;
 using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
@@ -16,9 +15,9 @@ namespace PsISEProjectExplorer.Services
     {
         public DocumentHierarchy DocumentHierarchy { get; private set; }
 
-        private PowershellFileParser PowershellFileParser { get; set; }
+        private readonly PowershellFileParser powershellFileParser;
 
-        private DocumentHierarchyIndexer DocumentHierarchyIndexer { get; set; }
+        private readonly DocumentHierarchyIndexer documentHierarchyIndexer;
 
         public string CurrentDocumentHierarchyPath
         {
@@ -30,8 +29,8 @@ namespace PsISEProjectExplorer.Services
 
         public DocumentHierarchyFactory(PowershellFileParser powershellFileParser, DocumentHierarchyIndexer documentHierarchyIndexer)
         {
-            this.PowershellFileParser = powershellFileParser;
-            this.DocumentHierarchyIndexer = documentHierarchyIndexer;
+            this.powershellFileParser = powershellFileParser;
+            this.documentHierarchyIndexer = documentHierarchyIndexer;
         }
 
         public DocumentHierarchy CreateDocumentHierarchy(string path, bool analyzeContents)
@@ -109,7 +108,7 @@ namespace PsISEProjectExplorer.Services
                         this.DocumentHierarchy.RemoveNode(node);
                         nodeShouldBeRemoved = false;
                     }
-                    this.DocumentHierarchyIndexer.AddFileSystemNode(this.DocumentHierarchy, fileSystemEntry);
+                    this.documentHierarchyIndexer.AddFileSystemNode(this.DocumentHierarchy, fileSystemEntry);
                     changed = true;
                 }
                 if (nodeShouldBeRemoved)
@@ -139,7 +138,7 @@ namespace PsISEProjectExplorer.Services
 
             if (File.Exists(path) && filesPatternProvider.DoesFileMatch(path))
             {
-                parseResult = this.PowershellFileParser.ParseFile(path, isDirectory: false, isExcluded: false, errorMessage: null);
+                parseResult = this.powershellFileParser.ParseFile(path, isDirectory: false, isExcluded: false, errorMessage: null);
                 yield return parseResult;
                 this.ReportProgress(worker, path);
                 yield break;
@@ -148,7 +147,7 @@ namespace PsISEProjectExplorer.Services
             {
                 yield break;
             }
-            parseResult = this.PowershellFileParser.ParseFile(path, isDirectory: true, isExcluded: false, errorMessage: null);
+            parseResult = this.powershellFileParser.ParseFile(path, isDirectory: true, isExcluded: false, errorMessage: null);
             yield return parseResult;
             pathsToEnumerate.Enqueue(path);
             while (pathsToEnumerate.Any())
@@ -166,7 +165,7 @@ namespace PsISEProjectExplorer.Services
                     dirs = Directory.EnumerateDirectories(currentPath).Where(dir => filesPatternProvider.DoesDirectoryMatch(dir));
                 } catch (Exception e) 
                 {
-                    parseResult = this.PowershellFileParser.ParseFile(currentPath, isDirectory: true, isExcluded: false, errorMessage: e.Message);
+                    parseResult = this.powershellFileParser.ParseFile(currentPath, isDirectory: true, isExcluded: false, errorMessage: e.Message);
                 }
                 if (parseResult != null)
                 {
@@ -178,7 +177,7 @@ namespace PsISEProjectExplorer.Services
                     bool isExcluded = filesPatternProvider.IsExcluded(dir);
                     if (filesPatternProvider.DoesDirectoryMatch(dir) && (isExcluded || filesPatternProvider.IncludeAllFiles || filesPatternProvider.IsInAdditonalPaths(dir)))
                     {
-                        parseResult = this.PowershellFileParser.ParseFile(dir, isDirectory: true, isExcluded: isExcluded, errorMessage: null);
+                        parseResult = this.powershellFileParser.ParseFile(dir, isDirectory: true, isExcluded: isExcluded, errorMessage: null);
                         yield return parseResult;
                     }
                     if (!isExcluded)
@@ -200,7 +199,7 @@ namespace PsISEProjectExplorer.Services
             }
             catch (Exception e)
             {
-                parseResult = this.PowershellFileParser.ParseFile(path, isDirectory: true, isExcluded: false, errorMessage: e.Message);
+                parseResult = this.powershellFileParser.ParseFile(path, isDirectory: true, isExcluded: false, errorMessage: e.Message);
             }
 
             if (parseResult != null)
@@ -211,7 +210,7 @@ namespace PsISEProjectExplorer.Services
 
             foreach (string file in files)
             {
-                parseResult = this.PowershellFileParser.ParseFile(file, isDirectory: false, isExcluded: filesPatternProvider.IsExcluded(file), errorMessage: null);
+                parseResult = this.powershellFileParser.ParseFile(file, isDirectory: false, isExcluded: filesPatternProvider.IsExcluded(file), errorMessage: null);
                 yield return parseResult;
             }
         }

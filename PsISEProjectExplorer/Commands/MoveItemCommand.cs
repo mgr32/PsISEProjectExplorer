@@ -8,34 +8,34 @@ using System;
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class MoveItemCommand : ParameterizedCommand<Tuple<TreeViewEntryItemModel, TreeViewEntryItemModel>>
     {
+        private readonly TreeViewModel treeViewModel;
 
-        private TreeViewModel TreeViewModel { get; set; }
+        private readonly MessageBoxHelper messageBoxHelper;
 
-        private MessageBoxHelper MessageBoxHelper { get; set;  }
+        private readonly WorkspaceDirectoryModel workspaceDirectoryModel;
 
-        private WorkspaceDirectoryModel WorkspaceDirectoryModel { get; set; }
+        private readonly FilesPatternProvider filesPatternProvider;
 
-        private FilesPatternProvider FilesPatternProvider { get; set; }
+        private readonly FileSystemOperationsService fileSystemOperationsService;
 
-        private FileSystemOperationsService FileSystemOperationsService { get; set; }
+        private readonly IseIntegrator iseIntegrator;
 
-        private IseIntegrator IseIntegrator { get; set; }
-
-        private UnsavedFileChecker UnsavedFileEnforcer { get; set; }
+        private readonly UnsavedFileChecker unsavedFileEnforcer;
 
         public MoveItemCommand(TreeViewModel treeViewModel, MessageBoxHelper messageBoxHelper, WorkspaceDirectoryModel workspaceDirectoryModel,
             FilesPatternProvider filesPatternProvider, FileSystemOperationsService fileSystemOperationsService, IseIntegrator iseIntegrator,
             UnsavedFileChecker unsavedFileEnforcer)
         {
-            this.TreeViewModel = treeViewModel;
-            this.MessageBoxHelper = messageBoxHelper;
-            this.WorkspaceDirectoryModel = workspaceDirectoryModel;
-            this.FilesPatternProvider = filesPatternProvider;
-            this.FileSystemOperationsService = fileSystemOperationsService;
-            this.IseIntegrator = iseIntegrator;
-            this.UnsavedFileEnforcer = unsavedFileEnforcer;
+            this.treeViewModel = treeViewModel;
+            this.messageBoxHelper = messageBoxHelper;
+            this.workspaceDirectoryModel = workspaceDirectoryModel;
+            this.filesPatternProvider = filesPatternProvider;
+            this.fileSystemOperationsService = fileSystemOperationsService;
+            this.iseIntegrator = iseIntegrator;
+            this.unsavedFileEnforcer = unsavedFileEnforcer;
         }
         public void Execute(Tuple<TreeViewEntryItemModel, TreeViewEntryItemModel> param)
         {
@@ -45,13 +45,13 @@ namespace PsISEProjectExplorer.Commands
             {
                 return;
             }
-            if (!this.UnsavedFileEnforcer.EnsureCurrentlyOpenedFileIsSaved())
+            if (!this.unsavedFileEnforcer.EnsureCurrentlyOpenedFileIsSaved())
             {
                 return;
             }
-            string rootDirectory = this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory;
+            string rootDirectory = this.workspaceDirectoryModel.CurrentWorkspaceDirectory;
             string destPath = destinationItem != null ? destinationItem.Path : rootDirectory;
-            if (!this.MessageBoxHelper.ShowConfirmMessage(String.Format("Please confirm you want to move '{0}' to '{1}'.", movedItem.Path, destPath)))
+            if (!this.messageBoxHelper.ShowConfirmMessage(String.Format("Please confirm you want to move '{0}' to '{1}'.", movedItem.Path, destPath)))
             {
                 return;
             }
@@ -75,13 +75,13 @@ namespace PsISEProjectExplorer.Commands
                 {
                     return;
                 }
-                this.FilesPatternProvider.RemoveAdditionalPath(movedItem.Path);
-                this.FilesPatternProvider.AddAdditionalPath(newPath);
-                bool closed = this.IseIntegrator.CloseFile(movedItem.Path);
-                FileSystemOperationsService.RenameFileOrDirectory(movedItem.Path, newPath);
+                this.filesPatternProvider.RemoveAdditionalPath(movedItem.Path);
+                this.filesPatternProvider.AddAdditionalPath(newPath);
+                bool closed = this.iseIntegrator.CloseFile(movedItem.Path);
+                fileSystemOperationsService.RenameFileOrDirectory(movedItem.Path, newPath);
                 if (closed)
                 {
-                    this.IseIntegrator.GoToFile(newPath);
+                    this.iseIntegrator.GoToFile(newPath);
                 }
                 if (destinationItem != null)
                 {
@@ -90,22 +90,22 @@ namespace PsISEProjectExplorer.Commands
             }
             catch (Exception e)
             {
-                this.TreeViewModel.PathOfItemToSelectOnRefresh = null;
-                this.MessageBoxHelper.ShowError("Failed to move: " + e.Message);
+                this.treeViewModel.PathOfItemToSelectOnRefresh = null;
+                this.messageBoxHelper.ShowError("Failed to move: " + e.Message);
             }
         }
 
         private string GenerateNewPath(string currentPath, string newValue)
         {
             var newPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(currentPath), newValue);
-            this.TreeViewModel.PathOfItemToSelectOnRefresh = newPath;
+            this.treeViewModel.PathOfItemToSelectOnRefresh = newPath;
             return newPath;
         }
 
         private string GenerateNewPathForDir(string currentPath, string newValue)
         {
             var newPath = System.IO.Path.Combine(currentPath, newValue);
-            this.TreeViewModel.PathOfItemToSelectOnRefresh = newPath;
+            this.treeViewModel.PathOfItemToSelectOnRefresh = newPath;
             return newPath;
         }
     }

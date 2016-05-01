@@ -7,18 +7,19 @@ using System.Windows.Controls;
 
 namespace PsISEProjectExplorer.Commands
 {
+    [Component]
     public class OpenBuiltinContextMenuCommand : ParameterizedCommand<DependencyObject>
     {
-        private ProjectExplorerWindow ProjectExplorerWindow { get; set; }
+        private readonly ProjectExplorerWindow projectExplorerWindow;
 
         public OpenBuiltinContextMenuCommand(ProjectExplorerWindow projectExplorerWindow)
         {
-            this.ProjectExplorerWindow = projectExplorerWindow;
+            this.projectExplorerWindow = projectExplorerWindow;
         }
 
         public void Execute(DependencyObject originalSource)
         {
-            var treeView = this.ProjectExplorerWindow.SearchResultsTreeView;
+            var treeView = this.projectExplorerWindow.SearchResultsTreeView;
             TreeViewEntryItemModel item;
             if (!treeView.SelectItemFromSource(originalSource))
             {

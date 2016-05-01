@@ -8,11 +8,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
     {
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        private List<TreeViewEntryItemModel> Items { get; set; }
+        private readonly List<TreeViewEntryItemModel> items;
 
         public TreeViewEntryItemObservableSet()
         {
-            this.Items = new List<TreeViewEntryItemModel>();
+            this.items = new List<TreeViewEntryItemModel>();
         }
 
         public bool Add(TreeViewEntryItemModel item)
@@ -28,31 +28,31 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         public void Clear()
         {
-            this.Items.Clear();
+            this.items.Clear();
             this.RaiseOnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         public bool Remove(TreeViewEntryItemModel item)
         {
-            int index = this.Items.BinarySearch(item, DefaultTreeViewEntryItemComparer.TreeViewEntryItemComparer);
+            int index = this.items.BinarySearch(item, DefaultTreeViewEntryItemComparer.TreeViewEntryItemComparer);
             if (index < 0)
             {
                 // not in list;
                 return false;
             }
-            this.Items.RemoveAt(index);
+            this.items.RemoveAt(index);
             this.RaiseOnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
             return true;
         }
 
         public IEnumerator<TreeViewEntryItemModel> GetEnumerator()
         {
-            return this.Items.GetEnumerator();
+            return this.items.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.Items.GetEnumerator();
+            return this.items.GetEnumerator();
         }
 
         private void RaiseOnCollectionChanged(NotifyCollectionChangedEventArgs e)
@@ -63,14 +63,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private int AddItem(TreeViewEntryItemModel item)
         {
-            int result = this.Items.BinarySearch(item, DefaultTreeViewEntryItemComparer.TreeViewEntryItemComparer);
+            int result = this.items.BinarySearch(item, DefaultTreeViewEntryItemComparer.TreeViewEntryItemComparer);
             if (result >= 0)
             {
                 // already on list
                 return -1;
             }
             int index = ~result;
-            this.Items.Insert(index, item);
+            this.items.Insert(index, item);
             return index;
         }
         
