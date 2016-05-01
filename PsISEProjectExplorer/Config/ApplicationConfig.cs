@@ -13,7 +13,7 @@ using System.Windows.Threading;
 
 namespace PsISEProjectExplorer.Config
 {
-    public class BootstrapConfig
+    public class ApplicationConfig
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -49,7 +49,7 @@ namespace PsISEProjectExplorer.Config
                 container.Register(component, component, Lifestyle.Singleton);
             }
             container.RegisterSingleton(typeof(ProjectExplorerWindow), mainWindow);
-            container.RegisterSingleton(typeof(BootstrapConfig), this);
+            container.RegisterSingleton(typeof(ApplicationConfig), this);
             return container;
         }
 

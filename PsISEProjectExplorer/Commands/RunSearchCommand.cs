@@ -30,15 +30,17 @@ namespace PsISEProjectExplorer.Commands
 
         private readonly ClearTreeViewCommand clearTreeViewCommand;
 
+        private readonly SyncWithActiveDocumentCommand syncWithActiveDocumentCommand;
+
         public RunSearchCommand(DocumentHierarchySearcher documentHierarchySearcher, MainViewModel mainViewModel, TreeViewModel treeViewModel,
-            DocumentHierarchyFactory documentHierarchyFactory, ClearTreeViewCommand clearTreeViewCommand)
+            DocumentHierarchyFactory documentHierarchyFactory, ClearTreeViewCommand clearTreeViewCommand, SyncWithActiveDocumentCommand syncWithActiveDocumentCommand)
         {
             this.documentHierarchySearcher = documentHierarchySearcher;
             this.mainViewModel = mainViewModel;
             this.treeViewModel = treeViewModel;
             this.documentHierarchyFactory = documentHierarchyFactory;
             this.clearTreeViewCommand = clearTreeViewCommand;
-            
+            this.syncWithActiveDocumentCommand = syncWithActiveDocumentCommand;
             this.backgroundSearchers = new List<BackgroundSearcher>();
         }
         // running in Indexing or UI thread
@@ -125,7 +127,7 @@ namespace PsISEProjectExplorer.Commands
                     {
                         this.treeViewModel.RefreshFromNode(result.ResultNode, result.Path, expandNewNodes);
                         // when 'Sync with active document' is enabled and search results changed, we need to try to locate current document in the new search results
-                        this.mainViewModel.ActiveDocumentPotentiallyChanged();
+                        this.syncWithActiveDocumentCommand.Execute();
                     });
                 }
             }

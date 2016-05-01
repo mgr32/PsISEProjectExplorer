@@ -6,8 +6,6 @@ using PsISEProjectExplorer.Model;
 using PsISEProjectExplorer.Services;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 
 namespace PsISEProjectExplorer.UI.ViewModel
 {
@@ -53,8 +51,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.OnPropertyChanged();
                 this.SearchOptions.SearchRegex = this.searchRegex;
                 this.configHandler.SaveConfigValue("SearchRegex", value.ToString());
-                this.documentHierarchyFactory.CreateDocumentHierarchy(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
-                this.commandExecutor.ExecuteWithParam<ReindexSearchTreeCommand, IEnumerable<string>>(null);
+                this.commandExecutor.Execute<RecreateSearchTreeCommand>();
             }
         }
 
@@ -100,7 +97,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.syncWithActiveDocument = value;
                 this.OnPropertyChanged();
-                this.ActiveDocumentPotentiallyChanged();
+                this.commandExecutor.Execute<SyncWithActiveDocumentCommand>();
                 this.configHandler.SaveConfigValue("SyncWithActiveDocument", value.ToString());
             }
         }
@@ -129,18 +126,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-
-        public SearchOptions SearchOptions { get; private set; }
-
-        private readonly DocumentHierarchyFactory documentHierarchyFactory;
-
-        private readonly FilesPatternProvider filesPatternProvider;
-
-        private readonly FileSystemChangeWatcher fileSystemChangeWatcher;
-
-        private readonly CommandExecutor commandExecutor;
-
-        private bool AnalyzeDocumentContents
+        public bool AnalyzeDocumentContents
         {
             get
             {
@@ -148,21 +134,23 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        public SearchOptions SearchOptions { get; private set; }
+
+        private readonly FilesPatternProvider filesPatternProvider;
+
+        private readonly CommandExecutor commandExecutor;
+
         private readonly ConfigHandler configHandler;
 
-        public MainViewModel(ConfigHandler configHandler, WorkspaceDirectoryModel workspaceDirectoryModel, DocumentHierarchyFactory documentHierarchyFactory,
-            FileSystemChangeWatcher fileSystemChangeWatcher, TreeViewModel treeViewModel, FilesPatternProvider filesPatternProvider, CommandExecutor commandExecutor)
+        public MainViewModel(ConfigHandler configHandler, WorkspaceDirectoryModel workspaceDirectoryModel,
+            TreeViewModel treeViewModel, FilesPatternProvider filesPatternProvider, CommandExecutor commandExecutor)
         {
             this.configHandler = configHandler;
             this.WorkspaceDirectoryModel = workspaceDirectoryModel;
-            this.documentHierarchyFactory = documentHierarchyFactory;
-            this.fileSystemChangeWatcher = fileSystemChangeWatcher;
             this.TreeViewModel = treeViewModel;
             this.filesPatternProvider = filesPatternProvider;
             this.commandExecutor = commandExecutor;
             this.TreeViewModel.PropertyChanged += (s, e) => { if (e.PropertyName == "NumberOfFiles") this.OnPropertyChanged("TreeItemsResultString"); };
-
-            fileSystemChangeWatcher.RegisterOnChangeCallback(this.ReindexOnFileSystemChanged);
 
             this.searchRegex = configHandler.ReadConfigBoolValue("SearchRegex", false);
             this.searchInFiles = configHandler.ReadConfigBoolValue("SearchInFiles", true);
@@ -173,50 +161,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
             
             this.syncWithActiveDocument = configHandler.ReadConfigBoolValue("SyncWithActiveDocument", false);
             var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
-            this.SearchOptions = new SearchOptions(searchField, string.Empty, this.searchRegex);
-
-            if (this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory != null)
-            {
-                this.documentHierarchyFactory.CreateDocumentHierarchy(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
-            }
-            this.WorkspaceDirectoryModel.PropertyChanged += this.OnWorkspaceDirectoryChanged;
-
-        }
-
-        private void ReindexOnFileSystemChanged(object sender, FileSystemChangedInfo changedInfo)
-        {
-            var workspaceDirectory = this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory;
-            var pathsChanged = changedInfo.PathsChanged.Where(p => p.RootPath == workspaceDirectory).Select(p => p.PathChanged).ToList();
-            if (!pathsChanged.Any())
-            {
-                return;
-            }
-            if (pathsChanged.Contains(workspaceDirectory, StringComparer.InvariantCultureIgnoreCase))
-            {
-                pathsChanged = null;
-            }
-            Logger.Debug("OnFileSystemChanged: " + (pathsChanged == null ? "root" : string.Join(",", pathsChanged)));
-            this.commandExecutor.ExecuteWithParam<ReindexSearchTreeCommand, IEnumerable<string>>(pathsChanged);
-        }
-
-        // TODO: get it out of here
-        public void ActiveDocumentPotentiallyChanged()
-        {
-            if (this.SyncWithActiveDocument)
-            {
-                // TODO: this should be suppressed during indexing
-                this.commandExecutor.Execute<LocateFileInTreeCommand>();
-            }
-        }
-
-        private void OnWorkspaceDirectoryChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "CurrentWorkspaceDirectory")
-            {
-                this.documentHierarchyFactory.CreateDocumentHierarchy(this.WorkspaceDirectoryModel.CurrentWorkspaceDirectory, this.AnalyzeDocumentContents);
-                this.commandExecutor.ExecuteWithParam<ReindexSearchTreeCommand, IEnumerable<string>>(null);
-            }
-        }
+            this.SearchOptions = new SearchOptions(searchField, string.Empty, this.searchRegex);          
+        }      
         
     }
 }

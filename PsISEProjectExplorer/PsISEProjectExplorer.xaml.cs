@@ -20,9 +20,9 @@ namespace PsISEProjectExplorer
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly MainViewModel mainViewModel;
         private readonly CommandExecutor commandExecutor;
         private readonly DragDropHandler dragDropHandler;
+        private readonly Bootstrap bootstrap;
 
         // Entry point to the ISE object model.
         public ObjectModelRoot HostObject
@@ -30,7 +30,7 @@ namespace PsISEProjectExplorer
             get { throw new InvalidOperationException("Should not use HostObject in user control - please use IseIntegrator class."); }
             set
             {
-                this.commandExecutor.ExecuteWithParam<SetIseHostObjectCommand, ObjectModelRoot>(value);
+                this.bootstrap.Start(value);
             }
         }
 
@@ -44,12 +44,12 @@ namespace PsISEProjectExplorer
 
         public ProjectExplorerWindow()
         {
-            BootstrapConfig bootstrapConfig = new BootstrapConfig();
-            bootstrapConfig.ConfigureApplication(this);
-            this.mainViewModel = bootstrapConfig.GetInstance<MainViewModel>();
-            this.commandExecutor = bootstrapConfig.GetInstance<CommandExecutor>();
-            this.dragDropHandler = bootstrapConfig.GetInstance<DragDropHandler>();
-            this.DataContext = this.mainViewModel;
+            ApplicationConfig applicationConfig = new ApplicationConfig();
+            applicationConfig.ConfigureApplication(this);
+            this.commandExecutor = applicationConfig.GetInstance<CommandExecutor>();
+            this.dragDropHandler = applicationConfig.GetInstance<DragDropHandler>();
+            this.bootstrap = applicationConfig.GetInstance<Bootstrap>();
+            this.DataContext = applicationConfig.GetInstance<MainViewModel>();
             InitializeComponent();
         }
 
@@ -125,7 +125,7 @@ namespace PsISEProjectExplorer
 
         private void TextBoxSearchClear_Click(object sender, RoutedEventArgs e)
         {
-            this.mainViewModel.SearchText = string.Empty;
+            this.commandExecutor.Execute<ClearSearchTextCommand>();
         }
 
         private void SearchResults_AddDirectory(object sender, RoutedEventArgs e)

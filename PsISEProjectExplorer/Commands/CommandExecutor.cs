@@ -7,9 +7,9 @@ namespace PsISEProjectExplorer.Commands
     public class CommandExecutor
     {
 
-        private readonly BootstrapConfig bootstrapConfig;
+        private readonly ApplicationConfig bootstrapConfig;
 
-        public CommandExecutor(BootstrapConfig bootstrapConfig)
+        public CommandExecutor(ApplicationConfig bootstrapConfig)
         {
             this.bootstrapConfig = bootstrapConfig;
         }
