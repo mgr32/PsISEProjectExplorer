@@ -52,14 +52,14 @@ namespace PsISEProjectExplorer.Commands
         private void ResetWorkspaceOnFileTabChanged(object sender, IseEventArgs args)
         {
             this.commandExecutor.ExecuteWithParam<ResetWorkspaceDirectoryCommand, bool>(false);
-            this.commandExecutor.Execute<SyncWithActiveDocumentCommand>();
+            this.commandExecutor.ExecuteWithParam<SyncWithActiveDocumentCommand, bool>(true);
         }
 
         private void RecreateSearchTreeOnWorkspaceDirectoryChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "CurrentWorkspaceDirectory")
             {
-                this.commandExecutor.Execute<RecreateSearchTreeCommand>();
+                this.commandExecutor.ExecuteWithParam<ReindexSearchTreeCommand, IEnumerable<string>>(null);               
             }
         }
 

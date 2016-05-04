@@ -28,8 +28,10 @@ namespace PsISEProjectExplorer.Commands
 
         private readonly FilesPatternProvider filesPatternProvider;
 
+        private readonly SyncWithActiveDocumentCommand syncWithActiveDocumentCommand;
+
         public ReindexSearchTreeCommand(MainViewModel mainViewModel, DocumentHierarchyFactory documentHierarchyFactory, WorkspaceDirectoryModel workspaceDirectoryModel,
-            ClearTreeViewCommand clearTreeViewCommand, RunSearchCommand runSearchCommand, FilesPatternProvider filesPatternProvider)
+            ClearTreeViewCommand clearTreeViewCommand, RunSearchCommand runSearchCommand, FilesPatternProvider filesPatternProvider, SyncWithActiveDocumentCommand syncWithActiveDocumentCommand)
         {
             this.mainViewModel = mainViewModel;
             this.documentHierarchyFactory = documentHierarchyFactory;
@@ -37,6 +39,7 @@ namespace PsISEProjectExplorer.Commands
             this.clearTreeViewCommand = clearTreeViewCommand;
             this.runSearchCommand = runSearchCommand;
             this.filesPatternProvider = filesPatternProvider;
+            this.syncWithActiveDocumentCommand = syncWithActiveDocumentCommand;
             this.backgroundIndexers = new List<BackgroundIndexer>();
         }
 
@@ -44,7 +47,9 @@ namespace PsISEProjectExplorer.Commands
         {
             if (pathsChanged == null)
             {
+                this.documentHierarchyFactory.CreateDocumentHierarchy(this.workspaceDirectoryModel.CurrentWorkspaceDirectory, this.mainViewModel.AnalyzeDocumentContents);
                 this.clearTreeViewCommand.Execute();
+                this.syncWithActiveDocumentCommand.Execute(true);
             }
             this.mainViewModel.AddNumOfIndexingThreads(1);
             var indexerParams = new BackgroundIndexerParams(this.documentHierarchyFactory, this.workspaceDirectoryModel.CurrentWorkspaceDirectory, pathsChanged, this.filesPatternProvider);

@@ -127,7 +127,7 @@ namespace PsISEProjectExplorer.Commands
                     {
                         this.treeViewModel.RefreshFromNode(result.ResultNode, result.Path, expandNewNodes);
                         // when 'Sync with active document' is enabled and search results changed, we need to try to locate current document in the new search results
-                        this.syncWithActiveDocumentCommand.Execute();
+                        this.syncWithActiveDocumentCommand.Execute(false);
                     });
                 }
             }

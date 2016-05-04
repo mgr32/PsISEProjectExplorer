@@ -79,7 +79,6 @@
     <Compile Include="Commands\ChangeWorkspaceCommand.cs" />
     <Compile Include="Commands\ClearSearchTextCommand.cs" />
     <Compile Include="Commands\ClearTreeViewCommand.cs" />
-    <Compile Include="Commands\RecreateSearchTreeCommand.cs" />
     <Compile Include="Commands\ReindexSearchTreeCommand.cs" />
     <Compile Include="Commands\ResetWorkspaceDirectoryCommand.cs" />
     <Compile Include="Commands\RunSearchCommand.cs" />

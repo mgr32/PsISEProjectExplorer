@@ -51,7 +51,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.OnPropertyChanged();
                 this.SearchOptions.SearchRegex = this.searchRegex;
                 this.configValues.SearchRegex = value;
-                this.commandExecutor.Execute<RecreateSearchTreeCommand>();
+                this.commandExecutor.ExecuteWithParam<ReindexSearchTreeCommand, IEnumerable<string>>(null);
             }
         }
 
@@ -97,7 +97,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 this.syncWithActiveDocument = value;
                 this.OnPropertyChanged();
-                this.commandExecutor.Execute<SyncWithActiveDocumentCommand>();
+                this.commandExecutor.ExecuteWithParam<SyncWithActiveDocumentCommand, bool>(true);
                 this.configValues.SyncWithActiveDocument = value;
             }
         }

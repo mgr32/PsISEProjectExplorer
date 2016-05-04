@@ -22,25 +22,31 @@ namespace PsISEProjectExplorer.Commands
 
         public void Execute()
         {
+            this.ExpandAndSelectCurrentlyOpenedItem();
+        }
+
+        public bool ExpandAndSelectCurrentlyOpenedItem()
+        {
             string path = this.iseIntegrator.SelectedFilePath;
             if (path == null)
             {
-                return;
+                return false;
             }
 
             var selectedItem = this.treeViewModel.SelectedItem;
             if (selectedItem != null && selectedItem.Path.StartsWith(path))
             {
-                return;
+                return true;
             }
 
             TreeViewEntryItemModel item = this.treeViewModel.FindTreeViewEntryItemByPath(path);
             if (item == null)
             {
-                return;
+                return false;
             }
 
             this.projectExplorerWindow.SearchResultsTreeView.ExpandAndSelectItem(item);
+            return true;
         }
     }
 }

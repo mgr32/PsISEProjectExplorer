@@ -4,24 +4,32 @@ using PsISEProjectExplorer.UI.ViewModel;
 namespace PsISEProjectExplorer.Commands
 {
     [Component]
-    public class SyncWithActiveDocumentCommand : Command
+    public class SyncWithActiveDocumentCommand : ParameterizedCommand<bool>
     {
         private MainViewModel mainViewModel;
 
+        private TreeViewModel treeViewModel;
+
         private LocateFileInTreeCommand locateFileInTreeCommand;
 
-        public SyncWithActiveDocumentCommand(MainViewModel mainViewModel, LocateFileInTreeCommand locateFileInTreeCommand)
+        private bool itemFound;
+
+        public SyncWithActiveDocumentCommand(MainViewModel mainViewModel, TreeViewModel treeViewModel, LocateFileInTreeCommand locateFileInTreeCommand)
         {
             this.mainViewModel = mainViewModel;
+            this.treeViewModel = treeViewModel;
             this.locateFileInTreeCommand = locateFileInTreeCommand;
         }
 
-        public void Execute()
+        public void Execute(bool resetState)
         {
-            if (this.mainViewModel.SyncWithActiveDocument)
+            if (resetState)
             {
-                // TODO: this should be suppressed during indexing
-                this.locateFileInTreeCommand.Execute();
+                this.itemFound = false;
+            }
+            if (this.mainViewModel.SyncWithActiveDocument && !this.itemFound)
+            {
+                this.itemFound = this.locateFileInTreeCommand.ExpandAndSelectCurrentlyOpenedItem();
             }
         }
     }
