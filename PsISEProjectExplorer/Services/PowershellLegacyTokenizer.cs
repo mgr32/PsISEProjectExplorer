@@ -10,7 +10,7 @@ namespace PsISEProjectExplorer.Services
 
         private PowershellLegacyTokenVisitor tokenVisitor;
 
-        public PowershellLegacyTokenizer(ConfigHandler configHandler) : base(configHandler)
+        public PowershellLegacyTokenizer(ConfigValues configValues) : base(configValues)
         {
             this.tokenVisitor = new PowershellLegacyTokenVisitor(
                 this.OnFunctionVisit,

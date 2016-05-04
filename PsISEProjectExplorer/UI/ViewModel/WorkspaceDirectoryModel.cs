@@ -42,28 +42,27 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.autoUpdateRootDirectory = value;
                 this.OnPropertyChanged();
                 this.commandExecutor.ExecuteWithParam<ResetWorkspaceDirectoryCommand, bool>(false);
-                configHandler.SaveConfigValue("AutoUpdateRootDirectory", value.ToString());
+                this.configValues.AutoUpdateRootDirectory = value;
             }
         }
 
         private readonly int maxNumOfWorkspaceDirectories;
 
-        private readonly ConfigHandler configHandler;
+        private readonly ConfigValues configValues;
 
         private readonly CommandExecutor commandExecutor;
 
         private readonly MessageBoxHelper messageBoxHelper;
 
-        public WorkspaceDirectoryModel(ConfigHandler configHandler, CommandExecutor commandExecutor, MessageBoxHelper messageBoxHelper)
+        public WorkspaceDirectoryModel(ConfigValues configValues, CommandExecutor commandExecutor, MessageBoxHelper messageBoxHelper)
         {
-            this.configHandler = configHandler;
+            this.configValues = configValues;
             this.commandExecutor = commandExecutor;
             this.messageBoxHelper = messageBoxHelper;
 
-            this.maxNumOfWorkspaceDirectories = configHandler.ReadConfigIntValue("MaxNumOfWorkspaceDirectories", 5);
-            var workspaceDirs = configHandler.ReadConfigStringEnumerableValue("WorkspaceDirectories");
-            this.WorkspaceDirectories = new ObservableCollection<string>(workspaceDirs);
-            this.autoUpdateRootDirectory = configHandler.ReadConfigBoolValue("AutoUpdateRootDirectory", true);
+            this.maxNumOfWorkspaceDirectories = configValues.MaxNumOfWorkspaceDirectories;
+            this.WorkspaceDirectories = new ObservableCollection<string>(configValues.WorkspaceDirectories);
+            this.autoUpdateRootDirectory = configValues.AutoUpdateRootDirectory;
 
             this.SanitizeWorkspaceDirectories();
         }
@@ -101,7 +100,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 cnt = this.WorkspaceDirectories.Count;
             }
 
-            configHandler.SaveConfigEnumerableValue("WorkspaceDirectories", this.WorkspaceDirectories);
+            this.configValues.WorkspaceDirectories = this.WorkspaceDirectories;
 
             this.TriggerWorkspaceDirectoryChange();
         }

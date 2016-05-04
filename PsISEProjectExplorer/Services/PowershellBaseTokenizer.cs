@@ -15,11 +15,6 @@ namespace PsISEProjectExplorer.Services
     {
         private static readonly Regex ImportDscRegex = new Regex("Import-DSCResource", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        private static readonly IEnumerable<string> DefaultDslCustomDictionary = new List<string>() {
-            "task", // psake
-            "serverrole", "serverconnection", "step" // PSCI
-        };
-
         protected ISet<string> AddedItems;
 
         protected PowershellItem RootItem;
@@ -30,21 +25,21 @@ namespace PsISEProjectExplorer.Services
 
         private bool parsePowershellDscWithExternalImports;
 
-        private readonly ConfigHandler configHandler;
+        private readonly ConfigValues configValues;
 
-        public PowershellBaseTokenizer(ConfigHandler configHandler)
+        public PowershellBaseTokenizer(ConfigValues configValues)
         {
-            this.configHandler = configHandler;
-            this.dslAutoDiscovery = configHandler.ReadConfigBoolValue("DslAutoDiscovery", true);
-            this.dslCustomDictionary = configHandler.ReadConfigStringEnumerableValue("DslCustomDictionary", true, DefaultDslCustomDictionary);
+            this.configValues = configValues;
+            this.dslAutoDiscovery = configValues.DslAutoDiscovery;
+            this.dslCustomDictionary = configValues.DslCustomDictionary;
             // this is fix for performance issue in PSParser.Tokenize - when file contains Import - DSCResource pointing to a non-installed resource,
             // parsing takes long time and 'Unable to load resource' errors appear 
-            this.parsePowershellDscWithExternalImports = configHandler.ReadConfigBoolValue("ParsePowershellDSCWithExternalImports", false);
+            this.parsePowershellDscWithExternalImports = configValues.ParsePowershellDSCWithExternalImports;
         }
 
         public PowershellItem GetPowershellItems(string path, string contents)
         {
-            bool parsePowershellItems = this.configHandler.ReadConfigBoolValue("ParsePowershellItems", true);
+            bool parsePowershellItems = configValues.ParsePowershellItems;
             if (!parsePowershellItems || !this.parsePowershellDscWithExternalImports && ImportDscRegex.IsMatch(contents))
             {
                 return this.createRootItem(null);

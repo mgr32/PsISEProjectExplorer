@@ -50,7 +50,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.searchRegex = value;
                 this.OnPropertyChanged();
                 this.SearchOptions.SearchRegex = this.searchRegex;
-                this.configHandler.SaveConfigValue("SearchRegex", value.ToString());
+                this.configValues.SearchRegex = value;
                 this.commandExecutor.Execute<RecreateSearchTreeCommand>();
             }
         }
@@ -69,7 +69,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 {
                     this.commandExecutor.ExecuteWithParam<RunSearchCommand, string>(null);
                 }
-                this.configHandler.SaveConfigValue("SearchInFiles", value.ToString());
+                this.configValues.SearchInFiles = value;
             }
         }
 
@@ -83,7 +83,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.showAllFiles = value;
                 this.filesPatternProvider.IncludeAllFiles = value;
                 this.OnPropertyChanged();
-                this.configHandler.SaveConfigValue("ShowAllFiles", value.ToString());
+                this.configValues.ShowAllFiles = value;
                 this.commandExecutor.ExecuteWithParam<ReindexSearchTreeCommand, IEnumerable<string>>(null);
             }
         }
@@ -98,7 +98,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                 this.syncWithActiveDocument = value;
                 this.OnPropertyChanged();
                 this.commandExecutor.Execute<SyncWithActiveDocumentCommand>();
-                this.configHandler.SaveConfigValue("SyncWithActiveDocument", value.ToString());
+                this.configValues.SyncWithActiveDocument = value;
             }
         }
 
@@ -140,26 +140,25 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private readonly CommandExecutor commandExecutor;
 
-        private readonly ConfigHandler configHandler;
+        private readonly ConfigValues configValues;
 
-        public MainViewModel(ConfigHandler configHandler, WorkspaceDirectoryModel workspaceDirectoryModel,
+        public MainViewModel(ConfigValues configValues, WorkspaceDirectoryModel workspaceDirectoryModel,
             TreeViewModel treeViewModel, FilesPatternProvider filesPatternProvider, CommandExecutor commandExecutor)
         {
-            this.configHandler = configHandler;
+            this.configValues = configValues;
             this.WorkspaceDirectoryModel = workspaceDirectoryModel;
             this.TreeViewModel = treeViewModel;
             this.filesPatternProvider = filesPatternProvider;
             this.commandExecutor = commandExecutor;
             this.TreeViewModel.PropertyChanged += (s, e) => { if (e.PropertyName == "NumberOfFiles") this.OnPropertyChanged("TreeItemsResultString"); };
 
-            this.searchRegex = configHandler.ReadConfigBoolValue("SearchRegex", false);
-            this.searchInFiles = configHandler.ReadConfigBoolValue("SearchInFiles", true);
-            this.showAllFiles = configHandler.ReadConfigBoolValue("ShowAllFiles", true);
-            IEnumerable<string> excludePaths = configHandler.ReadConfigStringEnumerableValue("ExcludePaths");
+            this.searchRegex = configValues.SearchRegex;
+            this.searchInFiles = configValues.SearchInFiles;
+            this.showAllFiles = configValues.ShowAllFiles;
             this.filesPatternProvider.IncludeAllFiles = this.showAllFiles;
-            this.filesPatternProvider.ExcludePaths = excludePaths;
-            
-            this.syncWithActiveDocument = configHandler.ReadConfigBoolValue("SyncWithActiveDocument", false);
+            this.filesPatternProvider.ExcludePaths = configValues.ExcludePaths;
+
+            this.syncWithActiveDocument = configValues.SyncWithActiveDocument;
             var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
             this.SearchOptions = new SearchOptions(searchField, string.Empty, this.searchRegex);          
         }      

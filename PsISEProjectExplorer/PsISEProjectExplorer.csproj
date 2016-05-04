@@ -108,6 +108,7 @@
     <Compile Include="Component.cs" />
     <Compile Include="Config\ApplicationConfig.cs" />
     <Compile Include="Config\ConfigHandler.cs" />
+    <Compile Include="Config\ConfigValues.cs" />
     <Compile Include="Contrib\Regex\CSharpRegexCapabilities.cs" />
     <Compile Include="Contrib\Regex\IRegexCapabilities.cs" />
     <Compile Include="Contrib\Regex\IRegexQueryCapable.cs" />

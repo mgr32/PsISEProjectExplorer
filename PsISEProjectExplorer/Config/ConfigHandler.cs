@@ -8,8 +8,7 @@ using System.Collections.Concurrent;
 
 namespace PsISEProjectExplorer.Config
 {
-    [Component]
-    public class ConfigHandler
+    class ConfigHandler
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 

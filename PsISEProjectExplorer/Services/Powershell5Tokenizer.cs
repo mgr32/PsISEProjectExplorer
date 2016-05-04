@@ -12,7 +12,7 @@ namespace PsISEProjectExplorer.Services
 
         private Powershell5TokenVisitor tokenVisitor;
 
-        public Powershell5Tokenizer(ConfigHandler configHandler) : base(configHandler)
+        public Powershell5Tokenizer(ConfigValues configValues) : base(configValues)
         {
             this.tokenVisitor = new Powershell5TokenVisitor(this.OnFunctionVisit,
                 this.OnConfigurationVisit,

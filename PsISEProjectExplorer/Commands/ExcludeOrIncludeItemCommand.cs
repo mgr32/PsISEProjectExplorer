@@ -13,17 +13,17 @@ namespace PsISEProjectExplorer.Commands
 
         private readonly FilesPatternProvider filesPatternProvider;
 
-        private readonly ConfigHandler configHandler;
+        private readonly ConfigValues configValues;
 
         private readonly ReindexSearchTreeCommand reindexSearchTreeCommand;
 
-        public ExcludeOrIncludeItemCommand(MainViewModel mainViewModel, TreeViewModel treeViewModel, FilesPatternProvider filesPatternProvider, ConfigHandler configHandler,
+        public ExcludeOrIncludeItemCommand(MainViewModel mainViewModel, TreeViewModel treeViewModel, FilesPatternProvider filesPatternProvider, ConfigValues configValues,
             ReindexSearchTreeCommand reindexSearchTreeCommand)
         {
             this.mainViewModel = mainViewModel;
             this.treeViewModel = treeViewModel;
             this.filesPatternProvider = filesPatternProvider;
-            this.configHandler = configHandler;
+            this.configValues = configValues;
             this.reindexSearchTreeCommand = reindexSearchTreeCommand;
         }
 
@@ -37,11 +37,11 @@ namespace PsISEProjectExplorer.Commands
 
             if (selectedItem.IsExcluded)
             {
-                this.filesPatternProvider.ExcludePaths = this.configHandler.RemoveConfigEnumerableValue("ExcludePaths", selectedItem.Path);
+                this.filesPatternProvider.ExcludePaths = this.configValues.RemoveExcludePath(selectedItem.Path);
             }
             else
             {
-                this.filesPatternProvider.ExcludePaths = this.configHandler.AddConfigEnumerableValue("ExcludePaths", selectedItem.Path);
+                this.filesPatternProvider.ExcludePaths = this.configValues.AddExcludePath(selectedItem.Path);
             }
             this.reindexSearchTreeCommand.Execute(null);
         }

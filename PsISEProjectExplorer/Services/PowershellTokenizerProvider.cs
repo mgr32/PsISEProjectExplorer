@@ -9,28 +9,23 @@ namespace PsISEProjectExplorer.Services
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Boolean isPowershell5Available;
-
-        private readonly ConfigHandler configHandler;
-
         private IPowershellTokenizer powershellTokenizer;
 
         public IPowershellTokenizer PowershellTokenizer { get { return this.powershellTokenizer; } }
 
-        public PowershellTokenizerProvider(ConfigHandler configHandler) {
-            this.configHandler = configHandler;
+        public PowershellTokenizerProvider(ConfigValues configValues) {
             Type t = typeof(System.Management.Automation.Language.AstVisitor);
             string assemblyName = t.Assembly.FullName.ToString();
-            isPowershell5Available = Type.GetType("System.Management.Automation.Language.AstVisitor2," + assemblyName, false) != null;
-            if (this.isPowershell5Available)
+            bool isPowershell5Available = Type.GetType("System.Management.Automation.Language.AstVisitor2," + assemblyName, false) != null;
+            if (isPowershell5Available)
             {
                 Logger.Info("Using Powershell5Tokenizer");
-                this.powershellTokenizer = new Powershell5Tokenizer(this.configHandler);
+                this.powershellTokenizer = new Powershell5Tokenizer(configValues);
             }
             else
             {
                 Logger.Info("Using PowershellLegacyTokenizer");
-                this.powershellTokenizer = new PowershellLegacyTokenizer(this.configHandler);
+                this.powershellTokenizer = new PowershellLegacyTokenizer(configValues);
             }
         }
     }
