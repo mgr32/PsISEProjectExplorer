@@ -2,7 +2,7 @@
 
 [PsGallery](https://www.powershellgallery.com/packages/PsISEProjectExplorer) or [direct download](https://github.com/mgr32/PsISEProjectExplorer/releases/latest)
 
-[What's new](https://github.com/mgr32/PsISEProjectExplorer/wiki/What's-new)
+[What's new](https://github.com/mgr32/PsISEProjectExplorer/wiki)
 
 [![Build status](https://ci.appveyor.com/api/projects/status/u2erfvsojuedn1sl/branch/master?svg=true)](https://ci.appveyor.com/project/mgr32/psiseprojectexplorer/branch/master)
 
