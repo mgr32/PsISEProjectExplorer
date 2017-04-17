@@ -216,3 +216,4 @@ FakesAssemblies/
 **/*.Server/ModelManifest.xml
 _Pvt_Extensions
 /.nuget/NuGet.exe
+/PsISEProjectExplorer/Install_to_PsGallery.ps1

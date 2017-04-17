@@ -24,7 +24,7 @@ Author = 'Marcin Grzywa'
 CompanyName = 'Marcin Grzywa'
 
 # Copyright statement for this module
-Copyright = '2015, MIT license'
+Copyright = '2017, MIT license'
 
 # Description of the functionality provided by this module
 Description = 'Provides a tree view that enables to index and explore whole directory structure containing Powershell scripts.'
@@ -81,7 +81,7 @@ AliasesToExport = @()
 # DscResourcesToExport = @()
 
 # List of all modules packaged with this module
-ModuleList = @('PsISEProjectExplorer.psm1')
+ModuleList = @()
 
 # List of all files packaged with this module
 FileList = @('PsISEProjectExplorer.psm1', 
