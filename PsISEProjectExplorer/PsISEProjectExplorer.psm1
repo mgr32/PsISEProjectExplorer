@@ -76,6 +76,7 @@ function Add-PsISEProjectExplorerToIseProfile {
 
 	if ($contents -inotmatch $importModule) {
 		Write-Host "Adding '$importModule'..." -NoNewLine
+		Add-Content -Path $profileFile -Value "`n# Load module PsISEProjectExplorer" | Out-Null
 		Add-Content -Path $profileFile -Value $importModule | Out-Null
         Write-Host 'OK'
 	} else {
