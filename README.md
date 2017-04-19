@@ -11,7 +11,7 @@
 Provides a tree view that enables to index and explore whole directory structure containing Powershell scripts. It has following features:
 
 * Visualize directory structure (also files not loaded to ISE yet) in a tree view.
-* Show functions, classes and DSL nodes (e.g. Pester / psake / custom) in leaves of the tree view and jump to the function definition (F12, similarly to some available Function Explorer plugins).
+* Show functions, classes and DSL nodes (e.g. Pester / psake / custom) in leaves of the tree view and jump to the function definition (F12).
 * Search the tree view (file names, function names, optionally file contents) - using full-text search or regex.
 * Show parse errors in tree view.
 * File operations in tree view (context menu - add / rename / delete, exclude, drag&drop).
@@ -42,11 +42,11 @@ Add-PsISEProjectExplorerToIseProfile
 If you don't have PsGet, [download latest package](https://github.com/mgr32/PsISEProjectExplorer/releases/latest) and either:
 * Install it automatically - by running `Install_to_UserModules.bat`, or
 * Install it manually:
- * Ensure all the files are unblocked (properties of the file / General)
- * Copy PSISEProjectExplorer to `$env:USERPROFILE\Documents\WindowsPowerShell\Modules`.
- * Launch PowerShell ISE.
- * Run `Import-Module PsISEProjectExplorer`.
- * If you want it to be loaded automatically when ISE starts, add the line above to your ISE profile (see `$profile`).
+  * Ensure all the files are unblocked (properties of the file / General)
+  * Copy PSISEProjectExplorer to `$env:USERPROFILE\Documents\WindowsPowerShell\Modules`.
+  * Launch PowerShell ISE.
+  * Run `Import-Module PsISEProjectExplorer`.
+  * If you want it to be loaded automatically when ISE starts, add the line above to your ISE profile (see `$profile`).
 
 #### Usage
 
