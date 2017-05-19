@@ -83,7 +83,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        public ImageSource GetImageSourceForPowershellItemEntry(string nodeType)
+        public ImageSource GetImageSourceBasingOnNodeType(string nodeType)
         {
             BitmapImage result;
             bool found = iconsMap.TryGetValue(nodeType.ToLowerInvariant(), out result);

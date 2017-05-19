@@ -7,11 +7,12 @@ namespace PsISEProjectExplorer.Commands
     {
         private readonly TreeViewModel treeViewModel;
 
-        private readonly UnsavedFileChecker unsavedFileEnforcer;
+        private readonly UnsavedFileChecker unsavedFileChecker;
 
-        public RenameItemCommand(TreeViewModel treeViewModel, UnsavedFileChecker unsavedFileEnforcer)
+        public RenameItemCommand(TreeViewModel treeViewModel, UnsavedFileChecker unsavedFileChecker)
         {
             this.treeViewModel = treeViewModel;
+            this.unsavedFileChecker = unsavedFileChecker;
         }
 
         public void Execute()
@@ -22,7 +23,7 @@ namespace PsISEProjectExplorer.Commands
                 return;
             }
 
-            if (!this.unsavedFileEnforcer.EnsureCurrentlyOpenedFileIsSaved())
+            if (!this.unsavedFileChecker.EnsureCurrentlyOpenedFileIsSaved())
             {
                 return;
             }

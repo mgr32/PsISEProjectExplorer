@@ -23,11 +23,11 @@ namespace PsISEProjectExplorer.Commands
 
         private readonly IseIntegrator iseIntegrator;
 
-        private readonly UnsavedFileChecker unsavedFileEnforcer;
+        private readonly UnsavedFileChecker unsavedFileChecker;
 
         public MoveItemCommand(TreeViewModel treeViewModel, MessageBoxHelper messageBoxHelper, WorkspaceDirectoryModel workspaceDirectoryModel,
             FilesPatternProvider filesPatternProvider, FileSystemOperationsService fileSystemOperationsService, IseIntegrator iseIntegrator,
-            UnsavedFileChecker unsavedFileEnforcer)
+            UnsavedFileChecker unsavedFileChecker)
         {
             this.treeViewModel = treeViewModel;
             this.messageBoxHelper = messageBoxHelper;
@@ -35,7 +35,7 @@ namespace PsISEProjectExplorer.Commands
             this.filesPatternProvider = filesPatternProvider;
             this.fileSystemOperationsService = fileSystemOperationsService;
             this.iseIntegrator = iseIntegrator;
-            this.unsavedFileEnforcer = unsavedFileEnforcer;
+            this.unsavedFileChecker = unsavedFileChecker;
         }
         public void Execute(Tuple<TreeViewEntryItemModel, TreeViewEntryItemModel> param)
         {
@@ -45,7 +45,7 @@ namespace PsISEProjectExplorer.Commands
             {
                 return;
             }
-            if (!this.unsavedFileEnforcer.EnsureCurrentlyOpenedFileIsSaved())
+            if (!this.unsavedFileChecker.EnsureCurrentlyOpenedFileIsSaved())
             {
                 return;
             }

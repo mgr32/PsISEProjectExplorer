@@ -21,17 +21,17 @@ namespace PsISEProjectExplorer.Commands
 
         private readonly FileSystemOperationsService fileSystemOperationsService;
 
-        private readonly UnsavedFileChecker unsavedFileEnforcer;
+        private readonly UnsavedFileChecker unsavedFileChecker;
 
         public DeleteItemCommand(TreeViewModel treeViewModel, MessageBoxHelper messageBoxHelper, IseIntegrator iseIntegrator, 
-            FilesPatternProvider filesPatternProvider, FileSystemOperationsService fileSystemOperationsService, UnsavedFileChecker unsavedFileEnforcer)
+            FilesPatternProvider filesPatternProvider, FileSystemOperationsService fileSystemOperationsService, UnsavedFileChecker unsavedFileChecker)
         {
             this.treeViewModel = treeViewModel;
             this.messageBoxHelper = messageBoxHelper;
             this.iseIntegrator = iseIntegrator;
             this.filesPatternProvider = filesPatternProvider;
             this.fileSystemOperationsService = fileSystemOperationsService;
-            this.unsavedFileEnforcer = unsavedFileEnforcer;
+            this.unsavedFileChecker = unsavedFileChecker;
         }
 
         public void Execute()
@@ -42,7 +42,7 @@ namespace PsISEProjectExplorer.Commands
                 return;
             }
 
-            if (!this.unsavedFileEnforcer.EnsureCurrentlyOpenedFileIsSaved())
+            if (!this.unsavedFileChecker.EnsureCurrentlyOpenedFileIsSaved())
             {
                 return;
             }

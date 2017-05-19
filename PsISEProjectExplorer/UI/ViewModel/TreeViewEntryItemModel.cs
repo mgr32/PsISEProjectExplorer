@@ -47,14 +47,11 @@ namespace PsISEProjectExplorer.UI.ViewModel
         {
             get
             {
-                if (this.NodeType == NodeType.Directory || this.NodeType == NodeType.File)
+                if (this.IsBeingAdded || (this.NodeType != NodeType.Directory && this.NodeType != NodeType.File))
                 {
-                    return this.IconProvider.GetImageSourceForFileSystemEntry(this.Path, this.Node.IsExcluded, this.Node.IsValid);
+                    return this.IconProvider.GetImageSourceBasingOnNodeType(this.NodeType.ToString());
                 }
-                else
-                {
-                    return this.IconProvider.GetImageSourceForPowershellItemEntry(this.NodeType.ToString());
-                }
+                return this.IconProvider.GetImageSourceForFileSystemEntry(this.Path, this.Node.IsExcluded, this.Node.IsValid);
             }
         }
 
