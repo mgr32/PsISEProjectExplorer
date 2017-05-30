@@ -78,7 +78,7 @@ namespace PsISEProjectExplorer.Tests.UI.ViewModel
             foreach (var name in namesToTest)
             {
                 Console.WriteLine("IconProvider " + name);
-                ImageSource result = iconProvider.GetImageSourceForPowershellItemEntry(name);
+                ImageSource result = iconProvider.GetImageSourceBasingOnNodeType(name);
                 Assert.That(result, Is.Not.Null);
             }
         }
@@ -86,7 +86,7 @@ namespace PsISEProjectExplorer.Tests.UI.ViewModel
         [Test]
         public void GetImageSourceForPowershellItemEntryShouldReturnNullWhenNodeTypeIsNotValid()
         {
-            ImageSource result = iconProvider.GetImageSourceForPowershellItemEntry("x");
+            ImageSource result = iconProvider.GetImageSourceBasingOnNodeType("x");
             Assert.That(result, Is.Null);
         }
     }
