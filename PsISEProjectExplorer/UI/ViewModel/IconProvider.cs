@@ -45,29 +45,32 @@ namespace PsISEProjectExplorer.UI.ViewModel
             try
             {
                 ShellItem shellItem = new ShellItem(new Uri(path));
-                var icon = shellItem.ShellIcon;
-                ImageSource shellIcon = Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-                if (!isExcluded && isValid)
+                using (var icon = shellItem.ShellIcon)
                 {
-                    return shellIcon;
-                }
+                    ImageSource shellIcon = Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
-                BitmapImage overlayIcon;
-                if (!isValid)
-                {
-                    overlayIcon = iconsMap["overlay_invalid"];
-                }
-                else
-                {
-                    overlayIcon = iconsMap["overlay_excluded"];
-                }
+                    if (!isExcluded && isValid)
+                    {
+                        return shellIcon;
+                    }
 
-                Rect rect = new Rect(new Size(16, 16));
-                DrawingGroup iconOverlays = new DrawingGroup();
-                iconOverlays.Children.Add(new ImageDrawing(shellIcon, rect));
-                iconOverlays.Children.Add(new ImageDrawing(overlayIcon, rect));
+                    BitmapImage overlayIcon;
+                    if (!isValid)
+                    {
+                        overlayIcon = iconsMap["overlay_invalid"];
+                    }
+                    else
+                    {
+                        overlayIcon = iconsMap["overlay_excluded"];
+                    }
 
-                return new DrawingImage(iconOverlays);
+                    Rect rect = new Rect(new Size(16, 16));
+                    DrawingGroup iconOverlays = new DrawingGroup();
+                    iconOverlays.Children.Add(new ImageDrawing(shellIcon, rect));
+                    iconOverlays.Children.Add(new ImageDrawing(overlayIcon, rect));
+
+                    return new DrawingImage(iconOverlays);
+                }
             }
             catch (Exception e)
             {
