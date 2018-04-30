@@ -130,7 +130,7 @@
                     <Image Source="Resources\toolbar_toggle_collapse.png" ToolTip="Collapse All" />
                 </Button>
                 <ToggleButton IsChecked="{Binding Path=WorkspaceDirectoryModel.AutoUpdateRootDirectory}">
-                    <Image Source="Resources\toolbar_autoUpdateProjectDir.png" ToolTip="Auto-update Workspace Directory"/>
+                    <Image Source="Resources\toolbar_autoUpdateProjectDir.png"/>
                     <ToggleButton.Style>
                         <Style TargetType="{x:Type ToggleButton}">
                             <Style.Triggers>
