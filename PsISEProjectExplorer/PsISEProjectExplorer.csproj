@@ -120,6 +120,7 @@
     <Compile Include="Contrib\Regex\RegexTermEnum.cs" />
     <Compile Include="Model\ChangePoolEntry.cs" />
     <Compile Include="Enums\PowershellItemType.cs" />
+    <Compile Include="Model\IndexingMode.cs" />
     <Compile Include="Model\PowershellParseResult.cs" />
     <Compile Include="Services\FilesPatternProvider.cs" />
     <Compile Include="Model\FileSystemChangedInfo.cs" />
@@ -186,6 +187,7 @@
     <Compile Include="UI\Helpers\DragDropHandler.cs" />
     <Compile Include="UI\Helpers\EmptyListToVisibilityConverter.cs" />
     <Compile Include="UI\Helpers\FocusExtensions.cs" />
+    <Compile Include="UI\Helpers\IndexingModeConverter.cs" />
     <Compile Include="UI\Helpers\LockedToolBar.cs" />
     <Compile Include="UI\Helpers\MessageBoxHelper.cs" />
     <Compile Include="UI\Helpers\StretchingTreeView.cs" />
@@ -254,6 +256,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Resources\toolbar_index_all.png" />
+    <Resource Include="Resources\toolbar_index_local.png" />
     <None Include="UI\GongSolutions.Shell\Licence.md" />
     <Resource Include="Resources\node_overlay_excluded.png" />
     <Resource Include="Resources\textfield_exclude.png" />
@@ -314,9 +318,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\toolbar_showAllFiles.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\toolbar_searchInFiles.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\toolbar_autoUpdateProjectDir.png" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PsISEProjectExplorer.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,15 +29,22 @@ namespace PsISEProjectExplorer.Config
             }
         }
 
-        public bool SearchInFiles
+        public IndexingMode IndexFilesMode
         {
             get
             {
-                return configHandler.ReadConfigBoolValue("SearchInFiles", true);
+                String modeStr = configHandler.ReadConfigStringValue("IndexFilesMode");
+                if (string.IsNullOrEmpty(modeStr))
+                {
+                    return IndexingMode.LOCAL_FILES;
+                }
+                IndexingMode result;
+                Enum.TryParse(modeStr, out result);
+                return result;
             }
             set
             {
-                configHandler.SaveConfigValue("SearchInFiles", value.ToString());
+                configHandler.SaveConfigValue("IndexFilesMode", value.ToString());
             }
         }
 

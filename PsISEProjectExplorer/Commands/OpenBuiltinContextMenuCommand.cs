@@ -1,4 +1,5 @@
 ﻿using PsISEProjectExplorer.Enums;
+using PsISEProjectExplorer.Services;
 using PsISEProjectExplorer.UI.Helpers;
 using PsISEProjectExplorer.UI.ViewModel;
 using System.Linq;
@@ -12,9 +13,12 @@ namespace PsISEProjectExplorer.Commands
     {
         private readonly ProjectExplorerWindow projectExplorerWindow;
 
-        public OpenBuiltinContextMenuCommand(ProjectExplorerWindow projectExplorerWindow)
+        private readonly FilesPatternProvider filesPatternProvider;
+
+        public OpenBuiltinContextMenuCommand(ProjectExplorerWindow projectExplorerWindow, FilesPatternProvider filesPatternProvider)
         {
             this.projectExplorerWindow = projectExplorerWindow;
+            this.filesPatternProvider = filesPatternProvider;
         }
 
         public void Execute(DependencyObject originalSource)
@@ -61,7 +65,7 @@ namespace PsISEProjectExplorer.Commands
 
                 if (item.IsExcluded)
                 {
-                    includeMenuItem.Visibility = Visibility.Visible;
+                    includeMenuItem.Visibility = filesPatternProvider.ExcludePaths.Contains(item.Path) ? Visibility.Visible : Visibility.Collapsed;
                     excludeMenuItem.Visibility = Visibility.Collapsed;
                 }
                 else

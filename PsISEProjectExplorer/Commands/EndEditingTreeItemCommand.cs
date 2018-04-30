@@ -48,13 +48,7 @@ namespace PsISEProjectExplorer.Commands
                 return;
             }
 
-            var addFileExtension = !this.mainViewModel.SearchInFiles;
             selectedItem.IsBeingEdited = false;
-
-            if (selectedItem.NodeType == NodeType.File && addFileExtension && !String.IsNullOrEmpty(newValue) && !this.filesPatternProvider.DoesFileMatch(newValue))
-            {
-                newValue += ".ps1";
-            }
             if (selectedItem.IsBeingAdded)
             {
                 selectedItem.IsBeingAdded = false;

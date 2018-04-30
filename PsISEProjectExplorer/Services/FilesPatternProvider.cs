@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using PsISEProjectExplorer.Model;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -22,6 +23,8 @@ namespace PsISEProjectExplorer.Services
 
         public bool IncludeAllFiles { get; set; }
 
+        public IndexingMode IndexFilesMode { get; set; }
+
         public IEnumerable<string> ExcludePaths { get; set; }
 
         private ISet<string> AdditionalPaths { get; set; }
@@ -38,7 +41,7 @@ namespace PsISEProjectExplorer.Services
 
         public bool DoesFileMatch(string fileName)
         {
-            return (this.IncludeAllFiles || PowershellFilesRegex.IsMatch(fileName) || OtherIncludedFilesRegex.IsMatch(fileName)) && !ExcludeRegex.IsMatch(fileName) && !IsReparsePointOrHiddenSystem(fileName);
+            return (this.IncludeAllFiles || PowershellFilesRegex.IsMatch(fileName) || OtherIncludedFilesRegex.IsMatch(fileName)) && !ExcludeRegex.IsMatch(fileName) && !IsHiddenSystem(fileName);
         }
 
         public bool IsModuleFile(string fileName)
@@ -48,12 +51,25 @@ namespace PsISEProjectExplorer.Services
 
         public bool DoesDirectoryMatch(string dirName)
         {
-            return !ExcludeRegex.IsMatch(dirName) && !IsReparsePointOrHiddenSystem(dirName);
+            return !ExcludeRegex.IsMatch(dirName) && !IsHiddenSystem(dirName);
         }
 
-        public bool IsExcluded(string path)
+        public bool IsExcludedFromIndexing(string path)
         {
-            return ExcludePaths.Any(e => path.StartsWith(e));
+            bool excludedExplicitly = ExcludePaths.Any(e => path.StartsWith(e));
+            if (excludedExplicitly)
+            {
+                return true;
+            }
+            if (IndexFilesMode == IndexingMode.ALL_FILES || IsDirectory(path))
+            {
+                return false;
+            }
+            if (IndexFilesMode == IndexingMode.NO_FILES)
+            {
+                return true;
+            }
+            return !IsLocal(path);
         }
 
         public string GetFilesPattern()
@@ -81,18 +97,36 @@ namespace PsISEProjectExplorer.Services
             this.AdditionalPaths.Clear();
         }
 
-        private bool IsReparsePointOrHiddenSystem(string path)
+        private bool IsLocal(string path)
+        {
+            var attributes = GetAttributes(path);
+            bool isUnpinned = ((int)attributes & 0x10_0000) == 0x10_0000; // currently undocumented - see https://superuser.com/questions/44812/windows-explorers-file-attribute-column-values/44820
+            bool isOffline = (attributes & FileAttributes.Offline) == FileAttributes.Offline;
+            return !isUnpinned && !isOffline;
+        }
+
+        private bool IsHiddenSystem(string path)
+        {
+            var attributes = GetAttributes(path);
+            bool isHidden = (attributes & FileAttributes.Hidden) == FileAttributes.Hidden;
+            bool isSystem = (attributes & FileAttributes.System) == FileAttributes.System;
+            return isHidden && isSystem;
+        }
+
+        private bool IsDirectory(string path)
+        {
+            return (GetAttributes(path) & FileAttributes.Directory) == FileAttributes.Directory;
+        }
+
+        private FileAttributes GetAttributes(string path)
         {
             try
             {
-                var attributes = File.GetAttributes(path);
-                return (attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint ||
-                    ((attributes & FileAttributes.Hidden) == FileAttributes.Hidden &&
-                     (attributes & FileAttributes.System) == FileAttributes.System);
+                return File.GetAttributes(path);
             }
             catch
             {
-                return false;
+                return FileAttributes.Normal;
             }
         }
     }

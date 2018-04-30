@@ -16,7 +16,11 @@ namespace GongSolutions.Shell
     /// Represents an item in the Windows Shell namespace.
     /// </summary>
     [TypeConverter(typeof(ShellItemConverter))]
+#pragma warning disable CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
+#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
     public class ShellItem : IEnumerable<ShellItem>
+#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
+#pragma warning restore CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
     {
 
         /// <summary>

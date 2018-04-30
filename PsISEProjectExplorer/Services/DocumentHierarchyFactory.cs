@@ -174,7 +174,7 @@ namespace PsISEProjectExplorer.Services
                 }
                 foreach (string dir in dirs)
                 {
-                    bool isExcluded = filesPatternProvider.IsExcluded(dir);
+                    bool isExcluded = filesPatternProvider.IsExcludedFromIndexing(dir);
                     if (filesPatternProvider.DoesDirectoryMatch(dir) && (isExcluded || filesPatternProvider.IncludeAllFiles || filesPatternProvider.IsInAdditonalPaths(dir)))
                     {
                         parseResult = this.powershellFileParser.ParseFile(dir, isDirectory: true, isExcluded: isExcluded, errorMessage: null);
@@ -210,7 +210,7 @@ namespace PsISEProjectExplorer.Services
 
             foreach (string file in files)
             {
-                parseResult = this.powershellFileParser.ParseFile(file, isDirectory: false, isExcluded: filesPatternProvider.IsExcluded(file), errorMessage: null);
+                parseResult = this.powershellFileParser.ParseFile(file, isDirectory: false, isExcluded: filesPatternProvider.IsExcludedFromIndexing(file), errorMessage: null);
                 yield return parseResult;
             }
         }

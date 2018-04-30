@@ -41,7 +41,10 @@ namespace PsISEProjectExplorer.Commands
 
             // TODO: this is hacky...
             this.mainViewModel.SearchOptions.SearchText = string.Empty;
-            this.mainViewModel.SearchInFiles = true;
+            if (this.mainViewModel.IndexFilesMode == IndexingMode.NO_FILES)
+            {
+                this.mainViewModel.IndexFilesMode = IndexingMode.LOCAL_FILES;
+            }
             this.mainViewModel.SearchText = funcName;
         }
 

@@ -18,8 +18,10 @@ namespace PsISEProjectExplorer.Commands
         public void Execute()
         {
             this.mainViewModel.SearchOptions.SearchText = string.Empty;
-            this.mainViewModel.SearchInFiles = true;
-
+            if (this.mainViewModel.IndexFilesMode == Model.IndexingMode.NO_FILES)
+            {
+                this.mainViewModel.IndexFilesMode = Model.IndexingMode.LOCAL_FILES;
+            }
             this.projectExplorerWindow.FocusOnTextBoxSearchText();
         }
     }

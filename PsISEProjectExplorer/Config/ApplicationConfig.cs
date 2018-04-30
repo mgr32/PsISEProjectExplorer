@@ -48,8 +48,8 @@ namespace PsISEProjectExplorer.Config
             {
                 container.Register(component, component, Lifestyle.Singleton);
             }
-            container.RegisterSingleton(typeof(ProjectExplorerWindow), mainWindow);
-            container.RegisterSingleton(typeof(ApplicationConfig), this);
+            container.RegisterInstance(typeof(ProjectExplorerWindow), mainWindow);
+            container.RegisterInstance(typeof(ApplicationConfig), this);
             return container;
         }
 

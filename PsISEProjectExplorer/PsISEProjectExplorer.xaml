@@ -5,12 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModel="clr-namespace:PsISEProjectExplorer.UI.ViewModel"
              xmlns:uiHelpers="clr-namespace:PsISEProjectExplorer.UI.Helpers"
+             xmlns:model="clr-namespace:PsISEProjectExplorer.Model"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <ResourceDictionary>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <uiHelpers:EmptyListToVisibilityConverter x:Key="EmptyListToVisibilityConverter"/>
+            <uiHelpers:IndexingModeConverter x:Key="IndexingModeConverter"/>
             <DataTemplate x:Key="StandardTemplate">
                 <StackPanel Orientation="Horizontal" ToolTip="{Binding Path=Tooltip}">
                     <Image Source="{Binding Path=Image}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
@@ -45,16 +47,81 @@
         <ToolBarTray Height="32" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,48,-4,0" IsLocked="True" Background="{DynamicResource {x:Static SystemColors.WindowBrush}}">
             <uiHelpers:LockedToolBar x:Name="ButtonToolbar" AllowDrop="False" Background="{DynamicResource {x:Static SystemColors.WindowBrush}}">
                 <ToggleButton IsChecked="{Binding Path=SearchRegex}">
-                    <Image Source="Resources\toolbar_searchRegex.png" ToolTip="Search using Regex" />
+                    <Image Source="Resources\toolbar_searchRegex.png" />
+                    <ToggleButton.Style>
+                        <Style TargetType="{x:Type ToggleButton}">
+                            <Style.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="ToolTip" Value="Searching with regex"/>
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="False">
+                                    <Setter Property="ToolTip" Value="Searching with simple matching"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ToggleButton.Style>
                 </ToggleButton>
-                <ToggleButton IsChecked="{Binding Path=SearchInFiles}">
-                    <Image Source="Resources\toolbar_searchInFiles.png" ToolTip="Search in Files" />
+                <ToggleButton IsChecked="{Binding Path=IndexFilesMode, Converter={StaticResource IndexingModeConverter}}" IsThreeState="True">
+                    <Image Width="16" Height="16">
+                        <Image.Style>
+                            <Style TargetType="{x:Type Image}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=IndexFilesMode}" Value="{x:Static model:IndexingMode.LOCAL_FILES}">
+                                        <Setter Property="Source" Value="Resources\toolbar_index_local.png"/>
+                                        <Setter Property="ToolTip" Value="Indexing contents of local files only"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=IndexFilesMode}" Value="{x:Static model:IndexingMode.ALL_FILES}">
+                                        <Setter Property="Source" Value="Resources\toolbar_index_all.png"/>
+                                        <Setter Property="ToolTip" Value="Indexing contents of all files"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=IndexFilesMode}" Value="{x:Static model:IndexingMode.NO_FILES}">
+                                        <Setter Property="Source" Value="Resources\toolbar_index_all.png"/>
+                                        <Setter Property="ToolTip" Value="Not indexing file contents"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+                    <ToggleButton.Style>
+                        <Style TargetType="{x:Type ToggleButton}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IndexFilesMode}" Value="{x:Static model:IndexingMode.LOCAL_FILES}">
+                                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.GradientActiveCaptionBrushKey}}" />
+                                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.GradientActiveCaptionBrushKey}}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ToggleButton.Style>
                 </ToggleButton>
                 <ToggleButton IsChecked="{Binding Path=ShowAllFiles}">
-                    <Image Source="Resources\toolbar_showAllFiles.png" ToolTip="Show All Files" />
+                    <Image Source="Resources\toolbar_showAllFiles.png" />
+                    <ToggleButton.Style>
+                        <Style TargetType="{x:Type ToggleButton}">
+                            <Style.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="ToolTip" Value="Showing all files"/>
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="False">
+                                    <Setter Property="ToolTip" Value="Showing only Powershell files"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ToggleButton.Style>
                 </ToggleButton>
                 <ToggleButton IsChecked="{Binding Path=SyncWithActiveDocument}">
-                    <Image Source="Resources\toolbar_sync.png" ToolTip="Sync with Active Document"/>
+                    <Image Source="Resources\toolbar_sync.png" />
+                    <ToggleButton.Style>
+                        <Style TargetType="{x:Type ToggleButton}">
+                            <Style.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="ToolTip" Value="Syncing tree selection with active document"/>
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="False">
+                                    <Setter Property="ToolTip" Value="Not syncing tree selection with active document"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ToggleButton.Style>
                 </ToggleButton>
                 <Button Click="RefreshDirectoryStructure_Click">
                     <Image Source="Resources\toolbar_refresh.png" ToolTip="Refresh Directory Structure" />
@@ -64,6 +131,18 @@
                 </Button>
                 <ToggleButton IsChecked="{Binding Path=WorkspaceDirectoryModel.AutoUpdateRootDirectory}">
                     <Image Source="Resources\toolbar_autoUpdateProjectDir.png" ToolTip="Auto-update Workspace Directory"/>
+                    <ToggleButton.Style>
+                        <Style TargetType="{x:Type ToggleButton}">
+                            <Style.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="ToolTip" Value="Auto-updating workspace directory basing on current document location"/>
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="False">
+                                    <Setter Property="ToolTip" Value="Auto-updating workspace directory disabled"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ToggleButton.Style>
                 </ToggleButton>
             </uiHelpers:LockedToolBar>
         </ToolBarTray>
@@ -194,7 +273,7 @@
                             <Setter Property="FontWeight" Value="Bold" />
                         </MultiTrigger>
                         <DataTrigger Binding="{Binding Path=IsExcluded}" Value="True">
-                            <Setter Property="Opacity" Value="0.5" />
+                            <Setter Property="Opacity" Value="0.85" />
                         </DataTrigger>
                         <Trigger Property="uiHelpers:TreeViewMouseHelper.IsMouseDirectlyOverItem" Value="True">
                             <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.MenuBrushKey}}" />

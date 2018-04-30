@@ -72,7 +72,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
                     return new DrawingImage(iconOverlays);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 if (File.Exists(path))
                 {

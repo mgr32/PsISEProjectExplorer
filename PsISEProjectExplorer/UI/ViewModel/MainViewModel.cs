@@ -55,21 +55,19 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
-        private bool searchInFiles;
+        private IndexingMode indexFilesMode;
 
-        public bool SearchInFiles
+        public IndexingMode IndexFilesMode
         {
-            get { return this.searchInFiles; }
+            get { return this.indexFilesMode; }
             set
             {
-                this.searchInFiles = value;
+                this.indexFilesMode = value;
+                this.filesPatternProvider.IndexFilesMode = value;
                 this.OnPropertyChanged();
-                this.SearchOptions.SearchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
-                if (!String.IsNullOrEmpty(this.SearchText))
-                {
-                    this.commandExecutor.ExecuteWithParam<RunSearchCommand, string>(null);
-                }
-                this.configValues.SearchInFiles = value;
+                this.SearchOptions.SearchField = (indexFilesMode != IndexingMode.NO_FILES ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
+                this.configValues.IndexFilesMode = indexFilesMode;
+                this.commandExecutor.ExecuteWithParam<ReindexSearchTreeCommand, IEnumerable<string>>(null);
             }
         }
 
@@ -153,13 +151,14 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.TreeViewModel.PropertyChanged += (s, e) => { if (e.PropertyName == "NumberOfFiles") this.OnPropertyChanged("TreeItemsResultString"); };
 
             this.searchRegex = configValues.SearchRegex;
-            this.searchInFiles = configValues.SearchInFiles;
+            this.indexFilesMode = configValues.IndexFilesMode;
             this.showAllFiles = configValues.ShowAllFiles;
             this.filesPatternProvider.IncludeAllFiles = this.showAllFiles;
             this.filesPatternProvider.ExcludePaths = configValues.ExcludePaths;
+            this.filesPatternProvider.IndexFilesMode = configValues.IndexFilesMode;
 
             this.syncWithActiveDocument = configValues.SyncWithActiveDocument;
-            var searchField = (this.searchInFiles ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
+            var searchField = (indexFilesMode != IndexingMode.NO_FILES ? FullTextFieldType.CatchAll : FullTextFieldType.Name);
             this.SearchOptions = new SearchOptions(searchField, string.Empty, this.searchRegex);          
         }      
         
