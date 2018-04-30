@@ -38,7 +38,8 @@ namespace PsISEProjectExplorer.Commands
             {
                 return;
             }
-            var node = (PowershellItemNode)this.documentHierarchySearcher.GetFunctionNodeByName(documentHierarchy, funcName);
+            string selectedFilePath = iseIntegrator.SelectedFilePath;
+            var node = (PowershellItemNode)this.documentHierarchySearcher.GetFunctionNodeByName(documentHierarchy, funcName, selectedFilePath);
             if (node == null)
             {
                 return;

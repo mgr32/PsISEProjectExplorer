@@ -34,7 +34,7 @@ namespace PsISEProjectExplorer.Services
             return this.FillNewFilteredDocumentHierarchyRecursively(filteredNodes, node, null, worker);
         }
 
-        public INode GetFunctionNodeByName(DocumentHierarchy documentHierarchy, string name)
+        public INode GetFunctionNodeByName(DocumentHierarchy documentHierarchy, string name, string currentFilePath)
         {
             if (documentHierarchy == null)
             {
@@ -43,7 +43,22 @@ namespace PsISEProjectExplorer.Services
             return documentHierarchy
                 .SearchNodesByTerm(name, FullTextFieldType.NameNotAnalyzed)
                 .Select(result => result.Node)
-                .FirstOrDefault(node => node.NodeType != NodeType.Directory && node.NodeType != NodeType.File && node.NodeType != NodeType.Intermediate);
+                .Where(node => node.NodeType != NodeType.Directory && node.NodeType != NodeType.File && node.NodeType != NodeType.Intermediate)
+                .OrderBy(node => hasParentWithPath(node, currentFilePath) ? 0 : 1)
+                .FirstOrDefault();
+        }
+
+        private bool hasParentWithPath(INode node, string path)
+        {
+            if (node == null)
+            {
+                return false;
+            }
+            if (node.Path == path)
+            {
+                return true;
+            }
+            return hasParentWithPath(node.Parent, path);
         }
 
         private INode CreateNewViewNodeWithParents(INode node)
