@@ -100,7 +100,7 @@ namespace PsISEProjectExplorer.Services
         private bool IsLocal(string path)
         {
             var attributes = GetAttributes(path);
-            bool isUnpinned = ((int)attributes & 0x10_0000) == 0x10_0000; // currently undocumented - see https://superuser.com/questions/44812/windows-explorers-file-attribute-column-values/44820
+            bool isUnpinned = ((int)attributes & 0x100000) == 0x100000; // currently undocumented - see https://superuser.com/questions/44812/windows-explorers-file-attribute-column-values/44820
             bool isOffline = (attributes & FileAttributes.Offline) == FileAttributes.Offline;
             return !isUnpinned && !isOffline;
         }
