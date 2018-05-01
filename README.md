@@ -1,10 +1,14 @@
-## Powershell ISE Addon - Project Explorer 1.4.1
+## Powershell ISE Addon - Project Explorer 1.5.0
 
 [PsGallery](https://www.powershellgallery.com/packages/PsISEProjectExplorer) or [direct download](https://github.com/mgr32/PsISEProjectExplorer/releases/latest)
 
 [What's new](https://github.com/mgr32/PsISEProjectExplorer/wiki)
 
 [![Build status](https://ci.appveyor.com/api/projects/status/u2erfvsojuedn1sl/branch/master?svg=true)](https://ci.appveyor.com/project/mgr32/psiseprojectexplorer/branch/master)
+
+#### Project status
+
+Project is in maintenance mode - it was created to support work on large Powershell projects, but now it has been mostly superseded by <a href="https://code.visualstudio.com/">Visual Studio Code</a>. Therefore, please don't expect any new major features, but still if there's a bug you need fixed or an improvement you need implemented please let me know by adding a new <a href="https://github.com/mgr32/PsISEProjectExplorer/issues">issue</a>.
 
 #### Description
 
@@ -21,10 +25,7 @@ Provides a tree view that enables to index and explore whole directory structure
 * Automatic reindex on file system change.
 * Ask user to reload files on file system change (editor functionality missing in ISE).
 
-
 Requires Powershell 3.0 or above.
-
-If you find it useful, see any bugs or have any suggestions for improvements feel free to add an <a href="https://github.com/mgr32/PsISEProjectExplorer/issues">issue</a>.
 
 #### Screenshots
 ![ScreenShot](./PsISEProjectExplorer_screen.png?raw=true)
