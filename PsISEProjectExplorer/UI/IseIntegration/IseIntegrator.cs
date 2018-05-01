@@ -89,42 +89,60 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         public void SetCursor(int line, int column)
         {
-            if (this.hostObject.CurrentPowerShellTab.Files.SelectedFile != null)
+            if (this.hostObject.CurrentPowerShellTab.Files.SelectedFile == null)
             {
-                Logger.Debug("ISEIntegrator - setting cursor to line " + line + ", column " + column);
-                var editor = this.hostObject.CurrentPowerShellTab.Files.SelectedFile.Editor;
-                if (editor.LineCount > line)
-                {
-                    try
-                    {
-                        editor.SetCaretPosition(line, column);
-                    }
-                    catch (Exception e) 
-                    {
-                        Logger.Error(e, "Failed to set cursor");
-                    }
-                }
+                return;
             }
+            Logger.Debug("ISEIntegrator - setting cursor to line " + line + ", column " + column);
+            var editor = this.hostObject.CurrentPowerShellTab.Files.SelectedFile.Editor;
+            if (editor.LineCount <= line)
+            {
+                return;
+            }
+            try
+            {
+                editor.SetCaretPosition(line, column);
+            }
+            catch (Exception e) 
+            {
+                Logger.Error(e, "Failed to set cursor");
+            }            
         }
 
         public void SelectText(int line, int column, int length)
         {
-            if (this.hostObject.CurrentPowerShellTab.Files.SelectedFile != null)
+            if (this.hostObject.CurrentPowerShellTab.Files.SelectedFile == null)
             {
-                Logger.Debug("IseIntegrator - selecting text at line " + line + ", column " + column + ", length " + length);
-                var editor = this.hostObject.CurrentPowerShellTab.Files.SelectedFile.Editor;
-                if (editor.LineCount > line)
-                {
-                    try
-                    {
-                        editor.Select(line, column, line, column + length);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, "Failed to select text");
-                    }
-                }
+                return;
             }
+            Logger.Debug("IseIntegrator - selecting text at line " + line + ", column " + column + ", length " + length);
+            var editor = this.hostObject.CurrentPowerShellTab.Files.SelectedFile.Editor;
+            if (editor.LineCount <= line)
+            {
+                return;
+            }
+            try
+            {
+                editor.Select(line, column, line, column + length);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Failed to select text");
+            }
+        }
+
+        public void WriteTextWithNewLine(String text)
+        {
+            if (this.hostObject.CurrentPowerShellTab.Files.SelectedFile == null)
+            {
+                return;
+            }
+            var editor = this.hostObject.CurrentPowerShellTab.Files.SelectedFile.Editor;
+            if (editor.CaretColumn > 1)
+            {
+                editor.SetCaretPosition(editor.CaretLine, 1);
+            }
+            editor.InsertText(text + Environment.NewLine);
         }
 
         public EditorInfo GetCurrentLineWithColumnIndex()
@@ -209,15 +227,14 @@ namespace PsISEProjectExplorer.UI.IseIntegration
 
         private void OnIseTabChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "LastEditorWithFocus")
+            if (e.PropertyName != "LastEditorWithFocus" || this.SelectedFilePath == this.currentSelectedFile)
             {
-                if (this.SelectedFilePath != this.currentSelectedFile) {
-                    this.currentSelectedFile = this.SelectedFilePath;
-                    if (this.FileTabChanged != null)
-                    {
-                        this.FileTabChanged(this, new IseEventArgs()); 
-                    }
-                }
+                return;
+            }
+            this.currentSelectedFile = this.SelectedFilePath;
+            if (this.FileTabChanged != null)
+            {
+                this.FileTabChanged(this, new IseEventArgs()); 
             }
         }
 

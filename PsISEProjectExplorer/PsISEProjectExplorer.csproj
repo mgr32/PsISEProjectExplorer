@@ -84,6 +84,7 @@
     <Compile Include="Commands\ChangeWorkspaceCommand.cs" />
     <Compile Include="Commands\ClearSearchTextCommand.cs" />
     <Compile Include="Commands\ClearTreeViewCommand.cs" />
+    <Compile Include="Commands\DotSourceCommand.cs" />
     <Compile Include="Commands\ReindexSearchTreeCommand.cs" />
     <Compile Include="Commands\ResetWorkspaceDirectoryCommand.cs" />
     <Compile Include="Commands\RunSearchCommand.cs" />
@@ -260,6 +261,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Resources\textfield_dotsource.png" />
     <Resource Include="Resources\node_region.png" />
     <Resource Include="Resources\toolbar_index_all.png" />
     <Resource Include="Resources\toolbar_index_local.png" />

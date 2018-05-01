@@ -218,6 +218,11 @@
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator />
+                    <MenuItem Header="Dot Source" Click="SearchResults_DotSource" InputGestureText=".">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/textfield_dotsource.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <MenuItem Header="Include" Click="SearchResults_ExcludeOrInclude" InputGestureText="F8">
                         <MenuItem.Icon>
                             <Image Source="Resources/textfield_include.png" />
@@ -236,6 +241,13 @@
                     <MenuItem Header="Delete" Click="SearchResults_Delete" InputGestureText="Del">
                         <MenuItem.Icon>
                             <Image Source="Resources/cross.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+                <ContextMenu x:Key="PowershellItemContext">
+                    <MenuItem Header="Dot Source" Click="SearchResults_DotSource" InputGestureText=".">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/textfield_dotsource.png" />
                         </MenuItem.Icon>
                     </MenuItem>
                 </ContextMenu>

@@ -213,6 +213,10 @@ namespace PsISEProjectExplorer
                     this.commandExecutor.Execute<OpenItemCommand>();
                     e.Handled = true;
                     return;
+                case Key.OemPeriod:
+                    this.commandExecutor.Execute<DotSourceCommand>();
+                    e.Handled = true;
+                    return;
             }
         }
 
@@ -240,6 +244,11 @@ namespace PsISEProjectExplorer
         private void SearchResults_OpenInExplorer(object sender, RoutedEventArgs e)
         {
             this.commandExecutor.Execute<OpenInExplorerCommand>();
+        }
+
+        private void SearchResults_DotSource(object sender, RoutedEventArgs e)
+        {
+            this.commandExecutor.Execute<DotSourceCommand>();
         }
 
         private void SearchResults_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
