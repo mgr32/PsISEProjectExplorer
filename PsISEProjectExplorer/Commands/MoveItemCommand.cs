@@ -41,7 +41,8 @@ namespace PsISEProjectExplorer.Commands
         {
             var movedItem = param.Item1;
             var destinationItem = param.Item2;
-            if (movedItem == destinationItem || movedItem == null)
+            if (movedItem == destinationItem || movedItem == null || destinationItem == null || (movedItem.NodeType != NodeType.Directory && movedItem.NodeType != NodeType.File) 
+                || (destinationItem.NodeType != NodeType.Directory && destinationItem.NodeType != NodeType.File))
             {
                 return;
             }

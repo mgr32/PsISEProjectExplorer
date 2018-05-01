@@ -3,6 +3,7 @@
     public enum PowershellItemType
     {
         Root,
+        Region,
         Function,
         Configuration,
         Class,

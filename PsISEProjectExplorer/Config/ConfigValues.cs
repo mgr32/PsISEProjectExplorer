@@ -60,6 +60,18 @@ namespace PsISEProjectExplorer.Config
             }
         }
 
+         public bool SortFunctions
+        {
+            get
+            {
+                return configHandler.ReadConfigBoolValue("SortFunctions", false);
+            }
+            set
+            {
+                configHandler.SaveConfigValue("SortFunctions", value.ToString());
+            }
+        }
+
         public bool SyncWithActiveDocument
         {
             get

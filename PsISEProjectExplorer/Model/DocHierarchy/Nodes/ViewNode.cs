@@ -63,7 +63,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
             }
             this.Node = viewedNode;
             this.Parent = parent;
-            this.Children = new SortedSet<INode>(DefaultNodeComparer.NodeComparer);
+            this.Children = new SortedSet<INode>(NodeComparerProvider.NodeComparer);
             if (this.Parent != null)
             {
                 this.Parent.Children.Add(this);

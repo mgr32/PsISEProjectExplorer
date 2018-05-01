@@ -38,5 +38,18 @@ namespace PsISEProjectExplorer.Model
                 this.Parent.Children.Add(this);
             }
         }
+
+        public void Reparent(PowershellItem newParent)
+        {
+            if (Parent != null)
+            {
+                this.Parent.Children.Remove(this);
+            }
+            this.Parent = newParent;
+            if (newParent != null)
+            {
+                newParent.Children.Add(this);
+            }
+        }
     }
 }

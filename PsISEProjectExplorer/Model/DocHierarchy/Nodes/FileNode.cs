@@ -8,7 +8,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         public override NodeType NodeType { get { return NodeType.File; } }
 
         public FileNode(string path, string name, INode parent, bool isExcluded, string errorMessage)
-            : base(path, name, parent, isExcluded, errorMessage == null, errorMessage)
+            : base(path, name, parent, null, isExcluded, errorMessage == null, errorMessage)
         {
         }
 

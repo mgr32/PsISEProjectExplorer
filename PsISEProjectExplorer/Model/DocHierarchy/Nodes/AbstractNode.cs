@@ -14,24 +14,26 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         public virtual string Metadata { get; protected set; }
         public INode Parent { get; private set; }
         public ISet<INode> Children { get; private set; }
+        public PowershellItem PowershellItem { get; private set; }
 
-        protected AbstractNode(string path, string name, INode parent)
-            : this(path, name, parent, false, true, null)
+        protected AbstractNode(string path, string name, INode parent, PowershellItem powershellItem)
+            : this(path, name, parent, powershellItem, false, true, null)
         {
         }
 
-        protected AbstractNode(string path, string name, INode parent, bool isExcluded, bool isValid, string metadata)
+        protected AbstractNode(string path, string name, INode parent, PowershellItem powershellItem, bool isExcluded, bool isValid, string metadata)
         {
             if (path == null) {
                 throw new ArgumentNullException("path");
             }
             this.Path = path;
             this.Name = name;
+            this.PowershellItem = powershellItem;
             this.IsExcluded = isExcluded;
             this.IsValid = isValid;
             this.Metadata = metadata;
             this.Parent = parent;
-            this.Children = new SortedSet<INode>(DefaultNodeComparer.NodeComparer);
+            this.Children = new SortedSet<INode>(NodeComparerProvider.NodeComparer);
             if (this.Parent != null)
             {
                 if (!this.Parent.Children.Add(this))

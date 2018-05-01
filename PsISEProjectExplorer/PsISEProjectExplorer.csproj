@@ -120,8 +120,11 @@
     <Compile Include="Contrib\Regex\RegexTermEnum.cs" />
     <Compile Include="Model\ChangePoolEntry.cs" />
     <Compile Include="Enums\PowershellItemType.cs" />
+    <Compile Include="Model\DocHierarchy\Nodes\NodeComparerAsIs.cs" />
+    <Compile Include="Model\DocHierarchy\Nodes\NodeComparerProvider.cs" />
     <Compile Include="Model\IndexingMode.cs" />
     <Compile Include="Model\PowershellParseResult.cs" />
+    <Compile Include="Model\PowershellRegion.cs" />
     <Compile Include="Services\FilesPatternProvider.cs" />
     <Compile Include="Model\FileSystemChangedInfo.cs" />
     <Compile Include="Model\LineInfo.cs" />
@@ -144,7 +147,7 @@
     <Compile Include="FullText\CustomQueryParser.cs" />
     <Compile Include="FullText\CustomTokenizer.cs" />
     <Compile Include="FullText\DocumentFactory.cs" />
-    <Compile Include="Model\DocHierarchy\Nodes\DefaultNodeComparer.cs" />
+    <Compile Include="Model\DocHierarchy\Nodes\NodeComparerAlphabetical.cs" />
     <Compile Include="Model\DocHierarchy\Nodes\INode.cs" />
     <Compile Include="Model\DocHierarchy\Nodes\PowershellItemNode.cs" />
     <Compile Include="Model\DocHierarchy\Nodes\RootNode.cs" />
@@ -153,6 +156,7 @@
     <Compile Include="Enums\NodeType.cs" />
     <Compile Include="Services\Powershell5Tokenizer.cs" />
     <Compile Include="Services\PowershellLegacyTokenizer.cs" />
+    <Compile Include="Services\PowershellTreeRestructurer.cs" />
     <Compile Include="Services\PowershellTokenizerProvider.cs" />
     <Compile Include="Services\TokenLocator.cs" />
     <Compile Include="UI\GongSolutions.Shell\Interop\BHID.cs" />
@@ -256,6 +260,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Resources\node_region.png" />
     <Resource Include="Resources\toolbar_index_all.png" />
     <Resource Include="Resources\toolbar_index_local.png" />
     <None Include="UI\GongSolutions.Shell\Licence.md" />
@@ -271,6 +276,7 @@
     <Resource Include="Resources\toolbar_sync.png" />
     <Resource Include="Resources\toolbar_toggle-expand.png" />
     <Resource Include="Resources\toolbar_toggle_collapse.png" />
+    <Resource Include="Resources\toolbar_sort.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

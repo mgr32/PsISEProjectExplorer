@@ -16,6 +16,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
                         case PowershellItemType.ClassProperty: return NodeType.ClassProperty;
                         case PowershellItemType.ClassConstructor: return NodeType.ClassConstructor;
                         case PowershellItemType.DslElement: return NodeType.DslElement;
+                        case PowershellItemType.Region: return NodeType.Region;   
                     }
                 }
                 return NodeType.Function;
@@ -24,13 +25,10 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
 
         public string FilePath { get; private set; }
 
-        public PowershellItem PowershellItem { get; private set; }
-
         public PowershellItemNode(string filePath, PowershellItem item, INode parent)
-            : base(GetNodePath(filePath, item, parent), item.Name, parent)
+            : base(GetNodePath(filePath, item, parent), item.Name, parent, item)
         {
             this.FilePath = filePath;
-            this.PowershellItem = item;
         }
 
         private static string GetNodePath(string filePath, PowershellItem item, INode parent)

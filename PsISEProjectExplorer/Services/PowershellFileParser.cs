@@ -10,10 +10,13 @@ namespace PsISEProjectExplorer.Services
 
         private readonly FileReader fileReader;
 
-        public PowershellFileParser(PowershellTokenizerProvider powershellTokenizerProvider, FileReader fileReader)
+        private readonly PowershellTreeRestructurer powershellTreeRestructurer;
+
+        public PowershellFileParser(PowershellTokenizerProvider powershellTokenizerProvider, FileReader fileReader, PowershellTreeRestructurer powershellTreeRestructurer)
         {
             this.powershellTokenizer = powershellTokenizerProvider.PowershellTokenizer;
             this.fileReader = fileReader;
+            this.powershellTreeRestructurer = powershellTreeRestructurer;
         }
 
         public PowershellParseResult ParseFile(string path, bool isDirectory, bool isExcluded, string errorMessage)
@@ -34,6 +37,7 @@ namespace PsISEProjectExplorer.Services
             if (fileContents != null)
             {
                var rootPowershellItem = this.powershellTokenizer.GetPowershellItems(path, fileContents);
+               rootPowershellItem = this.powershellTreeRestructurer.AddRegions(rootPowershellItem, fileContents);
                return new PowershellParseResult(rootPowershellItem, errorMessage, path, fileContents, isDirectory, isExcluded);
             }
             return new PowershellParseResult(null, errorMessage, path, fileContents, isDirectory, isExcluded);

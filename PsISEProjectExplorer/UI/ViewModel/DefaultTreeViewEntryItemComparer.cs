@@ -21,7 +21,7 @@ namespace PsISEProjectExplorer.UI.ViewModel
             {
                 return 1;
             }
-            return DefaultNodeComparer.NodeComparer.Compare(x.Node, y.Node);
+            return NodeComparerProvider.NodeComparer.Compare(x.Node, y.Node);
         }
     }
 }

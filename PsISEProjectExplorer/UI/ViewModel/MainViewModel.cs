@@ -3,6 +3,7 @@ using PsISEProjectExplorer.Commands;
 using PsISEProjectExplorer.Config;
 using PsISEProjectExplorer.Enums;
 using PsISEProjectExplorer.Model;
+using PsISEProjectExplorer.Model.DocHierarchy.Nodes;
 using PsISEProjectExplorer.Services;
 using System;
 using System.Collections.Generic;
@@ -86,6 +87,22 @@ namespace PsISEProjectExplorer.UI.ViewModel
             }
         }
 
+        private bool sortFunctions;
+
+        public bool SortFunctions
+        {
+            get { return this.sortFunctions; }
+            set
+            {
+                this.sortFunctions = value;
+                NodeComparerProvider.SortFunctions = value;
+                this.powershellTreeRestructurer.ShowRegions = !value;
+                this.OnPropertyChanged();
+                this.configValues.SortFunctions = value;
+                this.commandExecutor.ExecuteWithParam<ReindexSearchTreeCommand, IEnumerable<string>>(null);
+            }
+        }
+
         private bool syncWithActiveDocument;
 
         public bool SyncWithActiveDocument
@@ -140,14 +157,17 @@ namespace PsISEProjectExplorer.UI.ViewModel
 
         private readonly ConfigValues configValues;
 
+        private readonly PowershellTreeRestructurer powershellTreeRestructurer;
+
         public MainViewModel(ConfigValues configValues, WorkspaceDirectoryModel workspaceDirectoryModel,
-            TreeViewModel treeViewModel, FilesPatternProvider filesPatternProvider, CommandExecutor commandExecutor)
+            TreeViewModel treeViewModel, FilesPatternProvider filesPatternProvider, CommandExecutor commandExecutor, PowershellTreeRestructurer powershellTreeRestructurer)
         {
             this.configValues = configValues;
             this.WorkspaceDirectoryModel = workspaceDirectoryModel;
             this.TreeViewModel = treeViewModel;
             this.filesPatternProvider = filesPatternProvider;
             this.commandExecutor = commandExecutor;
+            this.powershellTreeRestructurer = powershellTreeRestructurer;
             this.TreeViewModel.PropertyChanged += (s, e) => { if (e.PropertyName == "NumberOfFiles") this.OnPropertyChanged("TreeItemsResultString"); };
 
             this.searchRegex = configValues.SearchRegex;
@@ -156,6 +176,8 @@ namespace PsISEProjectExplorer.UI.ViewModel
             this.filesPatternProvider.IncludeAllFiles = this.showAllFiles;
             this.filesPatternProvider.ExcludePaths = configValues.ExcludePaths;
             this.filesPatternProvider.IndexFilesMode = configValues.IndexFilesMode;
+            this.powershellTreeRestructurer.ShowRegions = !configValues.SortFunctions;
+            NodeComparerProvider.SortFunctions = configValues.SortFunctions;
 
             this.syncWithActiveDocument = configValues.SyncWithActiveDocument;
             var searchField = (indexFilesMode != IndexingMode.NO_FILES ? FullTextFieldType.CatchAll : FullTextFieldType.Name);

@@ -7,7 +7,7 @@ namespace PsISEProjectExplorer.Model.DocHierarchy.Nodes
         public override NodeType NodeType { get { return NodeType.Intermediate; } }
 
         public RootNode(string path)
-            : base(path, string.Empty, null)
+            : base(path, string.Empty, null, null)
         {
         }
     }

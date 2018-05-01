@@ -108,6 +108,21 @@
                         </Style>
                     </ToggleButton.Style>
                 </ToggleButton>
+                <ToggleButton IsChecked="{Binding Path=SortFunctions}">
+                  <Image Source="Resources\toolbar_sort.png" />
+                  <ToggleButton.Style>
+                    <Style TargetType="{x:Type ToggleButton}">
+                      <Style.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                          <Setter Property="ToolTip" Value="Sorting functions by name"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="False">
+                          <Setter Property="ToolTip" Value="Sorting functions by line number"/>
+                        </Trigger>
+                      </Style.Triggers>
+                    </Style>
+                  </ToggleButton.Style>
+                </ToggleButton>
                 <ToggleButton IsChecked="{Binding Path=SyncWithActiveDocument}">
                     <Image Source="Resources\toolbar_sync.png" />
                     <ToggleButton.Style>
