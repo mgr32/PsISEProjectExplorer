@@ -54,10 +54,14 @@ namespace PsISEProjectExplorer.Services
             return !ExcludeRegex.IsMatch(dirName) && !IsHiddenSystem(dirName);
         }
 
+        public bool IsExcludedByUser(string path)
+        {
+            return ExcludePaths.Any(e => path.StartsWith(e));
+        }
+
         public bool IsExcludedFromIndexing(string path)
         {
-            bool excludedExplicitly = ExcludePaths.Any(e => path.StartsWith(e));
-            if (excludedExplicitly)
+            if (IsExcludedByUser(path))
             {
                 return true;
             }

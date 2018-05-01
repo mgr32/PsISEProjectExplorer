@@ -72,7 +72,7 @@ namespace PsISEProjectExplorer.Services
         // runs on a separate thread (from system)
         private void OnFileChanged(object source, FileSystemEventArgs e)
         {
-            if (this.filesPatternProvider.IsExcludedFromIndexing(e.FullPath))
+            if (this.filesPatternProvider.IsExcludedByUser(e.FullPath))
             {
                 return;
             }
@@ -86,7 +86,12 @@ namespace PsISEProjectExplorer.Services
                 return;
             }
             // if !isDir, it can be either a file, or a deleted directory
-            if (!isDir && e.ChangeType != WatcherChangeTypes.Deleted && !this.filesPatternProvider.DoesFileMatch(e.FullPath))
+            if (!isDir && e.ChangeType == WatcherChangeTypes.Deleted && this.filesPatternProvider.DoesDirectoryMatch(e.FullPath))
+            {
+                this.fileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.FullPath, RootPath));
+                return;
+            }
+            if (!isDir && !this.filesPatternProvider.DoesFileMatch(e.FullPath))
             {
                 return;
             }
@@ -99,11 +104,11 @@ namespace PsISEProjectExplorer.Services
         {
             Logger.Debug("File renamed: " + e.OldFullPath + " to " + e.FullPath);
             bool isDir = Directory.Exists(e.FullPath) || Directory.Exists(e.OldFullPath);
-            if (!this.filesPatternProvider.IsExcludedFromIndexing(e.OldFullPath) && (isDir || this.filesPatternProvider.DoesFileMatch(e.OldFullPath)))
+            if (!this.filesPatternProvider.IsExcludedByUser(e.OldFullPath) && (isDir || this.filesPatternProvider.DoesFileMatch(e.OldFullPath)))
             {
                 this.fileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.OldFullPath, RootPath));
             }
-            if (!this.filesPatternProvider.IsExcludedFromIndexing(e.FullPath) && (isDir || this.filesPatternProvider.DoesFileMatch(e.FullPath)) &&
+            if (!this.filesPatternProvider.IsExcludedByUser(e.FullPath) && (isDir || this.filesPatternProvider.DoesFileMatch(e.FullPath)) &&
                 e.FullPath.ToLowerInvariant() != e.OldFullPath.ToLowerInvariant())
             {
                 this.fileSystemChangeNotifier.AddChangePoolEntry(new ChangePoolEntry(e.FullPath, RootPath));
