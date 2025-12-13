@@ -8,7 +8,7 @@
 
 #### Project status
 
-Project is in maintenance mode - it was created to support work on large Powershell projects, but now it has been mostly superseded by <a href="https://code.visualstudio.com/">Visual Studio Code</a>. Therefore, please don't expect any new major features, but still if there's a bug you need fixed or an improvement you need implemented please let me know by adding a new <a href="https://github.com/mgr32/PsISEProjectExplorer/issues">issue</a>.
+This project has been archived - it was created to support work on large Powershell projects, but now it has been mostly superseded by <a href="https://code.visualstudio.com/">Visual Studio Code</a>.
 
 #### Description
 
